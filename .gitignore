@@ -7,3 +7,6 @@
 .ropeproject
 
 phoeton/version.py
+
+# jupyter
+.ipynb_checkpoints
