@@ -1,0 +1,23 @@
+Logistic regression
+   - Which package to use? Scikit-learn, statsmodels, pandas?  
+   - Dependencies vs. Performance
+   - Statsmodels gives the smoothest results I think
+
+
+Description of the statistical model
+   - could use `patsy` for R-similar syntax
+      https://patsy.readthedocs.io/
+   - but doesn't really look 'phytonic' on the first glance
+
+Is the LogisticRegression and the initialization part of the Main-Class
+   or is it part of the fitting Function?
+
+   So it's either:
+   myclass = SimpleFhoenClassification(data, y, omega, ddsector, upstream, ...)
+   myclass.fit()
+
+   Or:
+   myclass = SimpleFhoenClassification(data, ddsector, upstream, ...)
+   myclass.fit(y, omega)
+
+   I think I like the second one better
