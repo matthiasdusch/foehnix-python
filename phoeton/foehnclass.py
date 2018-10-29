@@ -9,8 +9,8 @@ import statsmodels.api as sm
 import phoeton.functions as pf
 
 
-class FhoenClassification:
-    """ The main FhoenClassification Class
+class FoehnClassification:
+    """ The main FoehnClassification Class
 
     """
 
@@ -42,7 +42,7 @@ class FhoenClassification:
             self.valid = np.arange(len(self.data))
 
 
-class SimpleFhoenClassification(FhoenClassification):
+class SimpleFoehnClassification(FoehnClassification):
 
     # Fit the logistic model
     def fit(self,
@@ -130,10 +130,10 @@ class SimpleFhoenClassification(FhoenClassification):
 
         # Store the probability time serie
         # not true jet...
-        self.fhoen_probability = Q
+        self.foehn_probability = Q
 
 
-class AdvancedFhoenClassification(FhoenClassification):
+class AdvancedFoehnClassification(FoehnClassification):
 
     # Fit the logistic model
     def fit(self,
@@ -222,4 +222,4 @@ class AdvancedFhoenClassification(FhoenClassification):
 
         # Store the probability time serie
         # not true jet...
-        self.fhoen_probability = Q
+        self.foehn_probability = Q
