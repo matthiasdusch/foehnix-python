@@ -1,5 +1,5 @@
 # PHOETON
-A tool for Fhoen classification written in Python.
+A tool for Foehn classification written in Python.
 
 Scientific background is provided by Georg Mayr, Reto Stauffer and others
 

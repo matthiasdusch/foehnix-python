@@ -29,7 +29,7 @@ CLASSIFIERS = [
         'Programming Language :: Python :: 3.5',
     ]
 
-DESCRIPTION = 'Fhoen classifier for Python'
+DESCRIPTION = 'Foehn classifier for Python'
 LONG_DESCRIPTION = """
 lalalup
 """
@@ -150,7 +150,7 @@ setup(
     license=LICENSE,
     classifiers=CLASSIFIERS,
     # What does your project relate to?
-    keywords=['fhoen', 'meteorology', 'gap flows'],
+    keywords=['foehn', 'meteorology', 'gap flows'],
     # We are a python 3 only shop
     python_requires='>=3.4',
     # Find packages automatically
