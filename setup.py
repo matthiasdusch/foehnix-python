@@ -1,4 +1,4 @@
-"""Setup file for the phoeton.
+"""Setup file for foehnix.
 
    Adapted from the Python Packaging Authority template."""
 
@@ -9,16 +9,16 @@ import sys, warnings, importlib, re
 
 MAJOR = 0
 MINOR = 0
-MICRO = 1
+MICRO = 6
 ISRELEASED = False
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 QUALIFIER = ''
 
-DISTNAME = 'phoeton'
+DISTNAME = 'foehnix'
 LICENSE = 'MIT'
 AUTHOR = 'Matthias Dusch'
 AUTHOR_EMAIL = 'matthias.dusch@uibk.ac.at'
-URL = 'https://github.com/matthiasdusch/phoeton'
+URL = 'https://github.com/matthiasdusch/foehnix-python'
 CLASSIFIERS = [
         # How mature is this project? Common values are
         # 3 - Alpha  4 - Beta  5 - Production/Stable
@@ -29,9 +29,10 @@ CLASSIFIERS = [
         'Programming Language :: Python :: 3.5',
     ]
 
-DESCRIPTION = 'Foehn classifier for Python'
+DESCRIPTION = 'Toolbox for automated probabilistic foehn wind classification'
 LONG_DESCRIPTION = """
-lalalup
+The foehnix package provides a toolbox for automated probabilistic foehn wind
+classification based on two-component mixture models (foehn mixture models).
 """
 
 # code to extract and write the version copied from pandas
@@ -56,7 +57,7 @@ if not ISRELEASED:
 
     if pipe is None or pipe.returncode != 0:
         # no git, or not in git dir
-        if path.exists('phoeton/version.py'):
+        if path.exists('foehnix/version.py'):
             warnings.warn("WARNING: Couldn't get git revision, using existing "
                           "phoeton/version.py")
             write_version = False
@@ -89,7 +90,7 @@ short_version = '%s'
 isreleased = %s
 """
     if not filename:
-        filename = path.join(path.dirname(__file__), 'phoeton', 'version.py')
+        filename = path.join(path.dirname(__file__), 'foehnix', 'version.py')
 
     a = open(filename, 'w')
     try:

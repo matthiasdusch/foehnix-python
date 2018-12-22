@@ -6,7 +6,7 @@
 # Rope
 .ropeproject
 
-phoeton/version.py
+foehnix/version.py
 
 # jupyter
 .ipynb_checkpoints
