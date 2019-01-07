@@ -174,8 +174,6 @@ class Foehnix:
         # create a subset of the needed data
         columns = concomitant + [predictor]
         subset = data.reindex(columns, axis=1).copy()
-        # drop columns full of NaN (this is the case for concomitant==None)
-        subset.dropna(axis=1, how='all', inplace=True)
 
         # create index where predictor or concomitant is NaN
         idx_notnan = subset.dropna().index
@@ -381,14 +379,6 @@ class Foehnix:
         # Initial probabilities and prior  probabilities
         prob = logistic.cdf(logitX.dot(ccmodel['beta']))
         post = control.family.posterior(y, prob, theta)
-
-        """
-        # initial parameters of the Logistical Model
-        # alpha = sm.Logit(zn, sm.add_constant(X)).fit(disp=0).params
-
-        # Keep stuff for later...
-        # self.init_parameter = {'theta': theta, 'alpha': alpha}
-        """
 
         # EM algorithm: estimate probabilities (prob; E-step), update the model
         # given the new probabilities (M-step). Always with respect to the

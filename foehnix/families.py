@@ -55,12 +55,8 @@ class GaussianFamily(Family):
         dnorm2 = scipy.stats.norm(loc=theta['mu2'],
                                   scale=np.exp(theta['logsd2'])).logpdf(y)
 
-        # TODO vorzeichen ueberpruefen hier!
         component = np.sum(post * dnorm2) + np.sum((1-post) * dnorm1)
-        # component = -np.sum(post * dnorm2) - np.sum((1-post) * dnorm1)
 
-        concomitant = np.sum((1-post) * np.log(1-prob) + post * np.log(prob))
-        # concomitant = -np.sum((1-post) * np.log(1-prob) + post * np.log(prob))
         concomitant = np.sum((1-post) * np.log(1-prob) + post * np.log(prob))
 
         # TODO do I need to return both components? if so list is not very sexy

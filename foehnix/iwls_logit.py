@@ -19,16 +19,7 @@ def iwls_logit(X, y, beta=None, penalty=None, standardize=True, maxit=100,
 
     # Initialize regression coefficients if needed
     if beta is None:
-        beta = 0
-        beta = np.zeros(2)# .reshape(2,1)
-        # TODO ist das so? Nur wenn concomitant max 1
-
-    # TODO besser grundsaetzlich verhindern
-    if len(X.shape) == 1:
-        X = X.reshape(1, len(X))
-
-    # TODO besser schon frueher
-    # y = y.reshape(len(y), 1)
+        beta = np.zeros(X.shape[1])
 
     eta = X.dot(beta)
     eta = eta.reshape(len(eta), 1)
