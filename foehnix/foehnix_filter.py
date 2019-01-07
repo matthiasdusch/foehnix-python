@@ -81,15 +81,13 @@ def foehnix_filter(x, filter_method=None):
         filtered[np.all(tmp == 1, axis=1)] = 1
         filtered[np.any(tmp == 0, axis=1)] = 0
 
-        # TODO Retos "tmp <- apply(tmp, 1, all)" ist hier meiner Meinung nach
-        # nicht eindeutig, oder falsch dokumentiert.
-        # 0 und NAN gibt dabei FALSE nicht NA.
+        # TODO Retos "tmp <- apply(tmp, 1, all)" macht entgegen der Doku
+        # aus 0 und NAN -> FALSE und nicht NA. Kann man diskutieren.
         # test in R:
         # x <- cbind(x1 = c(1,0,NaN,1,NaN), x2=c(0,NaN,1,NaN,0))
         # print(x)
         # apply(x, 1, all)
 
-        # TODO irgendwas ist noch komisch hier
 
     # 4. error
     else:
