@@ -120,7 +120,6 @@ req_packages = ['numpy',
                 'scipy',
                 'pandas',
                 'matplotlib',
-                'statsmodels'
                 ]
 check_dependencies(req_packages)
 
