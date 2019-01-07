@@ -1,12 +1,22 @@
 # Foehnix
-A tool for Foehn classification written in Python.
+is a software tool for Foehn classification written in both R and python.
+It is still under development and especially this code here is still missing bigger chunks. We are looking forward to push or first release candidate (version 1.0) in the first half of 2019.
 
-This is still under development.
+# R Version
+The R package is at this stage more mature then this python version and can be found here:
+- https://github.com/retostauffer/Rfoehnix
+
+# Documentation
+There will be a python specific documentation at some point. But at the moment please have a look at: http://retostauffer.github.io/Rfoehnix  
+There you will find general details, examples and the R specific documentation.
 
 Note: `ellboegen_test_case.ipynb` more or less reproduces the example from https://retostauffer.github.io/Rfoehnix/articles/foehnix.html .
 
-Scientific background is provided by Georg Mayr, Reto Stauffer and others
-
-For more information and the coresponding R package see http://retostauffer.github.io/Rfoehnix
-
-Algorithm based on FlexMix https://www.jstatsoft.org/article/view/v028i04
+# Installation
+Currently foehnix-python is only available on github:  
+`git clone https://github.com/matthiasdusch/foehnix-python`  
+`cd foehnix-python`  
+`pip install -e .`
+ 
+# Contributors
+Reto, Matthias, Georg, and Fabien.
