@@ -6,6 +6,9 @@
 Welcome to foehnix-python's documentation!
 ==========================================
 
+Some text
+
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
@@ -18,3 +21,11 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+Get in touch
+------------
+
+- View the source code `on GitHub`_.
+
+.. _on GitHub: https://github.com/matthiasdusch/foehnix-python
+
