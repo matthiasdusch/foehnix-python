@@ -10,3 +10,7 @@ foehnix/version.py
 
 # jupyter
 .ipynb_checkpoints
+
+# docs
+/doctrees
+.buildinfo
