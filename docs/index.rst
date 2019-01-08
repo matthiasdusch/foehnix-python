@@ -18,9 +18,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-.. automodule:: pymap3d
-     :members:
-        
-.. automodule:: pymap3d.vincenty
-     :members:
