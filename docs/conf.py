@@ -16,6 +16,31 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+try:
+    import IPython
+    print("ipython: %s, %s" % (IPython.__version__, IPython.__file__))
+except ImportError:
+    print("no ipython")
+try:
+    import numpy
+    print("numpy: %s, %s" % (numpy.__version__, numpy.__file__))
+except ImportError:
+    print("no numpy")
+try:
+    import pandas
+    print("pandas: %s, %s" % (pandas.__version__, pandas.__file__))
+except ImportError:
+    print("no pandas")
+try:
+    import matplotlib
+    matplotlib.use('Agg')
+    print("matplotlib: %s, %s" % (matplotlib.__version__, matplotlib.__file__))
+except ImportError:
+    print("no matplotlib")
+
+import foehnix  # noqa: E402
+# print("foehnix: %s, %s" % (foehnix.__version__, foehnix.__file__))
+
 
 # -- Project information -----------------------------------------------------
 
@@ -40,13 +65,28 @@ release = '0.0.1'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.extlinks',
+    'sphinx.ext.mathjax',
+    'numpydoc',
+    'sphinx.ext.ifconfig',
+    'sphinx.ext.viewcode',
+    'IPython.sphinxext.ipython_directive',
+    'IPython.sphinxext.ipython_console_highlighting',
     'sphinx.ext.doctest',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
-    'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
 ]
+
+autosummary_generate = True
+
+numpydoc_class_members_toctree = True
+numpydoc_show_class_members = False
+
+ipython_warning_is_error = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -73,7 +113,7 @@ language = None
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = None
+pygments_style = 'sphinx'
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -81,7 +121,8 @@ pygments_style = None
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+# html_theme = 'alabaster'
+html_theme = 'classic'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

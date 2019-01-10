@@ -1,0 +1,182 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>foehnix.iwls_logit &#8212; foehnix-python 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">foehnix-python 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for foehnix.iwls_logit</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="k">import</span> <span class="n">logistic</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="c1"># logger</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="iwls_logit"><a class="viewcode-back" href="../../generated/foehnix.iwls_logit.iwls_logit.html#foehnix.iwls_logit.iwls_logit">[docs]</a><span class="k">def</span> <span class="nf">iwls_logit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">penalty</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">maxit</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+               <span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Iterative weighted least squares solver for a logistic regression model.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO check NaNs</span>
+
+    <span class="c1"># TODO check constant covariants</span>
+
+    <span class="c1"># TODO check standardize</span>
+
+    <span class="c1"># Initialize regression coefficients if needed</span>
+    <span class="k">if</span> <span class="n">beta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">eta</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+    <span class="n">eta</span> <span class="o">=</span> <span class="n">eta</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">eta</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">logistic</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">eta</span><span class="p">)</span>
+
+    <span class="c1"># Lists to trace log-likelihood path and the development of</span>
+    <span class="c1"># the coefficients during EM optimization.</span>
+    <span class="n">llpath</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">coefpath</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># iteration variable</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># likelihood difference between to iteration: break criteria</span>
+    <span class="n">converged</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Set to False if we do not converge before maxit</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+    <span class="k">while</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
+
+        <span class="c1"># new weights</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mu</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">mu</span><span class="p">))</span> <span class="o">+</span> <span class="n">eps</span>
+        <span class="k">if</span> <span class="n">penalty</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">reg</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">reg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span><span class="o">*</span><span class="n">penalty</span><span class="p">)</span>
+            <span class="n">reg</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(((</span><span class="n">X</span><span class="o">*</span><span class="n">w</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">*</span><span class="n">w</span><span class="p">)</span> <span class="o">+</span> <span class="n">reg</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">((</span><span class="n">X</span><span class="o">*</span><span class="n">w</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span>
+            <span class="n">eta</span><span class="o">*</span><span class="n">w</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span><span class="o">-</span><span class="n">mu</span><span class="p">)</span> <span class="o">/</span> <span class="n">w</span><span class="p">)</span>
+
+        <span class="c1"># update latent response eta</span>
+        <span class="n">eta</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+
+        <span class="c1"># update response</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">logistic</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">eta</span><span class="p">)</span>
+
+        <span class="c1"># update log-likelihood sum</span>
+        <span class="n">llpath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">eta</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">eta</span><span class="p">))))</span>
+        <span class="n">coefpath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">penalty</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pentext</span> <span class="o">=</span> <span class="s1">&#39;unregularized&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pentext</span> <span class="o">=</span> <span class="s1">&#39;lambda = </span><span class="si">%10.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">penalty</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Iteration </span><span class="si">%d</span><span class="s1">, ll=</span><span class="si">%15.4f</span><span class="s1">, </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">llpath</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">pentext</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">llpath</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">llpath</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># check if we converged</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">maxit</span><span class="p">:</span>
+            <span class="n">converged</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;IWLS solver for logistic model did not converge.&#39;</span><span class="p">)</span>
+            <span class="k">break</span>
+
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># If converged, remove last likelihood and coefficient entries</span>
+    <span class="k">if</span> <span class="n">converged</span><span class="p">:</span>
+        <span class="n">llpath</span> <span class="o">=</span> <span class="n">llpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">coefpath</span> <span class="o">=</span> <span class="n">coefpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># TODO: standardized</span>
+    <span class="n">beta_vcov</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">coef</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">coefpath</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># TODO add column name</span>
+
+    <span class="c1"># TODO EDF</span>
+    <span class="n">edf</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># unscale coefficients if needed</span>
+    <span class="n">ll</span> <span class="o">=</span> <span class="n">llpath</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">rval</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lambda&#39;</span><span class="p">:</span> <span class="n">penalty</span><span class="p">,</span>
+            <span class="s1">&#39;edf&#39;</span><span class="p">:</span> <span class="n">edf</span><span class="p">,</span>
+            <span class="s1">&#39;loglik&#39;</span><span class="p">:</span> <span class="n">ll</span><span class="p">,</span>
+            <span class="s1">&#39;AIC&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">ll</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">edf</span><span class="p">,</span>
+            <span class="s1">&#39;BIC&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">ll</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span> <span class="o">*</span> <span class="n">edf</span><span class="p">,</span>
+            <span class="s1">&#39;converged&#39;</span><span class="p">:</span> <span class="n">converged</span><span class="p">,</span>
+            <span class="s1">&#39;beta&#39;</span><span class="p">:</span> <span class="n">beta</span><span class="p">,</span>
+            <span class="s1">&#39;beta_vcov&#39;</span><span class="p">:</span> <span class="n">beta_vcov</span><span class="p">,</span>
+            <span class="s1">&#39;coef&#39;</span><span class="p">:</span> <span class="n">coef</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">rval</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">foehnix-python 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthias Dusch.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.3.
+    </div>
+  </body>
+</html>

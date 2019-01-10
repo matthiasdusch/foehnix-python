@@ -125,7 +125,7 @@ class Foehnix:
             will be initialized.
         switch : bool
             | ``False`` (default) if higher values of covariate ``y`` are
-            assumed to be the foehn cluster.
+                assumed to be the foehn cluster.
             | ``True`` if lower values are the foehn cluster.
         filter_method : dict, function or None
             Evaluates a filter on the data. E.g. a filter on the wind direction

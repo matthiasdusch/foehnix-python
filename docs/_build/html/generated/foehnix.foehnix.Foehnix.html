@@ -1,0 +1,186 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>foehnix.foehnix.Foehnix &#8212; foehnix-python 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="foehnix.families.Family" href="foehnix.families.Family.html" />
+    <link rel="prev" title="API Reference" href="../api.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="foehnix.families.Family.html" title="foehnix.families.Family"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../api.html" title="API Reference"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">foehnix-python 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../api.html" accesskey="U">API Reference</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="foehnix-foehnix-foehnix">
+<h1>foehnix.foehnix.Foehnix<a class="headerlink" href="#foehnix-foehnix-foehnix" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="foehnix.foehnix.Foehnix">
+<em class="property">class </em><code class="descclassname">foehnix.foehnix.</code><code class="descname">Foehnix</code><span class="sig-paren">(</span><em>predictor</em>, <em>data</em>, <em>concomitant=None</em>, <em>switch=False</em>, <em>filter_method=None</em>, <em>family='gaussian'</em>, <em>control=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/foehnix.html#Foehnix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.foehnix.Foehnix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Foehn Classification Based on a Two-Component Mixture Model</p>
+<p>This is the main method of the foehnix package to estimate two-component
+mixture models for automated foehn classification.</p>
+<dl class="method">
+<dt id="foehnix.foehnix.Foehnix.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>predictor</em>, <em>data</em>, <em>concomitant=None</em>, <em>switch=False</em>, <em>filter_method=None</em>, <em>family='gaussian'</em>, <em>control=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/foehnix.html#Foehnix.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.foehnix.Foehnix.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize parmeters which all methods need.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>predictor</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Name of the main predictor (covariate) variable which is used to
+identify the foehn/no-foehn cluster. Must be present in <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p>
+</dd>
+<dt><strong>data</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pandas.DataFrame</span></dt>
+<dd><p class="first last">Index must be a time object, rows must contain neccesary data</p>
+</dd>
+<dt><strong>concomitant</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Name of the covariate for the concomitant model. Must be present in
+<code class="docutils literal notranslate"><span class="pre">data</span></code>. If None (default), a mixture model without concomitants
+will be initialized.</p>
+</dd>
+<dt><strong>switch</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">False</span></code> (default) if higher values of covariate <code class="docutils literal notranslate"><span class="pre">y</span></code> are
+assumed to be the foehn cluster.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">True</span></code> if lower values are the foehn cluster.</div>
+</div>
+</dd>
+<dt><strong>filter_method</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict, function or None</span></dt>
+<dd><p class="first last">Evaluates a filter on the data. E.g. a filter on the wind direction
+data to only use data from within a certain wind sector. See
+<code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.foehnix_filter</span></code> for details on the syntax.</p>
+</dd>
+<dt><strong>family</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or foehnix.Family class</span></dt>
+<dd><div class="first last line-block">
+<div class="line">‘gaussian’ (default)</div>
+<div class="line">‘logistic’</div>
+</div>
+</dd>
+<dt><strong>control</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.Control</span></code></span></dt>
+<dd><p class="first last">If None (default) it will be initialized.</p>
+</dd>
+<dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">kwargs to pass to the control function</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#foehnix.foehnix.Foehnix.__init__" title="foehnix.foehnix.Foehnix.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(predictor,&nbsp;data[,&nbsp;concomitant,&nbsp;…])</td>
+<td>Initialize parmeters which all methods need.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">no_concomitant_fit</span></code>(y,&nbsp;control)</td>
+<td>Fitting foehnix Mixture Model Without Concomitant Model.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary</span></code>()</td>
+<td>print summary</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">unreg_fit</span></code>(y,&nbsp;logitX,&nbsp;control)</td>
+<td>Fitting foehnix Mixture Model Without Concomitant Model.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../api.html"
+                        title="previous chapter">API Reference</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="foehnix.families.Family.html"
+                        title="next chapter">foehnix.families.Family</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/generated/foehnix.foehnix.Foehnix.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="foehnix.families.Family.html" title="foehnix.families.Family"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../api.html" title="API Reference"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">foehnix-python 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Matthias Dusch.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.3.
+    </div>
+  </body>
+</html>

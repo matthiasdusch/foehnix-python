@@ -14,3 +14,4 @@ foehnix/version.py
 # docs
 /doctrees
 .buildinfo
+docs/generated

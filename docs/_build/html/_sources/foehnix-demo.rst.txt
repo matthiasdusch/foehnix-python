@@ -1,0 +1,28 @@
+.. currentmodule:: foehnix-python
+
+.. _foehnix-demo:
+
+Getting started
+===============
+
+.. ipython:: python
+   :suppress:
+
+    import numpy as np
+    np.set_printoptions(threshold=10)
+
+Foehnix and Pandas
+
+.. ipython:: python
+
+   import foehnix
+   import pandas as pd
+
+Load Ellboegen and Sattelberg
+
+.. ipython:: python
+
+   ellboegen = pd.read_csv('../data/ellboegen.csv', delimiter=';', skipinitialspace=True)
+   sattelberg = pd.read_csv('../data/sattelberg.csv', delimiter=';', skipinitialspace=True)
+
+

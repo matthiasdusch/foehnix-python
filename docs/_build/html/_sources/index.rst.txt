@@ -3,20 +3,53 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to foehnix-python's documentation!
-==========================================
+Toolbox for Automated Foehn Classification based on Mixture Models
+==================================================================
 
-Some text
+The python implementation of foehnix
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
+
+
+Getting started
+---------------
+
+Some introduction and stuff
+
+* :doc:`foehnix-demo`
+* :doc:`simulation`
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+   :caption: Started
+
+   foehnix-demo.rst
+   simulation.rst
+
+
+
+Python implementation
+---------------------
+
+Python specific documentation
+
+* :doc:`api`
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+   :caption: Python Implementation
+
+   api.rst
 
 
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
