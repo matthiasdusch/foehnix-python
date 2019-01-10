@@ -8,7 +8,10 @@ The R package is at this stage more mature then this python version and can be f
 
 # Documentation
 There will be a python specific documentation at some point. But at the moment please have a look at: http://retostauffer.github.io/Rfoehnix  
-There you will find general details, examples and the R specific documentation.
+There you will find general details, examples and the R specific documentation.  
+
+A very beta documentation can be found here
+https://matthiasdusch.github.io/foehnix-python/index.html
 
 Note: `ellboegen_test_case.ipynb` more or less reproduces the example from https://retostauffer.github.io/Rfoehnix/articles/foehnix.html .
 
