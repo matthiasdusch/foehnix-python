@@ -61,7 +61,7 @@ def foehnix_filter(x, filter_method=None):
 
             elif len(value) == 2:
                 if key not in x.columns:
-                    raise RuntimeError('Key: %s of filterdict not found in data'
+                    raise RuntimeError('Filterdict key: %s not found in data'
                                        % key)
 
                 tmp[x[key].isna(), nr] = np.nan
@@ -77,17 +77,12 @@ def foehnix_filter(x, filter_method=None):
 
                 log.info('Applied limit-filter to key %s' % key)
 
-        filtered = np.ones(len(x)) * np.nan
+        # - If at least one element is NAN     -> set to NAN
+        # - If all elements are TRUE (=1)      -> set to 1
+        # - Else: One ore more are FALSE (=0)  -> set to 0
+        filtered = np.zeros(len(x))
+        filtered[np.any(np.isnan(tmp), axis=1)] = np.nan
         filtered[np.all(tmp == 1, axis=1)] = 1
-        filtered[np.any(tmp == 0, axis=1)] = 0
-
-        # TODO Retos "tmp <- apply(tmp, 1, all)" macht entgegen der Doku
-        # aus 0 und NAN -> FALSE und nicht NA. Kann man diskutieren.
-        # test in R:
-        # x <- cbind(x1 = c(1,0,NaN,1,NaN), x2=c(0,NaN,1,NaN,0))
-        # print(x)
-        # apply(x, 1, all)
-
 
     # 4. error
     else:

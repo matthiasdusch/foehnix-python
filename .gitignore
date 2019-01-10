@@ -3,6 +3,9 @@
 *.egg-info
 
 
+# PyCharm stuffs
+.idea/
+
 # Rope
 .ropeproject
 
