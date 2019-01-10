@@ -24,5 +24,6 @@ Load Ellboegen and Sattelberg
 
    ellboegen = pd.read_csv('../data/ellboegen.csv', delimiter=';', skipinitialspace=True)
    sattelberg = pd.read_csv('../data/sattelberg.csv', delimiter=';', skipinitialspace=True)
+   ellboegen.head()
 
 
