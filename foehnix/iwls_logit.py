@@ -62,7 +62,7 @@ def iwls_logit(X, y, beta=None, penalty=None, standardize=True, maxit=100,
         else:
             pentext = 'lambda = %10.4f' % penalty
 
-        log.info('Iteration %d, ll=%15.4f, %s' % (i, llpath[-1], pentext))
+        log.debug('Iteration %d, ll=%15.4f, %s' % (i, llpath[-1], pentext))
 
         if i > 0:
             delta = llpath[i] - llpath[i-1]

@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import logging
 from scipy.stats import logistic
+import time
 
 from foehnix.families import *
 from foehnix.foehnix_filter import foehnix_filter
@@ -19,13 +20,13 @@ class Control:
     """
     def __init__(self, family, switch, left=float('-Inf'), right=float('Inf'),
                  truncated=False, standardize=True, maxit=100, tol=1e-8,
-                 alpha=None, verbose=True):
+                 force_inflate=False, alpha=None, verbose=True):
         """
         Initialization of the Control object
 
         Parameters
         ----------
-        family : str or py:class:`foehnix.Family`
+        family : str or :py:class:`foehnix.Family`
             specifying the distribution of the components in the mixture model.
 
             - 'gaussian'
@@ -34,16 +35,16 @@ class Control:
         switch : bool
             whether or not the two components should be switched.
 
-            - `False` (default): the component which shows higher values within
-              the predictor is assumed to be the foehn cluster.
-            - `True`: lower values are assumed to be the foehn cluster.
+            - ``False`` (default): the component which shows higher values
+              within the predictor is assumed to be the foehn cluster.
+            - ``True``: lower values are assumed to be the foehn cluster.
         left : float
             left censoring or truncation point. Default `-Inf`
         right : float
             right censoring or truncation point. Default `Inf`
         truncated : bool
-            If `True` truncation is used instead of censoring. This only
-            affects the model if `left` and/or `right` are specified.
+            If ``True`` truncation is used instead of censoring. This only
+            affects the model if ``left`` and/or ``right`` are specified.
         standardize : bool
             Defines whether or not the model matrix for the concomitant model
             should be standardized for model estimation. Recommended.
@@ -56,6 +57,13 @@ class Control:
             reached. Default is 1e-8. If a vector of length 2 is provided the
             first value is used for the EM algorithm, the second for the IWLS
             backfitting.
+        force_inflate : bool
+            :py:class:`foehnix.Foehnix` will create a strictly regular time
+            series by inflating the data to the smallest time intervall in the
+            data set. If the inflation rate is larger than 2 the model will
+            stop except the user forces inflation by specifying
+            ``force_inflate = True``. This can cause a serious runtime
+            increase. Default is False.
         alpha : TODO parameter for the penalization of the concomitatnt model
         verbose : bool or str
             Sets the verbose level of the model logging
@@ -121,6 +129,7 @@ class Control:
         self.right = right
         self.truncated = truncated
         self.standardize = standardize
+        self.force_inflate = force_inflate
         self.alpha = alpha
 
 
@@ -143,10 +152,10 @@ class Foehnix:
             identify the foehn/no-foehn cluster. Must be present in ``data``.
         data : :py:class:`pandas.DataFrame`
             Index must be a time object, rows must contain neccesary data
-        concomitant : str
-            Name of the covariate for the concomitant model. Must be present in
-            ``data``. If None (default), a mixture model without concomitants
-            will be initialized.
+        concomitant : str or list of str
+            Name(s) of the covariates for the concomitant model. Must be
+            present in ``data``. If None (default), a mixture model without
+            concomitants will be initialized.
         switch : bool
             - ``False`` (default) if higher values of covariate ``y`` are
               assumed to be the foehn cluster.
@@ -158,42 +167,69 @@ class Foehnix:
         family : str or foehnix.Family class
             - 'gaussian' (default)
             - 'logistic'
-        control : :py:class:`foehnix.Control`
+        control : :py:class:`foehnix.foehnix.Control`
             If None (default) it will be initialized.
         kwargs : kwargs to pass to the control function
         """
 
-        # TODO multiple concomitants? Dann list(str) etc...
+        # Log execution time of foehnix
+        start_time = time.time()
+
+        # Initialize Control
+        if not isinstance(control, Control):
+            control = Control(family, switch, **kwargs)
+            log.debug('Foehnix Control object initialized.')
+
+        # Handle multiple concomitants as list of strings:
         if isinstance(concomitant, str):
             concomitant = [concomitant]
         elif concomitant is None:
             concomitant = []
 
-        # Log execution time of foehnix
-        # TODO
-
         # Check if predictor and concomitant have sensible values
         if predictor not in data:
-            raise RuntimeError('Predictor variable not found in data')
+            raise ValueError('Predictor variable not found in data')
+        for con in concomitant:
+            if con not in data:
+                raise ValueError('Concomitant "%s" not found in data' % con)
 
-        # TODO think
-        #if concomitant is not None and concomitant not in data:
-        #    raise RuntimeError('Concomitant variable not found in data')
-
-        # Initialize Control
-        if not isinstance(control, Control):
-            control = Control(family, switch, **kwargs)
-
-        # Create a strictly regular time series with pandas Datetime
+        # Convert index to datetime
         data.index = pd.to_datetime(data.index)
         # check if regular
         if not data.index.is_monotonic_increasing:
             raise RuntimeError('DataFrame index is not monotonic increasing!')
-        # force to a strict increasing dataframe with minimal spacing
-        mindiff = data.index.to_series().diff().min()
-        data = data.asfreq(mindiff)
 
-        # TODO a lot of checks
+        # calculate minimal difference to make data strictly increasing
+        mindiff = data.index.to_series().diff().min()
+        inflated = data.asfreq(mindiff).index.size
+        lendata = len(data)
+
+        if (inflated/lendata > 2) and (control.force_inflate is False):
+            log.critical('You have provided a time series object spanning the '
+                         'time period %s to %s \n'
+                         'The smallest recorded time interval is %d hours. '
+                         'foehnix tries to inflate the time series to create '
+                         'a strictly regular time series object which, in '
+                         'this case, would yield a data set of dimension '
+                         '%d x %d (%d values) which is %.2f times the '
+                         'original data set. To avoid running into memory '
+                         'issues foehnix stops here! We ask you to check your '
+                         'data set.\n'
+                         'This condition can be overruled by setting the '
+                         'input argument ``force_inflate = True`` if needed. '
+                         'For more details please read the foehnix.control '
+                         'manual page.' % (data.index[0], data.index[-1],
+                                           mindiff.seconds/3600,
+                                           inflated, data.shape[1],
+                                           inflated*data.shape[1],
+                                           inflated/lendata))
+            raise RuntimeError('DataFrame gets inflated, see log for details!')
+
+        # Keep the number of observations (rows) added due to inflation.
+        N_inflated = inflated - lendata
+        # if inflation is ok or forced, create strictly increasing dataframe
+        # with minimal spacing
+        data = data.asfreq(mindiff)
 
         # create a subset of the needed data
         columns = concomitant + [predictor]
@@ -208,9 +244,17 @@ class Foehnix:
         # Take all elements which are not NaN and which are within
         # filter_obj['good']
         idx_take = idx_notnan[idx_notnan.isin(filter_obj['good'])]
-
         if len(idx_take) == 0:
             raise RuntimeError('No data left after applying required filters.')
+
+        # TODO check with Reto: constant value and truncated check should be
+        # TODO   after filtering in my opinion. Else the filtered data might
+        # TODO   contain constant values or values outside truncation
+
+        # check if we have columns with constant values.
+        # This would lead to a non-identifiable problem
+        if (subset.loc[idx_take].nunique() == 1).any():
+            raise RuntimeError('Columns with constant values in the data!')
 
         # and trim data to final size
         y = subset.loc[idx_take, predictor].values.copy()
@@ -221,8 +265,19 @@ class Foehnix:
             for nr, conc in enumerate(concomitant):
                 logitX[:, nr+1] = subset.loc[idx_take, conc].values.copy()
 
+        # If truncated family is used: y has to lie within the truncation
+        # points as density is not defined outside the range ]left, right[.
+        if (control.truncated is True) and (
+                (y.min() < control.left) or (y.max() > control.right)):
+            log.critical('Data %s outside of specified range for truncation '
+                         '(left = %.2f, right = %.2f)' % (predictor,
+                                                          control.left,
+                                                          control.right))
+            raise ValueError('Data exceeds truncation range, log for details')
+
         # Standardize data
         # TODO
+        # TODO here I left
 
         # call model accordingly
         if len(concomitant) == 0:
