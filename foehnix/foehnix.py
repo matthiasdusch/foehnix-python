@@ -117,23 +117,23 @@ class Foehnix:
         predictor : str
             Name of the main predictor (covariate) variable which is used to
             identify the foehn/no-foehn cluster. Must be present in ``data``.
-        data : pandas.DataFrame
+        data : :py:class:`pandas.DataFrame`
             Index must be a time object, rows must contain neccesary data
         concomitant : str
             Name of the covariate for the concomitant model. Must be present in
             ``data``. If None (default), a mixture model without concomitants
             will be initialized.
         switch : bool
-            | ``False`` (default) if higher values of covariate ``y`` are
-                assumed to be the foehn cluster.
-            | ``True`` if lower values are the foehn cluster.
+            - ``False`` (default) if higher values of covariate ``y`` are
+              assumed to be the foehn cluster.
+            - ``True`` if lower values are the foehn cluster.
         filter_method : dict, function or None
             Evaluates a filter on the data. E.g. a filter on the wind direction
             data to only use data from within a certain wind sector. See
             :py:class:`foehnix.foehnix_filter` for details on the syntax.
         family : str or foehnix.Family class
-            | 'gaussian' (default)
-            | 'logistic'
+            - 'gaussian' (default)
+            - 'logistic'
         control : :py:class:`foehnix.Control`
             If None (default) it will be initialized.
         kwargs : kwargs to pass to the control function

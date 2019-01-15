@@ -17,9 +17,7 @@
     <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="foehnix.iwls_logit.iwls_logit" href="foehnix.iwls_logit.iwls_logit.html" />
-    <link rel="prev" title="foehnix.families.Family" href="foehnix.families.Family.html" /> 
+    <link rel="search" title="Search" href="../search.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -27,14 +25,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="foehnix.iwls_logit.iwls_logit.html" title="foehnix.iwls_logit.iwls_logit"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="foehnix.families.Family.html" title="foehnix.families.Family"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">foehnix-python 0.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../api.html" accesskey="U">API Reference</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">foehnix-python 0.0.1 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -48,7 +39,64 @@
 <dl class="function">
 <dt id="foehnix.foehnix_filter.foehnix_filter">
 <code class="descclassname">foehnix.foehnix_filter.</code><code class="descname">foehnix_filter</code><span class="sig-paren">(</span><em>x</em>, <em>filter_method=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/foehnix_filter.html#foehnix_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.foehnix_filter.foehnix_filter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Foehnix filter function</p>
+<dd><p>Evaluates Data Filter Rules for foehnix Mixture Model Calls</p>
+<p><a class="reference internal" href="foehnix.Foehnix.html#foehnix.Foehnix" title="foehnix.Foehnix"><code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.Foehnix</span></code></a> models allow to specify an optional
+<a class="reference internal" href="foehnix.foehnix_filter.html#foehnix.foehnix_filter" title="foehnix.foehnix_filter"><code class="xref py py-func docutils literal notranslate"><span class="pre">foehnix.foehnix_filter()</span></code></a>. If a filter is given only a subset of
+the data set provided to <a class="reference internal" href="foehnix.Foehnix.html#foehnix.Foehnix" title="foehnix.Foehnix"><code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.Foehnix</span></code></a> is used for the foehn
+classification.</p>
+<p>A typical example is a wind direction filter such that
+only observations (times) are used where the observed
+wind direction was within a user defined wind sector
+corresponding to the wind direction during foehn events
+for a specific location.</p>
+<p>However, the filter option allows to even implement complex
+filter rules if required. The ‘Details’ section contains
+further information and examples how this filter rules can be used.</p>
+<p>The most common filter rule: The filter is a <cite>dict</cite> where the dict-keys
+are column-names of the DataFrame <cite>x</cite>. The dict-values are lists of length
+2 and define the range which should be used to filter the data. Example:</p>
+<p>filter_method = {‘dd’: [43 223]}</p>
+<p>This will keep all wind directions <cite>dd</cite> between 43 and 223 degrees</p>
+<p>The dict can contain several items to filter, e.g. to also limit the wind
+direction range at a crest station. Example:</p>
+<p>filter_method = {‘dd’: [43 223], ‘dd_crest’: [90, 270]}</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>x</strong> <span class="classifier-delimiter">:</span> <span class="classifier">py:class:<cite>pandas.DataFrame</cite></span></dt>
+<dd><p class="first last">containing the observations</p>
+</dd>
+<dt><strong>filter_method</strong> <span class="classifier-delimiter">:</span> <span class="classifier">None, custom function or dict</span></dt>
+<dd><p class="first">Can be one of the following:</p>
+<ul class="last simple">
+<li><cite>None</cite>: No filter will be applied</li>
+<li><cite>func</cite>: A custom function which will be applied on x</li>
+<li><dl class="first docutils">
+<dt><cite>dict</cite>: Keys must be columns of x, values can either be a custom</dt>
+<dd>function on x[key] or a list of length two.</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dict</strong></dt>
+<dd><p class="first">A dictionary containing the following items:</p>
+<ul class="last simple">
+<li><cite>dict[‘good’]</cite>: all indices of x within the filter values</li>
+<li><cite>dict[‘bad’]</cite> : all indices of x outside the filter values</li>
+<li><cite>dict[‘ugly’]</cite>: all indices where one of the filter variables is NAN</li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -59,12 +107,6 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="foehnix.families.Family.html"
-                        title="previous chapter">foehnix.families.Family</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="foehnix.iwls_logit.iwls_logit.html"
-                        title="next chapter">foehnix.iwls_logit.iwls_logit</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -94,14 +136,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="foehnix.iwls_logit.iwls_logit.html" title="foehnix.iwls_logit.iwls_logit"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="foehnix.families.Family.html" title="foehnix.families.Family"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">foehnix-python 0.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">foehnix-python 0.0.1 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

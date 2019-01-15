@@ -16,8 +16,9 @@ Tools to set-up and run OGGM.
     :toctree: generated/
     :nosignatures:
 
-    foehnix.foehnix.Foehnix
-    foehnix.families.Family
+    foehnix.Foehnix
+    foehnix.Family
+    foehnix.GaussianFamily
 
 
 Filter
@@ -27,7 +28,7 @@ Filter
     :toctree: generated/
     :nosignatures:
 
-    foehnix.foehnix_filter.foehnix_filter
+    foehnix.foehnix_filter
 
 
 IWLS
@@ -37,4 +38,4 @@ IWLS
     :toctree: generated/
     :nosignatures:
 
-    foehnix.iwls_logit.iwls_logit
+    foehnix.iwls_logit

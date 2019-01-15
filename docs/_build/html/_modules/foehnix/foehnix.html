@@ -139,13 +139,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
 
 
-<div class="viewcode-block" id="Foehnix"><a class="viewcode-back" href="../../generated/foehnix.foehnix.Foehnix.html#foehnix.foehnix.Foehnix">[docs]</a><span class="k">class</span> <span class="nc">Foehnix</span><span class="p">:</span>
+<div class="viewcode-block" id="Foehnix"><a class="viewcode-back" href="../../generated/foehnix.Foehnix.html#foehnix.foehnix.Foehnix">[docs]</a><span class="k">class</span> <span class="nc">Foehnix</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Foehn Classification Based on a Two-Component Mixture Model</span>
 
 <span class="sd">    This is the main method of the foehnix package to estimate two-component</span>
 <span class="sd">    mixture models for automated foehn classification.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Foehnix.__init__"><a class="viewcode-back" href="../../generated/foehnix.foehnix.Foehnix.html#foehnix.foehnix.Foehnix.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictor</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">concomitant</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">switch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<div class="viewcode-block" id="Foehnix.__init__"><a class="viewcode-back" href="../../generated/foehnix.Foehnix.html#foehnix.foehnix.Foehnix.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictor</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">concomitant</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">switch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">filter_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">control</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Initialize parmeters which all methods need.</span>
@@ -155,23 +155,23 @@
 <span class="sd">        predictor : str</span>
 <span class="sd">            Name of the main predictor (covariate) variable which is used to</span>
 <span class="sd">            identify the foehn/no-foehn cluster. Must be present in ``data``.</span>
-<span class="sd">        data : pandas.DataFrame</span>
+<span class="sd">        data : :py:class:`pandas.DataFrame`</span>
 <span class="sd">            Index must be a time object, rows must contain neccesary data</span>
 <span class="sd">        concomitant : str</span>
 <span class="sd">            Name of the covariate for the concomitant model. Must be present in</span>
 <span class="sd">            ``data``. If None (default), a mixture model without concomitants</span>
 <span class="sd">            will be initialized.</span>
 <span class="sd">        switch : bool</span>
-<span class="sd">            | ``False`` (default) if higher values of covariate ``y`` are</span>
-<span class="sd">                assumed to be the foehn cluster.</span>
-<span class="sd">            | ``True`` if lower values are the foehn cluster.</span>
+<span class="sd">            - ``False`` (default) if higher values of covariate ``y`` are</span>
+<span class="sd">              assumed to be the foehn cluster.</span>
+<span class="sd">            - ``True`` if lower values are the foehn cluster.</span>
 <span class="sd">        filter_method : dict, function or None</span>
 <span class="sd">            Evaluates a filter on the data. E.g. a filter on the wind direction</span>
 <span class="sd">            data to only use data from within a certain wind sector. See</span>
 <span class="sd">            :py:class:`foehnix.foehnix_filter` for details on the syntax.</span>
 <span class="sd">        family : str or foehnix.Family class</span>
-<span class="sd">            | &#39;gaussian&#39; (default)</span>
-<span class="sd">            | &#39;logistic&#39;</span>
+<span class="sd">            - &#39;gaussian&#39; (default)</span>
+<span class="sd">            - &#39;logistic&#39;</span>
 <span class="sd">        control : :py:class:`foehnix.Control`</span>
 <span class="sd">            If None (default) it will be initialized.</span>
 <span class="sd">        kwargs : kwargs to pass to the control function</span>

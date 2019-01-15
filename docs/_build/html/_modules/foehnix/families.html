@@ -40,12 +40,12 @@
 <span class="kn">import</span> <span class="nn">scipy</span>
 
 
-<div class="viewcode-block" id="Family"><a class="viewcode-back" href="../../generated/foehnix.families.Family.html#foehnix.families.Family">[docs]</a><span class="k">class</span> <span class="nc">Family</span><span class="p">:</span>
+<div class="viewcode-block" id="Family"><a class="viewcode-back" href="../../generated/foehnix.Family.html#foehnix.families.Family">[docs]</a><span class="k">class</span> <span class="nc">Family</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Common logic for the foehnix families</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Family.__init__"><a class="viewcode-back" href="../../generated/foehnix.families.Family.html#foehnix.families.Family.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Family.__init__"><a class="viewcode-back" href="../../generated/foehnix.Family.html#foehnix.families.Family.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Main family&#39;</span></div>
 
     <span class="k">def</span> <span class="nf">density</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
@@ -67,13 +67,13 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
-<span class="k">class</span> <span class="nc">GaussianFamily</span><span class="p">(</span><span class="n">Family</span><span class="p">):</span>
+<div class="viewcode-block" id="GaussianFamily"><a class="viewcode-back" href="../../generated/foehnix.GaussianFamily.html#foehnix.families.GaussianFamily">[docs]</a><span class="k">class</span> <span class="nc">GaussianFamily</span><span class="p">(</span><span class="n">Family</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Standard gaussian foehnix mixture mode family</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Gaussian&#39;</span>
+<div class="viewcode-block" id="GaussianFamily.__init__"><a class="viewcode-back" href="../../generated/foehnix.GaussianFamily.html#foehnix.families.GaussianFamily.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Gaussian&#39;</span></div>
 
     <span class="k">def</span> <span class="nf">density</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
@@ -129,7 +129,7 @@
                  <span class="s1">&#39;logsd1&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sd1</span><span class="p">)</span> <span class="k">if</span> <span class="n">sd1</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">)</span> <span class="k">else</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span>
                  <span class="s1">&#39;mu2&#39;</span><span class="p">:</span> <span class="n">mu2</span><span class="p">,</span>
                  <span class="s1">&#39;logsd2&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sd2</span><span class="p">)</span> <span class="k">if</span> <span class="n">sd2</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">)</span> <span class="k">else</span> <span class="o">-</span><span class="mi">6</span><span class="p">}</span>
-        <span class="k">return</span> <span class="n">theta</span>
+        <span class="k">return</span> <span class="n">theta</span></div>
 
 
 <span class="k">def</span> <span class="nf">logitprob</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>

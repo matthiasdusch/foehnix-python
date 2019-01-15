@@ -17,9 +17,7 @@
     <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="foehnix.families.Family" href="foehnix.families.Family.html" />
-    <link rel="prev" title="API Reference" href="../api.html" /> 
+    <link rel="search" title="Search" href="../search.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -27,14 +25,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="foehnix.families.Family.html" title="foehnix.families.Family"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="../api.html" title="API Reference"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">foehnix-python 0.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../api.html" accesskey="U">API Reference</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">foehnix-python 0.0.1 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -64,7 +55,7 @@ mixture models for automated foehn classification.</p>
 <dd><p class="first last">Name of the main predictor (covariate) variable which is used to
 identify the foehn/no-foehn cluster. Must be present in <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p>
 </dd>
-<dt><strong>data</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pandas.DataFrame</span></dt>
+<dt><strong>data</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></span></dt>
 <dd><p class="first last">Index must be a time object, rows must contain neccesary data</p>
 </dd>
 <dt><strong>concomitant</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
@@ -73,22 +64,22 @@ identify the foehn/no-foehn cluster. Must be present in <code class="docutils li
 will be initialized.</p>
 </dd>
 <dt><strong>switch</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><div class="first last line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">False</span></code> (default) if higher values of covariate <code class="docutils literal notranslate"><span class="pre">y</span></code> are
-assumed to be the foehn cluster.</div>
-<div class="line"><code class="docutils literal notranslate"><span class="pre">True</span></code> if lower values are the foehn cluster.</div>
-</div>
+<dd><ul class="first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">False</span></code> (default) if higher values of covariate <code class="docutils literal notranslate"><span class="pre">y</span></code> are
+assumed to be the foehn cluster.</li>
+<li><code class="docutils literal notranslate"><span class="pre">True</span></code> if lower values are the foehn cluster.</li>
+</ul>
 </dd>
 <dt><strong>filter_method</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict, function or None</span></dt>
 <dd><p class="first last">Evaluates a filter on the data. E.g. a filter on the wind direction
 data to only use data from within a certain wind sector. See
-<code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.foehnix_filter</span></code> for details on the syntax.</p>
+<a class="reference internal" href="foehnix.foehnix_filter.html#foehnix.foehnix_filter" title="foehnix.foehnix_filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.foehnix_filter</span></code></a> for details on the syntax.</p>
 </dd>
 <dt><strong>family</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or foehnix.Family class</span></dt>
-<dd><div class="first last line-block">
-<div class="line">‘gaussian’ (default)</div>
-<div class="line">‘logistic’</div>
-</div>
+<dd><ul class="first last simple">
+<li>‘gaussian’ (default)</li>
+<li>‘logistic’</li>
+</ul>
 </dd>
 <dt><strong>control</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.Control</span></code></span></dt>
 <dd><p class="first last">If None (default) it will be initialized.</p>
@@ -133,12 +124,6 @@ data to only use data from within a certain wind sector. See
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="../api.html"
-                        title="previous chapter">API Reference</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="foehnix.families.Family.html"
-                        title="next chapter">foehnix.families.Family</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -168,14 +153,7 @@ data to only use data from within a certain wind sector. See
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="foehnix.families.Family.html" title="foehnix.families.Family"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="../api.html" title="API Reference"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">foehnix-python 0.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">foehnix-python 0.0.1 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
