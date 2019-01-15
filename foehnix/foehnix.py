@@ -1,13 +1,9 @@
-"""
-Classes and other stuff
-"""
-
 import numpy as np
 import pandas as pd
 import logging
 from scipy.stats import logistic
 
-from foehnix.families import Family, GaussianFamily
+from foehnix.families import *
 from foehnix.foehnix_filter import foehnix_filter
 from foehnix.iwls_logit import iwls_logit
 
@@ -16,13 +12,58 @@ log = logging.getLogger(__name__)
 
 
 class Control:
-    """Control Object for Foehnix
+    """
+    Foehnix Two-Component Mixture-Model Control Object
 
     Can be passed to the Foehnix class or will be initialized
     """
     def __init__(self, family, switch, left=float('-Inf'), right=float('Inf'),
                  truncated=False, standardize=True, maxit=100, tol=1e-8,
                  alpha=None, verbose=True):
+        """
+        Initialization of the Control object
+
+        Parameters
+        ----------
+        family : str or py:class:`foehnix.Family`
+            specifying the distribution of the components in the mixture model.
+
+            - 'gaussian'
+            - 'logistic'
+            - :py:class:`foehnix.Family`
+        switch : bool
+            whether or not the two components should be switched.
+
+            - `False` (default): the component which shows higher values within
+              the predictor is assumed to be the foehn cluster.
+            - `True`: lower values are assumed to be the foehn cluster.
+        left : float
+            left censoring or truncation point. Default `-Inf`
+        right : float
+            right censoring or truncation point. Default `Inf`
+        truncated : bool
+            If `True` truncation is used instead of censoring. This only
+            affects the model if `left` and/or `right` are specified.
+        standardize : bool
+            Defines whether or not the model matrix for the concomitant model
+            should be standardized for model estimation. Recommended.
+        maxit : int or [int, int]
+            Maximum number of iterations for the iterative solvers.
+            Default is 100. If a vector of length 2 is provided the first value
+            is used for the EM algorithm, the second for the IWLS backfitting.
+        tol : float or [float, float]
+            Tolerance defining when convergence of the iterative solvers is
+            reached. Default is 1e-8. If a vector of length 2 is provided the
+            first value is used for the EM algorithm, the second for the IWLS
+            backfitting.
+        alpha : TODO parameter for the penalization of the concomitatnt model
+        verbose : bool or str
+            Sets the verbose level of the model logging
+
+            - True (default): Information on most tasks will be provided
+            - False: Only critical errors and warnings will be provided
+            - 'DEBUG': More detailed information will be provided
+        """
 
         # set logging
         if verbose is True:
@@ -36,47 +77,31 @@ class Control:
                             level=getattr(logging, logging_level))
 
         # Check limits for censoring/truncation
-        # TODO
+        if np.isfinite([left, right]).any():
+            left = np.max([-np.inf, left])
+            right = np.min([np.inf, right])
+            if left >= right:
+                raise ValueError('For censoring and truncation left must be '
+                                 'smaller than right.')
 
         # Check if family object is provided or initialize it
-        # TODO: Gibts ne schoenere Logik hier?
         if isinstance(family, Family):
-            log.info('foehnix.Family object provided.')
-        elif np.isinf([left, right]).all():
-            if family == 'gaussian':
-                log.debug('Initializing Gaussian foehnix mixture model family.')
-                family = GaussianFamily
-            elif family == 'logistic':
-                log.debug('Initializing Logistic foehnix mixture model family.')
-                family = LogisticFamily
-        elif np.isfinite([left, right]).any():
-            if truncated:
-                if family == 'gaussian':
-                    log.debug('Initializing truncated Gaussian fmmf.')
-                    family = TruncatedGaussianFamily
-                elif family == 'logistic':
-                    log.debug('Initializing truncated Logistic fmmf.')
-                    family = TruncatedLogisticFamily
-            elif not truncated:
-                if family == 'gaussian':
-                    log.debug('Initializing censored Gaussian fmmf.')
-                    family = CensoredGaussianFamily
-                elif family == 'logistic':
-                    log.debug('Initializing censored Logistic fmmf.')
-                    family = CensoredLogisticFamily
+            log.debug('custom foehnix.Family object provided.')
+        else:
+            family = initialize_family(familyname=family, left=left,
+                                       right=right, truncated=truncated)
 
         # Maxit and tol are the maximum number of iterations for the
         # optimization. Need to be numeric. If one value is given it will
         # be used for both, the EM algorithm and the IWLS optimization for
         # the concomitants. If two values are given the first one is used
         # for the EM algorithm, the second for the IWLS solver.
-        # TODO hier stimmt eventuell der Ablauf try if else except nicht!!
         try:
             if len(maxit) == 2:
                 self.maxit_em = maxit[0]
                 self.maxit_iwls = maxit[1]
             else:
-                raise RuntimeError('maxit must be integer or list of length 2')
+                raise ValueError('maxit must be integer or list of length 2')
         except TypeError:
             self.maxit_em = maxit
             self.maxit_iwls = maxit
@@ -85,7 +110,7 @@ class Control:
                 self.tol_em = tol[0]
                 self.tol_iwls = tol[1]
             else:
-                raise RuntimeError('tol must be integer or list of length 2')
+                raise ValueError('tol must be float or list of length 2')
         except TypeError:
             self.tol_em = tol
             self.tol_iwls = tol
@@ -96,13 +121,12 @@ class Control:
         self.right = right
         self.truncated = truncated
         self.standardize = standardize
-        self.maxit = maxit
-        self.tol = tol
         self.alpha = alpha
 
 
 class Foehnix:
-    """Foehn Classification Based on a Two-Component Mixture Model
+    """
+    Foehn Classification Based on a Two-Component Mixture Model
 
     This is the main method of the foehnix package to estimate two-component
     mixture models for automated foehn classification.
