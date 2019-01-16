@@ -7,6 +7,7 @@ import time
 from foehnix.families import *
 from foehnix.foehnix_filter import foehnix_filter
 from foehnix.iwls_logit import iwls_logit
+import foehnix.foehnix_functions as func
 
 # logger
 log = logging.getLogger(__name__)
@@ -261,9 +262,24 @@ class Foehnix:
         y = y.reshape(len(y), 1)
 
         if len(concomitant) > 0:
-            logitX = np.ones([len(y), len(concomitant)+1])
+            _logitx = np.ones([len(y), len(concomitant)+1])
             for nr, conc in enumerate(concomitant):
-                logitX[:, nr+1] = subset.loc[idx_take, conc].values.copy()
+                _logitx[:, nr+1] = subset.loc[idx_take, conc].values.copy()
+
+            # store concomitant matrix in a dict
+            logitx = {'values': _logitx,
+                      'names': ['Intercept'] + concomitant,
+                      'scale': np.std(_logitx, axis=0),
+                      'center': np.mean(_logitx, axis=0),
+                      'is_standardized': False}
+
+            # If std == 0 (e.g. for the Intercept), set center=0 and scale=1
+            logitx['center'][logitx['scale'] == 0] = 0
+            logitx['scale'][logitx['scale'] == 0] = 1
+
+            # standardize data if control.standardize = True (default)
+            if control.standardize is True:
+                logitx = func.standardize(logitx)
 
         # If truncated family is used: y has to lie within the truncation
         # points as density is not defined outside the range ]left, right[.
@@ -275,27 +291,35 @@ class Foehnix:
                                                           control.right))
             raise ValueError('Data exceeds truncation range, log for details')
 
-        # Standardize data
-        # TODO
-        # TODO here I left
-
-        # call model accordingly
+        #
+        # - Call the according model
+        #
         if len(concomitant) == 0:
             log.info('Calling Foehnix.no_concomitant_fit')
             self.no_concomitant_fit(y, control)
         elif control.alpha is None:
             log.info('Calling Foehnix.unreg_fit')
-            self.unreg_fit(y, logitX, control)
+            self.unreg_fit(y, logitx, control)
 
         log.info('Estimation finished, create final object.')
 
         # Final coefficients of the concomitant model have to be destandardized
-        # if standardize == TRUE.
         if self.optimizer['ccmodel'] is not None:
-            # TODO need to check if ceofficients are standardized
-            coef = '2do'
-        else:
-            coef = None
+            if logitx['is_standardized'] is True:
+                coef = func.destandardize_coefficients(
+                    self.optimizer['ccmodel']['coef'], logitx)
+            else:
+                coef = self.optimizer['ccmodel']['coef']
+
+        # If there was only one iteration: drop a warning
+        if self.optimizer['iter'] == 0:
+            log.critical('The EM algorithm stopped after one iteration!\n'
+                         'The coefficients returned are the initial '
+                         'coefficients. This indicates that the model as '
+                         'specified is not suitable for the data. Suggestion: '
+                         'check model (e.g, using model.plot() and '
+                         'model.summary(detailed = True) and try a different '
+                         'model specification (change/add concomitants).')
 
         # store relevant data within the Foehnix class
         self.data = data
@@ -310,16 +334,31 @@ class Foehnix:
         self.coef_concomitants = coef
 
         # TODO some more stuff like weights and estimated coefficients
+        # Calculate the weighted standard error of the estimated
+        # coefficients for the test statistics.
+        # 1. calculate weighted sum of squared residuals for both components
+        res_c1 = (y - self.coef['mu1']) * (1 - self.optimizer['post'])
+        res_c2 = (y - self.coef['mu2']) * self.optimizer['post']
+        mu1_se = np.sqrt(np.sum(res_c1**2) /
+                         (np.sum((1 - self.optimizer['post'])**2) *
+                          (np.sum(1 - self.optimizer['post']) - 1)))
+        mu2_se = np.sqrt(np.sum(res_c2**2) /
+                         (np.sum(self.optimizer['post']**2) *
+                          (np.sum(self.optimizer['post']) - 1)))
+        # Standard errors for intercept of mu1(component1) and mu2(component2)
+        self.mu_se = {'mu1_se': mu1_se,
+                      'mu2_se': mu2_se}
 
-        # The final result, the foehn probability. Creates an object of the same
-        # class as the input "data" (currently only pandas.DataFrame!) with two
-        # columns. The first contains the final foehn probability (column name
-        # prob), the second column contains a flag. The flag is as follows:
+        # The final result, the foehn probability. Creates an object of the
+        # same class as the input "data" (currently only pandas.DataFrame!)
+        # with two columns. The first contains the final foehn probability
+        # (column name prob), the second column contains a flag. The flag is as
+        # follows:
         # - NaN  if not modelled (data for the model not available).
         # - 0    if foehn probability has been modelled, data not left out due
         #        to the filter rules.
-        # - 1    if the filter removed the observations/sample, not used for the
-        # foehn classification model, but no missing observations.
+        # - 1    if the filter removed the observations/sample, not used for
+        #        the foehn classification model, but no missing observations.
 
         # The following procedure is used:
         # - By default, use NaN for both columns.
@@ -339,11 +378,18 @@ class Foehnix:
         # store in self
         self.prob = tmp.copy()
 
+        # Store execution time in seconds
+        self.time = time.time() - start_time
+
     def no_concomitant_fit(self, y, control):
         """Fitting foehnix Mixture Model Without Concomitant Model.
 
         Parameters
         ----------
+        y : :py:class:`numpy.ndarray`
+            Covariate for the components of the mixture model
+        control : :py:class:`foehnix.foehnix.Control`
+            Foehnix control object
         """
 
         # Lists to trace log-likelihood path and the development of
@@ -389,8 +435,8 @@ class Foehnix:
             log.info('EM iteration %d/%d, ll = %10.2f' % (i, control.maxit_em,
                                                           np.sum(llpath[i])))
             if np.isnan(np.sum(llpath[i])):
-                log.critical('Likelihood got NA!')
-                raise RuntimeError('Likelihood got NA!')
+                log.critical('Likelihood got NaN!')
+                raise RuntimeError('Likelihood got NaN!')
 
             # update liklihood difference
             if i > 0:
@@ -408,6 +454,7 @@ class Foehnix:
         if converged:
             llpath = llpath[:-1]
             coefpath = coefpath[:-1]
+        ll = np.sum(llpath[-1])
 
         # TODO might have to adjust the content of llpath and coefpath
         colcoef = 1
@@ -416,10 +463,10 @@ class Foehnix:
         fdict = {'prob': prob,
                  'post': post,
                  'theta': theta,
-                 'loglik': np.sum(llpath[-1]),
+                 'loglik': ll,
                  'edf': len(coefpath),
-                 'AIC': -2 * np.sum(llpath[-1]) + 2 * colcoef,
-                 'BIC': -2 * np.sum(llpath[-1]) + np.log(len(y)) * colcoef,
+                 'AIC': -2 * ll + 2 * colcoef,
+                 'BIC': -2 * ll + np.log(len(y)) * colcoef,
                  'ccmodel': None,
                  'loglikpath': llpath,
                  'coefpath': coefpath,
@@ -427,11 +474,24 @@ class Foehnix:
 
         self.optimizer = fdict
 
-    def unreg_fit(self, y, logitX, control):
+    def unreg_fit(self, y, logitx, control):
         """Fitting foehnix Mixture Model Without Concomitant Model.
 
         Parameters
         ----------
+        y : :py:class:`numpy.ndarray`
+            Covariate for the components of the mixture model
+        logitx : dict
+            Covariats for the concomitant model
+            Must contain:
+
+            - ``'values'`` : :py:class:`numpy.ndarray` the model matrix
+            - ``'center'`` : list, mean of each model matrix row
+            - ``'scale'`` : list, standard deviation of matrix rows
+            - ``'name'`` : list, names of the rows
+            - ``'is_standardized'``: boolean if matrix is standardized
+        control : :py:class:`foehnix.foehnix.Control`
+            Foehnix control object
         """
 
         # Lists to trace log-likelihood path and the development of
@@ -452,11 +512,11 @@ class Foehnix:
         # Initial probability: fifty/fifty!
         # Force standardize = FALSE. If required logitX has alreday been
         # standardized in the parent function (foehnix)
-        ccmodel = iwls_logit(logitX, z, standardize=False,
+        ccmodel = iwls_logit(logitx, z, standardize=False,
                              maxit=control.maxit_iwls, tol=control.tol_iwls)
 
         # Initial probabilities and prior  probabilities
-        prob = logistic.cdf(logitX.dot(ccmodel['beta']))
+        prob = logistic.cdf(logitx['values'].dot(ccmodel['beta']))
         post = control.family.posterior(y, prob, theta)
 
         # EM algorithm: estimate probabilities (prob; E-step), update the model
@@ -468,10 +528,10 @@ class Foehnix:
 
         while delta > control.tol_em:
             # M-step: update probabilites and theta
-            ccmodel = iwls_logit(logitX, post, beta=ccmodel['beta'],
+            ccmodel = iwls_logit(logitx, post, beta=ccmodel['beta'],
                                  standardize=False,
                                  maxit=control.maxit_iwls, tol=control.tol_iwls)
-            prob = logistic.cdf(logitX.dot(ccmodel['beta']))
+            prob = logistic.cdf(logitx['values'].dot(ccmodel['beta']))
             # TODO was mach das theta=theta hier?
             theta = control.family.theta(y, post)
 
@@ -502,6 +562,15 @@ class Foehnix:
             llpath = llpath[:-1]
             coefpath = coefpath[:-1],
 
+        ll = np.sum(llpath[-1])
+        # TODO im em algorithmus:
+        # TODO - beta (Intercept und ff) zu coefpath dazu schreiben
+        # TODO - coefpath etwas anderes format wählen
+        # TODO
+
+        import pdb
+        pdb.set_trace()
+
         # TODO hardcoded, muss noch die coefpath-Variable anpassen
         # colcoef = ncol(coefpath)
         colcoef = 6
@@ -510,10 +579,10 @@ class Foehnix:
         fdict = {'prob': prob,
                  'post': post,
                  'theta': theta,
-                 'loglik': np.sum(llpath[-1]),
+                 'loglik': ll,
                  'edf': len(coefpath),
-                 'AIC': -2 * np.sum(llpath[-1]) + 2 * colcoef,
-                 'BIC': -2 * np.sum(llpath[-1]) + np.log(len(y)) * colcoef,
+                 'AIC': -2 * ll + 2 * colcoef,
+                 'BIC': -2 * llpath + np.log(len(y)) * colcoef,
                  'ccmodel': ccmodel,
                  'loglikpath': llpath,
                  'coefpath': coefpath,

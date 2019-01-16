@@ -6,11 +6,13 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def iwls_logit(X, y, beta=None, penalty=None, standardize=True, maxit=100,
+def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
                tol=1e-8):
     """Iterative weighted least squares solver for a logistic regression model.
 
     """
+    x = logitx['values']
+
     # TODO check NaNs
 
     # TODO check constant covariants
@@ -19,9 +21,9 @@ def iwls_logit(X, y, beta=None, penalty=None, standardize=True, maxit=100,
 
     # Initialize regression coefficients if needed
     if beta is None:
-        beta = np.zeros(X.shape[1])
+        beta = np.zeros(x.shape[1])
 
-    eta = X.dot(beta)
+    eta = x.dot(beta)
     eta = eta.reshape(len(eta), 1)
     mu = logistic.cdf(eta)
 
@@ -44,11 +46,11 @@ def iwls_logit(X, y, beta=None, penalty=None, standardize=True, maxit=100,
         else:
             reg = np.diag(np.ones_like(beta)*penalty)
             reg[0, 0] = 0
-        beta = np.linalg.inv(((X*w).T).dot(X*w) + reg).dot((X*w).T).dot(
+        beta = np.linalg.inv((x*w).T.dot(x*w) + reg).dot((x*w).T).dot(
             eta*w + (y-mu) / w)
 
         # update latent response eta
-        eta = X.dot(beta)
+        eta = x.dot(beta)
 
         # update response
         mu = logistic.cdf(eta)
@@ -90,13 +92,17 @@ def iwls_logit(X, y, beta=None, penalty=None, standardize=True, maxit=100,
     # TODO EDF
     edf = 0
 
+    # TODO Reto:
+    # rval$coef      <- if ( standardize ) destandardize_coefficients(beta, X) else beta
+    # aber später nocham destandardize??!??
+
     # unscale coefficients if needed
     ll = llpath[-1]
     rval = {'lambda': penalty,
             'edf': edf,
             'loglik': ll,
             'AIC': -2*ll + 2*edf,
-            'BIC': -2*ll + np.log(len(X)) * edf,
+            'BIC': -2*ll + np.log(len(x)) * edf,
             'converged': converged,
             'beta': beta,
             'beta_vcov': beta_vcov,
