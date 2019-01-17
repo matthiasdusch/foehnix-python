@@ -11,7 +11,7 @@ There will be a python specific documentation at some point. But at the moment p
 There you will find general details, examples and the R specific documentation.  
 
 A very beta documentation can be found here
-https://matthiasdusch.github.io/foehnix-python/index.html
+https://matthiasdusch.github.io/foehnix-python
 
 Note: `ellboegen_test_case.ipynb` more or less reproduces the example from https://retostauffer.github.io/Rfoehnix/articles/foehnix.html .
 
