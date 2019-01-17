@@ -50,7 +50,7 @@
 <span class="gp">In [2]: </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 </pre></div>
 </div>
-<p>Load Ellboegen and Sattelberg</p>
+<p>Load Ellboegen and Sattelberg data, merge and create filter</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [3]: </span><span class="n">ellboegen</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../data/ellboegen.csv&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">skipinitialspace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
 <span class="gp">In [4]: </span><span class="n">sattelberg</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../data/sattelberg.csv&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">skipinitialspace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -63,6 +63,38 @@
 <span class="go">2  1263812400  344.0  0.8  899.1  63.0  0.7</span>
 <span class="go">3  1263816000  303.0  2.4  898.8  60.0  0.7</span>
 <span class="go">4  1263819600  292.0  2.8  898.5  57.0  1.9</span>
+
+<span class="gp">In [6]: </span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">ellboegen</span><span class="p">,</span> <span class="n">sattelberg</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;timestamp&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">,</span> <span class="n">suffixes</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;_crest&#39;</span><span class="p">),</span> <span class="n">sort</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="gp">In [7]: </span><span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
+
+<span class="gp">In [8]: </span><span class="n">train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="o">-</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="gp">In [9]: </span><span class="n">test</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="gp">In [10]: </span><span class="n">train</span><span class="p">[</span><span class="s1">&#39;diff_t&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">train</span><span class="p">[</span><span class="s1">&#39;t_crest&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">10.27</span> <span class="o">-</span> <span class="n">train</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span>
+
+<span class="gp">In [11]: </span><span class="n">ddfilter</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dd&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">43</span><span class="p">,</span> <span class="mi">223</span><span class="p">],</span> <span class="s1">&#39;dd_crest&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">90</span><span class="p">,</span> <span class="mi">270</span><span class="p">]}</span>
+</pre></div>
+</div>
+<p>Run the model and show a summary</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [12]: </span><span class="n">model</span> <span class="o">=</span> <span class="n">foehnix</span><span class="o">.</span><span class="n">Foehnix</span><span class="p">(</span><span class="s1">&#39;diff_t&#39;</span><span class="p">,</span> <span class="n">train</span><span class="p">,</span> <span class="n">concomitant</span><span class="o">=</span><span class="s1">&#39;ff&#39;</span><span class="p">,</span> <span class="n">filter_method</span><span class="o">=</span><span class="n">ddfilter</span><span class="p">,</span> <span class="n">switch</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="gp">In [13]: </span><span class="n">model</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+
+<span class="go">Number of observations (total)    71346</span>
+<span class="go">Removed due to missing values     10187 (14.3 percent)</span>
+<span class="go">Outside defined wind sector       43539 (61.0 percent)</span>
+<span class="go">Used for classification           17620 (24.7 percent)</span>
+
+<span class="go">Climatological foehn occurance 13.38 percent (on n = 61159)</span>
+<span class="go">Mean foehn probability 13.23 percent (on n = 61159)</span>
+
+<span class="go">Log-likelihood: -40634.7, 6 effective degrees of freedom</span>
+<span class="go">Corresponding AIC = 81281.3, BIC = 81328.0</span>
+
+<span class="go">Number of EM iterations 9/100 (converged)</span>
+<span class="go">Time required for model estimation: 0.7 seconds</span>
 </pre></div>
 </div>
 </div>

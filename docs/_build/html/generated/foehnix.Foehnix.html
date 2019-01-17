@@ -67,10 +67,10 @@ identify the foehn/no-foehn cluster. Must be present in <code class="docutils li
 <dt><strong>data</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></span></dt>
 <dd><p class="first last">Index must be a time object, rows must contain neccesary data</p>
 </dd>
-<dt><strong>concomitant</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">Name of the covariate for the concomitant model. Must be present in
-<code class="docutils literal notranslate"><span class="pre">data</span></code>. If None (default), a mixture model without concomitants
-will be initialized.</p>
+<dt><strong>concomitant</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or list of str</span></dt>
+<dd><p class="first last">Name(s) of the covariates for the concomitant model. Must be
+present in <code class="docutils literal notranslate"><span class="pre">data</span></code>. If None (default), a mixture model without
+concomitants will be initialized.</p>
 </dd>
 <dt><strong>switch</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
 <dd><ul class="first last simple">
@@ -90,7 +90,7 @@ data to only use data from within a certain wind sector. See
 <li>‘logistic’</li>
 </ul>
 </dd>
-<dt><strong>control</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.Control</span></code></span></dt>
+<dt><strong>control</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.foehnix.Control</span></code></span></dt>
 <dd><p class="first last">If None (default) it will be initialized.</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">kwargs to pass to the control function</span></dt>
@@ -115,10 +115,10 @@ data to only use data from within a certain wind sector. See
 <tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">no_concomitant_fit</span></code>(y,&nbsp;control)</td>
 <td>Fitting foehnix Mixture Model Without Concomitant Model.</td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary</span></code>()</td>
-<td>print summary</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary</span></code>([detailed])</td>
+<td>Prints information about the model</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">unreg_fit</span></code>(y,&nbsp;logitX,&nbsp;control)</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">unreg_fit</span></code>(y,&nbsp;logitx,&nbsp;control)</td>
 <td>Fitting foehnix Mixture Model Without Concomitant Model.</td>
 </tr>
 </tbody>

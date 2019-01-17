@@ -36,31 +36,81 @@
           <div class="body" role="main">
             
   <h1>Source code for foehnix.foehnix</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Classes and other stuff</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="k">import</span> <span class="n">logistic</span>
+<span class="kn">import</span> <span class="nn">time</span>
 
-<span class="kn">from</span> <span class="nn">foehnix.families</span> <span class="k">import</span> <span class="n">Family</span><span class="p">,</span> <span class="n">GaussianFamily</span>
+<span class="kn">from</span> <span class="nn">foehnix.families</span> <span class="k">import</span> <span class="n">Family</span><span class="p">,</span> <span class="n">initialize_family</span>
 <span class="kn">from</span> <span class="nn">foehnix.foehnix_filter</span> <span class="k">import</span> <span class="n">foehnix_filter</span>
-<span class="kn">from</span> <span class="nn">foehnix.iwls_logit</span> <span class="k">import</span> <span class="n">iwls_logit</span>
+<span class="kn">from</span> <span class="nn">foehnix.iwls_logit</span> <span class="k">import</span> <span class="n">iwls_logit</span><span class="p">,</span> <span class="n">iwls_summary</span>
+<span class="kn">import</span> <span class="nn">foehnix.foehnix_functions</span> <span class="k">as</span> <span class="nn">func</span>
 
 <span class="c1"># logger</span>
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">Control</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Control Object for Foehnix</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Foehnix Two-Component Mixture-Model Control Object</span>
 
 <span class="sd">    Can be passed to the Foehnix class or will be initialized</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">family</span><span class="p">,</span> <span class="n">switch</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-Inf&#39;</span><span class="p">),</span> <span class="n">right</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;Inf&#39;</span><span class="p">),</span>
                  <span class="n">truncated</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">maxit</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-                 <span class="n">alpha</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                 <span class="n">force_inflate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization of the Control object</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        family : str or :py:class:`foehnix.Family`</span>
+<span class="sd">            specifying the distribution of the components in the mixture model.</span>
+
+<span class="sd">            - &#39;gaussian&#39;</span>
+<span class="sd">            - &#39;logistic&#39;</span>
+<span class="sd">            - :py:class:`foehnix.Family`</span>
+<span class="sd">        switch : bool</span>
+<span class="sd">            whether or not the two components should be switched.</span>
+
+<span class="sd">            - ``False`` (default): the component which shows higher values</span>
+<span class="sd">              within the predictor is assumed to be the foehn cluster.</span>
+<span class="sd">            - ``True``: lower values are assumed to be the foehn cluster.</span>
+<span class="sd">        left : float</span>
+<span class="sd">            left censoring or truncation point. Default `-Inf`</span>
+<span class="sd">        right : float</span>
+<span class="sd">            right censoring or truncation point. Default `Inf`</span>
+<span class="sd">        truncated : bool</span>
+<span class="sd">            If ``True`` truncation is used instead of censoring. This only</span>
+<span class="sd">            affects the model if ``left`` and/or ``right`` are specified.</span>
+<span class="sd">        standardize : bool</span>
+<span class="sd">            Defines whether or not the model matrix for the concomitant model</span>
+<span class="sd">            should be standardized for model estimation. Recommended.</span>
+<span class="sd">        maxit : int or [int, int]</span>
+<span class="sd">            Maximum number of iterations for the iterative solvers.</span>
+<span class="sd">            Default is 100. If a vector of length 2 is provided the first value</span>
+<span class="sd">            is used for the EM algorithm, the second for the IWLS backfitting.</span>
+<span class="sd">        tol : float or [float, float]</span>
+<span class="sd">            Tolerance defining when convergence of the iterative solvers is</span>
+<span class="sd">            reached. Default is 1e-8. If a vector of length 2 is provided the</span>
+<span class="sd">            first value is used for the EM algorithm, the second for the IWLS</span>
+<span class="sd">            backfitting.</span>
+<span class="sd">        force_inflate : bool</span>
+<span class="sd">            :py:class:`foehnix.Foehnix` will create a strictly regular time</span>
+<span class="sd">            series by inflating the data to the smallest time intervall in the</span>
+<span class="sd">            data set. If the inflation rate is larger than 2 the model will</span>
+<span class="sd">            stop except the user forces inflation by specifying</span>
+<span class="sd">            ``force_inflate = True``. This can cause a serious runtime</span>
+<span class="sd">            increase. Default is False.</span>
+<span class="sd">        alpha : TODO parameter for the penalization of the concomitatnt model</span>
+<span class="sd">        verbose : bool or str</span>
+<span class="sd">            Sets the verbose level of the model logging</span>
+
+<span class="sd">            - True (default): Information on most tasks will be provided</span>
+<span class="sd">            - False: Only critical errors and warnings will be provided</span>
+<span class="sd">            - &#39;DEBUG&#39;: More detailed information will be provided</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># set logging</span>
         <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
@@ -74,47 +124,31 @@
                             <span class="n">level</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">logging</span><span class="p">,</span> <span class="n">logging_level</span><span class="p">))</span>
 
         <span class="c1"># Check limits for censoring/truncation</span>
-        <span class="c1"># TODO</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">([</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">left</span><span class="p">])</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">right</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">left</span> <span class="o">&gt;=</span> <span class="n">right</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For censoring and truncation left must be &#39;</span>
+                                 <span class="s1">&#39;smaller than right.&#39;</span><span class="p">)</span>
 
         <span class="c1"># Check if family object is provided or initialize it</span>
-        <span class="c1"># TODO: Gibts ne schoenere Logik hier?</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">family</span><span class="p">,</span> <span class="n">Family</span><span class="p">):</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;foehnix.Family object provided.&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">([</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">:</span>
-                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Initializing Gaussian foehnix mixture model family.&#39;</span><span class="p">)</span>
-                <span class="n">family</span> <span class="o">=</span> <span class="n">GaussianFamily</span>
-            <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;logistic&#39;</span><span class="p">:</span>
-                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Initializing Logistic foehnix mixture model family.&#39;</span><span class="p">)</span>
-                <span class="n">family</span> <span class="o">=</span> <span class="n">LogisticFamily</span>
-        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">([</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">truncated</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">:</span>
-                    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Initializing truncated Gaussian fmmf.&#39;</span><span class="p">)</span>
-                    <span class="n">family</span> <span class="o">=</span> <span class="n">TruncatedGaussianFamily</span>
-                <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;logistic&#39;</span><span class="p">:</span>
-                    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Initializing truncated Logistic fmmf.&#39;</span><span class="p">)</span>
-                    <span class="n">family</span> <span class="o">=</span> <span class="n">TruncatedLogisticFamily</span>
-            <span class="k">elif</span> <span class="ow">not</span> <span class="n">truncated</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">:</span>
-                    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Initializing censored Gaussian fmmf.&#39;</span><span class="p">)</span>
-                    <span class="n">family</span> <span class="o">=</span> <span class="n">CensoredGaussianFamily</span>
-                <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;logistic&#39;</span><span class="p">:</span>
-                    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Initializing censored Logistic fmmf.&#39;</span><span class="p">)</span>
-                    <span class="n">family</span> <span class="o">=</span> <span class="n">CensoredLogisticFamily</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;custom foehnix.Family object provided.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">family</span> <span class="o">=</span> <span class="n">initialize_family</span><span class="p">(</span><span class="n">familyname</span><span class="o">=</span><span class="n">family</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="n">left</span><span class="p">,</span>
+                                       <span class="n">right</span><span class="o">=</span><span class="n">right</span><span class="p">,</span> <span class="n">truncated</span><span class="o">=</span><span class="n">truncated</span><span class="p">)</span>
 
         <span class="c1"># Maxit and tol are the maximum number of iterations for the</span>
         <span class="c1"># optimization. Need to be numeric. If one value is given it will</span>
         <span class="c1"># be used for both, the EM algorithm and the IWLS optimization for</span>
         <span class="c1"># the concomitants. If two values are given the first one is used</span>
         <span class="c1"># for the EM algorithm, the second for the IWLS solver.</span>
-        <span class="c1"># TODO hier stimmt eventuell der Ablauf try if else except nicht!!</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">maxit</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">maxit_em</span> <span class="o">=</span> <span class="n">maxit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">maxit_iwls</span> <span class="o">=</span> <span class="n">maxit</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;maxit must be integer or list of length 2&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;maxit must be integer or list of length 2&#39;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">maxit_em</span> <span class="o">=</span> <span class="n">maxit</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">maxit_iwls</span> <span class="o">=</span> <span class="n">maxit</span>
@@ -123,7 +157,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">tol_em</span> <span class="o">=</span> <span class="n">tol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">tol_iwls</span> <span class="o">=</span> <span class="n">tol</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;tol must be integer or list of length 2&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;tol must be float or list of length 2&#39;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tol_em</span> <span class="o">=</span> <span class="n">tol</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tol_iwls</span> <span class="o">=</span> <span class="n">tol</span>
@@ -134,18 +168,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">truncated</span> <span class="o">=</span> <span class="n">truncated</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">standardize</span> <span class="o">=</span> <span class="n">standardize</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">maxit</span> <span class="o">=</span> <span class="n">maxit</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tol</span> <span class="o">=</span> <span class="n">tol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">force_inflate</span> <span class="o">=</span> <span class="n">force_inflate</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
 
 
-<div class="viewcode-block" id="Foehnix"><a class="viewcode-back" href="../../generated/foehnix.Foehnix.html#foehnix.foehnix.Foehnix">[docs]</a><span class="k">class</span> <span class="nc">Foehnix</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Foehn Classification Based on a Two-Component Mixture Model</span>
+<div class="viewcode-block" id="Foehnix"><a class="viewcode-back" href="../../generated/foehnix.Foehnix.html#foehnix.Foehnix">[docs]</a><span class="k">class</span> <span class="nc">Foehnix</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Foehn Classification Based on a Two-Component Mixture Model</span>
 
 <span class="sd">    This is the main method of the foehnix package to estimate two-component</span>
 <span class="sd">    mixture models for automated foehn classification.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Foehnix.__init__"><a class="viewcode-back" href="../../generated/foehnix.Foehnix.html#foehnix.foehnix.Foehnix.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictor</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">concomitant</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">switch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<div class="viewcode-block" id="Foehnix.__init__"><a class="viewcode-back" href="../../generated/foehnix.Foehnix.html#foehnix.Foehnix.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictor</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">concomitant</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">switch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">filter_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">control</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Initialize parmeters which all methods need.</span>
@@ -157,10 +191,10 @@
 <span class="sd">            identify the foehn/no-foehn cluster. Must be present in ``data``.</span>
 <span class="sd">        data : :py:class:`pandas.DataFrame`</span>
 <span class="sd">            Index must be a time object, rows must contain neccesary data</span>
-<span class="sd">        concomitant : str</span>
-<span class="sd">            Name of the covariate for the concomitant model. Must be present in</span>
-<span class="sd">            ``data``. If None (default), a mixture model without concomitants</span>
-<span class="sd">            will be initialized.</span>
+<span class="sd">        concomitant : str or list of str</span>
+<span class="sd">            Name(s) of the covariates for the concomitant model. Must be</span>
+<span class="sd">            present in ``data``. If None (default), a mixture model without</span>
+<span class="sd">            concomitants will be initialized.</span>
 <span class="sd">        switch : bool</span>
 <span class="sd">            - ``False`` (default) if higher values of covariate ``y`` are</span>
 <span class="sd">              assumed to be the foehn cluster.</span>
@@ -172,42 +206,69 @@
 <span class="sd">        family : str or foehnix.Family class</span>
 <span class="sd">            - &#39;gaussian&#39; (default)</span>
 <span class="sd">            - &#39;logistic&#39;</span>
-<span class="sd">        control : :py:class:`foehnix.Control`</span>
+<span class="sd">        control : :py:class:`foehnix.foehnix.Control`</span>
 <span class="sd">            If None (default) it will be initialized.</span>
 <span class="sd">        kwargs : kwargs to pass to the control function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># TODO multiple concomitants? Dann list(str) etc...</span>
+        <span class="c1"># Log execution time of foehnix</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="c1"># Initialize Control</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="n">Control</span><span class="p">):</span>
+            <span class="n">control</span> <span class="o">=</span> <span class="n">Control</span><span class="p">(</span><span class="n">family</span><span class="p">,</span> <span class="n">switch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Foehnix Control object initialized.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Handle multiple concomitants as list of strings:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">concomitant</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">concomitant</span> <span class="o">=</span> <span class="p">[</span><span class="n">concomitant</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">concomitant</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">concomitant</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="c1"># Log execution time of foehnix</span>
-        <span class="c1"># TODO</span>
-
         <span class="c1"># Check if predictor and concomitant have sensible values</span>
         <span class="k">if</span> <span class="n">predictor</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Predictor variable not found in data&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Predictor variable not found in data&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">con</span> <span class="ow">in</span> <span class="n">concomitant</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">con</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Concomitant &quot;</span><span class="si">%s</span><span class="s1">&quot; not found in data&#39;</span> <span class="o">%</span> <span class="n">con</span><span class="p">)</span>
 
-        <span class="c1"># TODO think</span>
-        <span class="c1">#if concomitant is not None and concomitant not in data:</span>
-        <span class="c1">#    raise RuntimeError(&#39;Concomitant variable not found in data&#39;)</span>
-
-        <span class="c1"># Initialize Control</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="n">Control</span><span class="p">):</span>
-            <span class="n">control</span> <span class="o">=</span> <span class="n">Control</span><span class="p">(</span><span class="n">family</span><span class="p">,</span> <span class="n">switch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-        <span class="c1"># Create a strictly regular time series with pandas Datetime</span>
+        <span class="c1"># Convert index to datetime</span>
         <span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
         <span class="c1"># check if regular</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;DataFrame index is not monotonic increasing!&#39;</span><span class="p">)</span>
-        <span class="c1"># force to a strict increasing dataframe with minimal spacing</span>
-        <span class="n">mindiff</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">asfreq</span><span class="p">(</span><span class="n">mindiff</span><span class="p">)</span>
 
-        <span class="c1"># TODO a lot of checks</span>
+        <span class="c1"># calculate minimal difference to make data strictly increasing</span>
+        <span class="n">mindiff</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">inflated</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">asfreq</span><span class="p">(</span><span class="n">mindiff</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">lendata</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">inflated</span><span class="o">/</span><span class="n">lendata</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">control</span><span class="o">.</span><span class="n">force_inflate</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;You have provided a time series object spanning the &#39;</span>
+                         <span class="s1">&#39;time period </span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span>
+                         <span class="s1">&#39;The smallest recorded time interval is </span><span class="si">%d</span><span class="s1"> hours. &#39;</span>
+                         <span class="s1">&#39;foehnix tries to inflate the time series to create &#39;</span>
+                         <span class="s1">&#39;a strictly regular time series object which, in &#39;</span>
+                         <span class="s1">&#39;this case, would yield a data set of dimension &#39;</span>
+                         <span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> x </span><span class="si">%d</span><span class="s1"> (</span><span class="si">%d</span><span class="s1"> values) which is </span><span class="si">%.2f</span><span class="s1"> times the &#39;</span>
+                         <span class="s1">&#39;original data set. To avoid running into memory &#39;</span>
+                         <span class="s1">&#39;issues foehnix stops here! We ask you to check your &#39;</span>
+                         <span class="s1">&#39;data set.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                         <span class="s1">&#39;This condition can be overruled by setting the &#39;</span>
+                         <span class="s1">&#39;input argument ``force_inflate = True`` if needed. &#39;</span>
+                         <span class="s1">&#39;For more details please read the foehnix.control &#39;</span>
+                         <span class="s1">&#39;manual page.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                           <span class="n">mindiff</span><span class="o">.</span><span class="n">seconds</span><span class="o">/</span><span class="mi">3600</span><span class="p">,</span>
+                                           <span class="n">inflated</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                           <span class="n">inflated</span><span class="o">*</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                           <span class="n">inflated</span><span class="o">/</span><span class="n">lendata</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;DataFrame gets inflated, see log for details!&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Keep the number of observations (rows) added due to inflation.</span>
+        <span class="n">N_inflated</span> <span class="o">=</span> <span class="n">inflated</span> <span class="o">-</span> <span class="n">lendata</span>
+        <span class="c1"># if inflation is ok or forced, create strictly increasing dataframe</span>
+        <span class="c1"># with minimal spacing</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">asfreq</span><span class="p">(</span><span class="n">mindiff</span><span class="p">)</span>
 
         <span class="c1"># create a subset of the needed data</span>
         <span class="n">columns</span> <span class="o">=</span> <span class="n">concomitant</span> <span class="o">+</span> <span class="p">[</span><span class="n">predictor</span><span class="p">]</span>
@@ -222,39 +283,92 @@
         <span class="c1"># Take all elements which are not NaN and which are within</span>
         <span class="c1"># filter_obj[&#39;good&#39;]</span>
         <span class="n">idx_take</span> <span class="o">=</span> <span class="n">idx_notnan</span><span class="p">[</span><span class="n">idx_notnan</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">filter_obj</span><span class="p">[</span><span class="s1">&#39;good&#39;</span><span class="p">])]</span>
-
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_take</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;No data left after applying required filters.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># TODO check with Reto: constant value and truncated check should be</span>
+        <span class="c1"># TODO   after filtering in my opinion. Else the filtered data might</span>
+        <span class="c1"># TODO   contain constant values or values outside truncation</span>
+
+        <span class="c1"># check if we have columns with constant values.</span>
+        <span class="c1"># This would lead to a non-identifiable problem</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">subset</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_take</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Columns with constant values in the data!&#39;</span><span class="p">)</span>
 
         <span class="c1"># and trim data to final size</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">subset</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_take</span><span class="p">,</span> <span class="n">predictor</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">concomitant</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logitX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">concomitant</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">_logitx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">concomitant</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
             <span class="k">for</span> <span class="n">nr</span><span class="p">,</span> <span class="n">conc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">concomitant</span><span class="p">):</span>
-                <span class="n">logitX</span><span class="p">[:,</span> <span class="n">nr</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_take</span><span class="p">,</span> <span class="n">conc</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">_logitx</span><span class="p">[:,</span> <span class="n">nr</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_take</span><span class="p">,</span> <span class="n">conc</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-        <span class="c1"># Standardize data</span>
-        <span class="c1"># TODO</span>
+            <span class="c1"># store concomitant matrix in a dict</span>
+            <span class="n">logitx</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="n">_logitx</span><span class="p">,</span>
+                      <span class="s1">&#39;names&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s1">&#39;Intercept&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">concomitant</span><span class="p">),</span>
+                      <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">_logitx</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                      <span class="s1">&#39;center&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">_logitx</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                      <span class="s1">&#39;is_standardized&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 
-        <span class="c1"># call model accordingly</span>
+            <span class="c1"># If std == 0 (e.g. for the Intercept), set center=0 and scale=1</span>
+            <span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;center&#39;</span><span class="p">][</span><span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">][</span><span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="c1"># standardize data if control.standardize = True (default)</span>
+            <span class="k">if</span> <span class="n">control</span><span class="o">.</span><span class="n">standardize</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">logitx</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">standardize</span><span class="p">(</span><span class="n">logitx</span><span class="p">)</span>
+
+        <span class="c1"># If truncated family is used: y has to lie within the truncation</span>
+        <span class="c1"># points as density is not defined outside the range ]left, right[.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">control</span><span class="o">.</span><span class="n">truncated</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">control</span><span class="o">.</span><span class="n">left</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">control</span><span class="o">.</span><span class="n">right</span><span class="p">)):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Data </span><span class="si">%s</span><span class="s1"> outside of specified range for truncation &#39;</span>
+                         <span class="s1">&#39;(left = </span><span class="si">%.2f</span><span class="s1">, right = </span><span class="si">%.2f</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">predictor</span><span class="p">,</span>
+                                                          <span class="n">control</span><span class="o">.</span><span class="n">left</span><span class="p">,</span>
+                                                          <span class="n">control</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Data exceeds truncation range, log for details&#39;</span><span class="p">)</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># - Call the according model</span>
+        <span class="c1">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">concomitant</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Calling Foehnix.no_concomitant_fit&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">no_concomitant_fit</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">control</span><span class="o">.</span><span class="n">alpha</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Calling Foehnix.unreg_fit&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">unreg_fit</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">logitX</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unreg_fit</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">logitx</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
 
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Estimation finished, create final object.&#39;</span><span class="p">)</span>
 
-        <span class="c1"># Final coefficients of the concomitant model have to be destandardized</span>
-        <span class="c1"># if standardize == TRUE.</span>
+        <span class="c1"># TODO ich mach das destandardice_coefficients im iwls_logit. Reto?</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        # Final coefficients of the concomitant model have to be destandardized</span>
+<span class="sd">        if self.optimizer[&#39;ccmodel&#39;] is not None:</span>
+<span class="sd">            if logitx[&#39;is_standardized&#39;] is True:</span>
+<span class="sd">                coef = func.destandardize_coefficients(</span>
+<span class="sd">                    self.optimizer[&#39;ccmodel&#39;][&#39;coef&#39;], logitx)</span>
+<span class="sd">            else:</span>
+<span class="sd">                coef = self.optimizer[&#39;ccmodel&#39;][&#39;coef&#39;]</span>
+<span class="sd">        else:</span>
+<span class="sd">            coef = None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;ccmodel&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># TODO need to check if ceofficients are standardized</span>
-            <span class="n">coef</span> <span class="o">=</span> <span class="s1">&#39;2do&#39;</span>
+            <span class="n">coef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;ccmodel&#39;</span><span class="p">][</span><span class="s1">&#39;coef&#39;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">coef</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># If there was only one iteration: drop a warning</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;iter&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;The EM algorithm stopped after one iteration!</span><span class="se">\n</span><span class="s1">&#39;</span>
+                         <span class="s1">&#39;The coefficients returned are the initial &#39;</span>
+                         <span class="s1">&#39;coefficients. This indicates that the model as &#39;</span>
+                         <span class="s1">&#39;specified is not suitable for the data. Suggestion: &#39;</span>
+                         <span class="s1">&#39;check model (e.g, using model.plot() and &#39;</span>
+                         <span class="s1">&#39;model.summary(detailed = True) and try a different &#39;</span>
+                         <span class="s1">&#39;model specification (change/add concomitants).&#39;</span><span class="p">)</span>
 
         <span class="c1"># store relevant data within the Foehnix class</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
@@ -266,19 +380,33 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">switch</span> <span class="o">=</span> <span class="n">switch</span>
         <span class="c1"># TODO struktur von coef</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;theta&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coef_concomitants</span> <span class="o">=</span> <span class="n">coef</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;concomitants&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">coef</span>
 
-        <span class="c1"># TODO some more stuff like weights and estimated coefficients</span>
+        <span class="c1"># Calculate the weighted standard error of the estimated</span>
+        <span class="c1"># coefficients for the test statistics.</span>
+        <span class="c1"># 1. calculate weighted sum of squared residuals for both components</span>
+        <span class="n">res_c1</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;mu1&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;post&#39;</span><span class="p">])</span>
+        <span class="n">res_c2</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;mu2&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;post&#39;</span><span class="p">]</span>
+        <span class="n">mu1_se</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">res_c1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span>
+                         <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;post&#39;</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span>
+                          <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;post&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span>
+        <span class="n">mu2_se</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">res_c2</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span>
+                         <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;post&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span>
+                          <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;post&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span>
+        <span class="c1"># Standard errors for intercept of mu1(component1) and mu2(component2)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mu_se</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mu1_se&#39;</span><span class="p">:</span> <span class="n">mu1_se</span><span class="p">,</span>
+                      <span class="s1">&#39;mu2_se&#39;</span><span class="p">:</span> <span class="n">mu2_se</span><span class="p">}</span>
 
-        <span class="c1"># The final result, the foehn probability. Creates an object of the same</span>
-        <span class="c1"># class as the input &quot;data&quot; (currently only pandas.DataFrame!) with two</span>
-        <span class="c1"># columns. The first contains the final foehn probability (column name</span>
-        <span class="c1"># prob), the second column contains a flag. The flag is as follows:</span>
+        <span class="c1"># The final result, the foehn probability. Creates an object of the</span>
+        <span class="c1"># same class as the input &quot;data&quot; (currently only pandas.DataFrame!)</span>
+        <span class="c1"># with two columns. The first contains the final foehn probability</span>
+        <span class="c1"># (column name prob), the second column contains a flag. The flag is as</span>
+        <span class="c1"># follows:</span>
         <span class="c1"># - NaN  if not modelled (data for the model not available).</span>
         <span class="c1"># - 0    if foehn probability has been modelled, data not left out due</span>
         <span class="c1">#        to the filter rules.</span>
-        <span class="c1"># - 1    if the filter removed the observations/sample, not used for the</span>
-        <span class="c1"># foehn classification model, but no missing observations.</span>
+        <span class="c1"># - 1    if the filter removed the observations/sample, not used for</span>
+        <span class="c1">#        the foehn classification model, but no missing observations.</span>
 
         <span class="c1"># The following procedure is used:</span>
         <span class="c1"># - By default, use NaN for both columns.</span>
@@ -296,13 +424,20 @@
         <span class="n">tmp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filter_obj</span><span class="p">[</span><span class="s1">&#39;bad&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="c1"># store in self</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">prob</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prob</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># Store execution time in seconds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span></div>
 
     <span class="k">def</span> <span class="nf">no_concomitant_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">control</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fitting foehnix Mixture Model Without Concomitant Model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
+<span class="sd">        y : :py:class:`numpy.ndarray`</span>
+<span class="sd">            Covariate for the components of the mixture model</span>
+<span class="sd">        control : :py:class:`foehnix.foehnix.Control`</span>
+<span class="sd">            Foehnix control object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Lists to trace log-likelihood path and the development of</span>
@@ -332,6 +467,11 @@
         <span class="n">delta</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># likelihood difference between to iteration: break criteria</span>
         <span class="n">converged</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Set to False if we do not converge before maxit</span>
 
+        <span class="c1"># DataFrames to trace log-likelihood path and the development of</span>
+        <span class="c1"># the coefficients during EM optimization.</span>
+        <span class="n">coefpath</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">theta</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="n">llpath</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;component&#39;</span><span class="p">,</span> <span class="s1">&#39;concomitant&#39;</span><span class="p">,</span> <span class="s1">&#39;full&#39;</span><span class="p">])</span>
+
         <span class="k">while</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="n">control</span><span class="o">.</span><span class="n">tol_em</span><span class="p">:</span>
             <span class="c1"># M-step: update probabilites and theta</span>
             <span class="n">prob</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
@@ -343,17 +483,22 @@
             <span class="n">post</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">posterior</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">prob</span><span class="p">),</span> <span class="n">theta</span><span class="p">)</span>
 
             <span class="c1"># Store log-likelihood and coefficients of the current iteration.</span>
+            <span class="n">_ll</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">loglik</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+            <span class="n">llpath</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">_ll</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span> <span class="o">=</span> <span class="n">_ll</span>
+            <span class="n">coefpath</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">theta</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span> <span class="o">=</span> <span class="n">theta</span>
+
+            <span class="c1"># Store log-likelihood and coefficients of the current iteration.</span>
             <span class="n">llpath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">loglik</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">theta</span><span class="p">))</span>
             <span class="n">coefpath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
             <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;EM iteration </span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">, ll = </span><span class="si">%10.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">control</span><span class="o">.</span><span class="n">maxit_em</span><span class="p">,</span>
-                                                          <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">llpath</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">llpath</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
-                <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Likelihood got NA!&#39;</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Likelihood got NA!&#39;</span><span class="p">)</span>
+                                                          <span class="n">_ll</span><span class="p">[</span><span class="s1">&#39;full&#39;</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">_ll</span><span class="p">[</span><span class="s1">&#39;full&#39;</span><span class="p">]):</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Likelihood got NaN!&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Likelihood got NaN!&#39;</span><span class="p">)</span>
 
             <span class="c1"># update liklihood difference</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">llpath</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">llpath</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">delta</span> <span class="o">=</span> <span class="n">llpath</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">full</span> <span class="o">-</span> <span class="n">llpath</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">full</span>
 
             <span class="c1"># increase iteration variable</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -365,20 +510,22 @@
 
         <span class="c1"># If converged, remove last likelihood and coefficient entries</span>
         <span class="k">if</span> <span class="n">converged</span><span class="p">:</span>
-            <span class="n">llpath</span> <span class="o">=</span> <span class="n">llpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">coefpath</span> <span class="o">=</span> <span class="n">coefpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">llpath</span> <span class="o">=</span> <span class="n">llpath</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">coefpath</span> <span class="o">=</span> <span class="n">coefpath</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="c1"># TODO might have to adjust the content of llpath and coefpath</span>
-        <span class="n">colcoef</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="n">llpath</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">full</span>
+
+        <span class="c1"># effective degree of freedom</span>
+        <span class="n">edf</span> <span class="o">=</span> <span class="n">coefpath</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="c1"># create results dict</span>
         <span class="n">fdict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;prob&#39;</span><span class="p">:</span> <span class="n">prob</span><span class="p">,</span>
                  <span class="s1">&#39;post&#39;</span><span class="p">:</span> <span class="n">post</span><span class="p">,</span>
                  <span class="s1">&#39;theta&#39;</span><span class="p">:</span> <span class="n">theta</span><span class="p">,</span>
-                 <span class="s1">&#39;loglik&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">llpath</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
-                 <span class="s1">&#39;edf&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">coefpath</span><span class="p">),</span>
-                 <span class="s1">&#39;AIC&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">llpath</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">colcoef</span><span class="p">,</span>
-                 <span class="s1">&#39;BIC&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">llpath</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="o">*</span> <span class="n">colcoef</span><span class="p">,</span>
+                 <span class="s1">&#39;loglik&#39;</span><span class="p">:</span> <span class="n">ll</span><span class="p">,</span>
+                 <span class="s1">&#39;edf&#39;</span><span class="p">:</span> <span class="n">edf</span><span class="p">,</span>
+                 <span class="s1">&#39;AIC&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ll</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">edf</span><span class="p">,</span>
+                 <span class="s1">&#39;BIC&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ll</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="o">*</span> <span class="n">edf</span><span class="p">,</span>
                  <span class="s1">&#39;ccmodel&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="s1">&#39;loglikpath&#39;</span><span class="p">:</span> <span class="n">llpath</span><span class="p">,</span>
                  <span class="s1">&#39;coefpath&#39;</span><span class="p">:</span> <span class="n">coefpath</span><span class="p">,</span>
@@ -386,17 +533,25 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">fdict</span>
 
-    <span class="k">def</span> <span class="nf">unreg_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">logitX</span><span class="p">,</span> <span class="n">control</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">unreg_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">logitx</span><span class="p">,</span> <span class="n">control</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fitting foehnix Mixture Model Without Concomitant Model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        y : :py:class:`numpy.ndarray`</span>
+<span class="sd">            Covariate for the components of the mixture model</span>
+<span class="sd">        logitx : dict</span>
+<span class="sd">            Covariats for the concomitant model</span>
+<span class="sd">            Must contain:</span>
 
-        <span class="c1"># Lists to trace log-likelihood path and the development of</span>
-        <span class="c1"># the coefficients during EM optimization.</span>
-        <span class="n">llpath</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">coefpath</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="sd">            - ``&#39;values&#39;`` : :py:class:`numpy.ndarray` the model matrix</span>
+<span class="sd">            - ``&#39;center&#39;`` : list, mean of each model matrix row</span>
+<span class="sd">            - ``&#39;scale&#39;`` : list, standard deviation of matrix rows</span>
+<span class="sd">            - ``&#39;name&#39;`` : list, names of the rows</span>
+<span class="sd">            - ``&#39;is_standardized&#39;``: boolean if matrix is standardized</span>
+<span class="sd">        control : :py:class:`foehnix.foehnix.Control`</span>
+<span class="sd">            Foehnix control object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Given the initial probabilities: calculate parameters for the two</span>
         <span class="c1"># components (mu1, logsd1, mu2, logsd2) given the selected family and</span>
@@ -411,11 +566,11 @@
         <span class="c1"># Initial probability: fifty/fifty!</span>
         <span class="c1"># Force standardize = FALSE. If required logitX has alreday been</span>
         <span class="c1"># standardized in the parent function (foehnix)</span>
-        <span class="n">ccmodel</span> <span class="o">=</span> <span class="n">iwls_logit</span><span class="p">(</span><span class="n">logitX</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">ccmodel</span> <span class="o">=</span> <span class="n">iwls_logit</span><span class="p">(</span><span class="n">logitx</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                              <span class="n">maxit</span><span class="o">=</span><span class="n">control</span><span class="o">.</span><span class="n">maxit_iwls</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">control</span><span class="o">.</span><span class="n">tol_iwls</span><span class="p">)</span>
 
         <span class="c1"># Initial probabilities and prior  probabilities</span>
-        <span class="n">prob</span> <span class="o">=</span> <span class="n">logistic</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">logitX</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ccmodel</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]))</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">logistic</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;values&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ccmodel</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]))</span>
         <span class="n">post</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">posterior</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
 
         <span class="c1"># EM algorithm: estimate probabilities (prob; E-step), update the model</span>
@@ -425,12 +580,18 @@
         <span class="n">delta</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># likelihood difference between to iteration: break criteria</span>
         <span class="n">converged</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Set to False if we do not converge before maxit</span>
 
+        <span class="c1"># DataFrames to trace log-likelihood path and the development of</span>
+        <span class="c1"># the coefficients during EM optimization.</span>
+        <span class="n">coefpath</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">theta</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span>
+                                <span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;names&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="n">llpath</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;component&#39;</span><span class="p">,</span> <span class="s1">&#39;concomitant&#39;</span><span class="p">,</span> <span class="s1">&#39;full&#39;</span><span class="p">])</span>
+
         <span class="k">while</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="n">control</span><span class="o">.</span><span class="n">tol_em</span><span class="p">:</span>
             <span class="c1"># M-step: update probabilites and theta</span>
-            <span class="n">ccmodel</span> <span class="o">=</span> <span class="n">iwls_logit</span><span class="p">(</span><span class="n">logitX</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">ccmodel</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">],</span>
+            <span class="n">ccmodel</span> <span class="o">=</span> <span class="n">iwls_logit</span><span class="p">(</span><span class="n">logitx</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">ccmodel</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">],</span>
                                  <span class="n">standardize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                  <span class="n">maxit</span><span class="o">=</span><span class="n">control</span><span class="o">.</span><span class="n">maxit_iwls</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">control</span><span class="o">.</span><span class="n">tol_iwls</span><span class="p">)</span>
-            <span class="n">prob</span> <span class="o">=</span> <span class="n">logistic</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">logitX</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ccmodel</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]))</span>
+            <span class="n">prob</span> <span class="o">=</span> <span class="n">logistic</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;values&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ccmodel</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]))</span>
             <span class="c1"># TODO was mach das theta=theta hier?</span>
             <span class="n">theta</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">theta</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">post</span><span class="p">)</span>
 
@@ -438,15 +599,16 @@
             <span class="n">post</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">posterior</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
 
             <span class="c1"># Store log-likelihood and coefficients of the current iteration.</span>
-            <span class="n">llpath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">loglik</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">theta</span><span class="p">))</span>
-            <span class="c1"># TODO append theta and ccmodel.beta?</span>
-            <span class="n">coefpath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+            <span class="n">_ll</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">loglik</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+            <span class="n">llpath</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">_ll</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span> <span class="o">=</span> <span class="n">_ll</span>
+            <span class="n">coefpath</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">theta</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span> <span class="o">=</span> <span class="n">theta</span>
+            <span class="n">coefpath</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;names&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ccmodel</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
 
             <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;EM iteration </span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">, ll = </span><span class="si">%10.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">control</span><span class="o">.</span><span class="n">maxit_em</span><span class="p">,</span>
-                                                          <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">llpath</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
+                                                          <span class="n">_ll</span><span class="p">[</span><span class="s1">&#39;full&#39;</span><span class="p">]))</span>
             <span class="c1"># update liklihood difference</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">llpath</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">llpath</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">delta</span> <span class="o">=</span> <span class="n">llpath</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">full</span> <span class="o">-</span> <span class="n">llpath</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">full</span>
 
             <span class="c1"># increase iteration variable</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -458,21 +620,22 @@
 
         <span class="c1"># If converged, remove last likelihood and coefficient entries</span>
         <span class="k">if</span> <span class="n">converged</span><span class="p">:</span>
-            <span class="n">llpath</span> <span class="o">=</span> <span class="n">llpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">coefpath</span> <span class="o">=</span> <span class="n">coefpath</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">llpath</span> <span class="o">=</span> <span class="n">llpath</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">coefpath</span> <span class="o">=</span> <span class="n">coefpath</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="c1"># TODO hardcoded, muss noch die coefpath-Variable anpassen</span>
-        <span class="c1"># colcoef = ncol(coefpath)</span>
-        <span class="n">colcoef</span> <span class="o">=</span> <span class="mi">6</span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="n">llpath</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">full</span>
+
+        <span class="c1"># effective degree of freedom</span>
+        <span class="n">edf</span> <span class="o">=</span> <span class="n">coefpath</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="c1"># create results dict</span>
         <span class="n">fdict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;prob&#39;</span><span class="p">:</span> <span class="n">prob</span><span class="p">,</span>
                  <span class="s1">&#39;post&#39;</span><span class="p">:</span> <span class="n">post</span><span class="p">,</span>
                  <span class="s1">&#39;theta&#39;</span><span class="p">:</span> <span class="n">theta</span><span class="p">,</span>
-                 <span class="s1">&#39;loglik&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">llpath</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
-                 <span class="s1">&#39;edf&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">coefpath</span><span class="p">),</span>
-                 <span class="s1">&#39;AIC&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">llpath</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">colcoef</span><span class="p">,</span>
-                 <span class="s1">&#39;BIC&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">llpath</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="o">*</span> <span class="n">colcoef</span><span class="p">,</span>
+                 <span class="s1">&#39;loglik&#39;</span><span class="p">:</span> <span class="n">ll</span><span class="p">,</span>
+                 <span class="s1">&#39;edf&#39;</span><span class="p">:</span> <span class="n">edf</span><span class="p">,</span>
+                 <span class="s1">&#39;AIC&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ll</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">edf</span><span class="p">,</span>
+                 <span class="s1">&#39;BIC&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ll</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="o">*</span> <span class="n">edf</span><span class="p">,</span>
                  <span class="s1">&#39;ccmodel&#39;</span><span class="p">:</span> <span class="n">ccmodel</span><span class="p">,</span>
                  <span class="s1">&#39;loglikpath&#39;</span><span class="p">:</span> <span class="n">llpath</span><span class="p">,</span>
                  <span class="s1">&#39;coefpath&#39;</span><span class="p">:</span> <span class="n">coefpath</span><span class="p">,</span>
@@ -481,8 +644,17 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">fdict</span>
 
-    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; print summary</span>
+    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detailed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints information about the model</span>
+
+<span class="sd">        E.g. number of observations used for the classification,</span>
+<span class="sd">        the filter and its effect, and the corresponding information criteria.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        detailed : bool</span>
+<span class="sd">            If True, additional information will be printed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">sum_na</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span>
@@ -503,14 +675,31 @@
               <span class="p">(</span><span class="n">sum_0</span><span class="p">,</span> <span class="n">sum_0</span> <span class="o">/</span> <span class="n">nr</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Used for classification        </span><span class="si">%8d</span><span class="s2"> (</span><span class="si">%3.1f</span><span class="s2"> percent)&quot;</span> <span class="o">%</span>
               <span class="p">(</span><span class="n">sum_1</span><span class="p">,</span> <span class="n">sum_1</span> <span class="o">/</span> <span class="n">nr</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span>
+
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Climatological foehn occurance </span><span class="si">%.2f</span><span class="s2"> percent (on n = </span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span>
               <span class="p">(</span><span class="n">mean_occ</span><span class="p">,</span> <span class="n">mean_n</span><span class="p">))</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mean foehn probability </span><span class="si">%.2f</span><span class="s2"> percent (on n = </span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span>
               <span class="p">(</span><span class="n">mean_prob</span><span class="p">,</span> <span class="n">mean_n</span><span class="p">))</span>
+
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Log-likelihood: </span><span class="si">%.1f</span><span class="s2">, </span><span class="si">%d</span><span class="s2"> effective degrees of freedom&quot;</span> <span class="o">%</span>
-              <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;loglik&#39;</span><span class="p">],</span> <span class="o">-</span><span class="mi">999</span><span class="p">))</span>
+              <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;loglik&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;edf&#39;</span><span class="p">]))</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Corresponding AIC = </span><span class="si">%.1f</span><span class="s2">, BIC = </span><span class="si">%.1f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span>
-              <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;AIC&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;BIC&#39;</span><span class="p">]))</span></div>
+              <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;AIC&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;BIC&#39;</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of EM iterations </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span>
+              <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;iter&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">maxit_em</span><span class="p">,</span>
+               <span class="p">(</span><span class="s1">&#39;converged&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;converged&#39;</span><span class="p">]</span>
+                <span class="k">else</span> <span class="s1">&#39;not converged&#39;</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="mi">60</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Time required for model estimation: </span><span class="si">%.1f</span><span class="s2"> seconds&quot;</span> <span class="o">%</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Time required for model estimation: </span><span class="si">%.1f</span><span class="s2"> minutes&quot;</span> <span class="o">%</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">/</span><span class="mi">60</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">detailed</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">TODO: print detailed stuff&#39;</span><span class="p">)</span>
+
+            <span class="n">iwls_summary</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;ccmodel&#39;</span><span class="p">])</span></div>
 </pre></div>
 
           </div>

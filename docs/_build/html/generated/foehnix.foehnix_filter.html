@@ -64,11 +64,11 @@ further information and examples how this filter rules can be used.</p>
 <p>The most common filter rule: The filter is a <cite>dict</cite> where the dict-keys
 are column-names of the DataFrame <cite>x</cite>. The dict-values are lists of length
 2 and define the range which should be used to filter the data. Example:</p>
-<p>filter_method = {‘dd’: [43 223]}</p>
+<p>filter_method = {‘dd’: [43, 223]}</p>
 <p>This will keep all wind directions <cite>dd</cite> between 43 and 223 degrees</p>
 <p>The dict can contain several items to filter, e.g. to also limit the wind
 direction range at a crest station. Example:</p>
-<p>filter_method = {‘dd’: [43 223], ‘dd_crest’: [90, 270]}</p>
+<p>filter_method = {‘dd’: [43, 223], ‘dd_crest’: [90, 270]}</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

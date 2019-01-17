@@ -43,8 +43,52 @@
 <h1>foehnix.iwls_logit<a class="headerlink" href="#foehnix-iwls-logit" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="foehnix.iwls_logit">
-<code class="descclassname">foehnix.</code><code class="descname">iwls_logit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>beta=None</em>, <em>penalty=None</em>, <em>standardize=True</em>, <em>maxit=100</em>, <em>tol=1e-08</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/iwls_logit.html#iwls_logit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.iwls_logit" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">foehnix.</code><code class="descname">iwls_logit</code><span class="sig-paren">(</span><em>logitx</em>, <em>y</em>, <em>beta=None</em>, <em>penalty=None</em>, <em>standardize=True</em>, <em>maxit=100</em>, <em>tol=1e-08</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/iwls_logit.html#iwls_logit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.iwls_logit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterative weighted least squares solver for a logistic regression model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>logitx</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first">Must contain:</p>
+<ul class="last simple">
+<li><code class="docutils literal notranslate"><span class="pre">'values'</span></code> : <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> the model matrix</li>
+<li><code class="docutils literal notranslate"><span class="pre">'center'</span></code> : list, containing the mean of each model matrix row</li>
+<li><code class="docutils literal notranslate"><span class="pre">'scale'</span></code> : list, containing the standard deviation of matrix rows</li>
+<li><code class="docutils literal notranslate"><span class="pre">'name'</span></code> : list, containing the names of the rows</li>
+<li><code class="docutils literal notranslate"><span class="pre">'is_standardized'</span></code>: boolean info if matrix is standardized</li>
+</ul>
+</dd>
+<dt><strong>y</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></span></dt>
+<dd><p class="first last">predictor values of shape(len(observations), 1)</p>
+</dd>
+<dt><strong>beta</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code></span></dt>
+<dd><p class="first last">initial regression coefficients. If None will be initialized with 0.</p>
+</dd>
+<dt><strong>penalty</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">Penalty for regularization. Default is None.</p>
+</dd>
+<dt><strong>standardize</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">If True (default) the model matrix will be standardized</p>
+</dd>
+<dt><strong>maxit</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">maximum number of iterations, default 100.</p>
+</dd>
+<dt><strong>tol</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">tolerance for improvement between iterations, default 1e-8.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>: dict</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>

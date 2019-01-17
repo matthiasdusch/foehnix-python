@@ -48,11 +48,11 @@
 <dl class="class">
 <dt id="foehnix.GaussianFamily">
 <em class="property">class </em><code class="descclassname">foehnix.</code><code class="descname">GaussianFamily</code><a class="reference internal" href="../_modules/foehnix/families.html#GaussianFamily"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.GaussianFamily" title="Permalink to this definition">¶</a></dt>
-<dd><p>Standard gaussian foehnix mixture mode family</p>
+<dd><p>Gaussian foehnix mixture model family</p>
 <dl class="method">
 <dt id="foehnix.GaussianFamily.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/families.html#GaussianFamily.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.GaussianFamily.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dd><p>Initialize the Gaussian Family</p>
 </dd></dl>
 
 <p class="rubric">Methods</p>
@@ -63,24 +63,24 @@
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="#foehnix.GaussianFamily.__init__" title="foehnix.GaussianFamily.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>()</td>
-<td>Initialize self.</td>
+<td>Initialize the Gaussian Family</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">density</span></code>(mu,&nbsp;sigma)</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">density</span></code>(y,&nbsp;mu,&nbsp;sigma)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">distribution</span></code>(mu)</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">distribution</span></code>(q,&nbsp;mu)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">loglik</span></code>(post,&nbsp;prob,&nbsp;theta)</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">loglik</span></code>(y,&nbsp;post,&nbsp;prob,&nbsp;theta)</td>
+<td>Calculate log-likelihood sum of the two-component mixture model</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">posterior</span></code>(y,&nbsp;prob,&nbsp;theta)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">posterior</span></code>(prob,&nbsp;theta)</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">random_sample</span></code>(n,&nbsp;mu,&nbsp;sigma)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">random_sample</span></code>(mu,&nbsp;sigma)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">theta</span></code>(post[,&nbsp;init])</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">theta</span></code>(y,&nbsp;post[,&nbsp;init])</td>
 <td></td>
 </tr>
 </tbody>
