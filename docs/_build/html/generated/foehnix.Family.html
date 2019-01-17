@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>foehnix.foehnix_filter.foehnix_filter &#8212; foehnix-python 0.0.1 documentation</title>
+    <title>foehnix.Family &#8212; foehnix-python 0.0.1 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
@@ -18,8 +18,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="foehnix.iwls_logit.iwls_logit" href="foehnix.iwls_logit.iwls_logit.html" />
-    <link rel="prev" title="foehnix.families.Family" href="foehnix.families.Family.html" /> 
+    <link rel="next" title="foehnix.GaussianFamily" href="foehnix.GaussianFamily.html" />
+    <link rel="prev" title="foehnix.Foehnix" href="foehnix.Foehnix.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -28,10 +28,10 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="foehnix.iwls_logit.iwls_logit.html" title="foehnix.iwls_logit.iwls_logit"
+          <a href="foehnix.GaussianFamily.html" title="foehnix.GaussianFamily"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="foehnix.families.Family.html" title="foehnix.families.Family"
+          <a href="foehnix.Foehnix.html" title="foehnix.Foehnix"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">foehnix-python 0.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../api.html" accesskey="U">API Reference</a> &#187;</li> 
@@ -43,12 +43,48 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="foehnix-foehnix-filter-foehnix-filter">
-<h1>foehnix.foehnix_filter.foehnix_filter<a class="headerlink" href="#foehnix-foehnix-filter-foehnix-filter" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
-<dt id="foehnix.foehnix_filter.foehnix_filter">
-<code class="descclassname">foehnix.foehnix_filter.</code><code class="descname">foehnix_filter</code><span class="sig-paren">(</span><em>x</em>, <em>filter_method=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/foehnix_filter.html#foehnix_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.foehnix_filter.foehnix_filter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Foehnix filter function</p>
+  <div class="section" id="foehnix-family">
+<h1>foehnix.Family<a class="headerlink" href="#foehnix-family" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="foehnix.Family">
+<em class="property">class </em><code class="descclassname">foehnix.</code><code class="descname">Family</code><a class="reference internal" href="../_modules/foehnix/families.html#Family"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.Family" title="Permalink to this definition">¶</a></dt>
+<dd><p>Common logic for the foehnix families</p>
+<dl class="method">
+<dt id="foehnix.Family.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/families.html#Family.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.Family.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#foehnix.Family.__init__" title="foehnix.Family.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>()</td>
+<td>Initialize self.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">density</span></code>(y,&nbsp;mu,&nbsp;sigma)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">distribution</span></code>(q,&nbsp;mu)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">loglik</span></code>(y,&nbsp;post,&nbsp;prob,&nbsp;theta)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">posterior</span></code>(y,&nbsp;prob,&nbsp;theta)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">random_sample</span></code>(n,&nbsp;mu,&nbsp;sigma)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">theta</span></code>(y,&nbsp;post[,&nbsp;init])</td>
+<td></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -60,15 +96,15 @@
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="foehnix.families.Family.html"
-                        title="previous chapter">foehnix.families.Family</a></p>
+  <p class="topless"><a href="foehnix.Foehnix.html"
+                        title="previous chapter">foehnix.Foehnix</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="foehnix.iwls_logit.iwls_logit.html"
-                        title="next chapter">foehnix.iwls_logit.iwls_logit</a></p>
+  <p class="topless"><a href="foehnix.GaussianFamily.html"
+                        title="next chapter">foehnix.GaussianFamily</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/generated/foehnix.foehnix_filter.foehnix_filter.rst.txt"
+      <li><a href="../_sources/generated/foehnix.Family.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -95,10 +131,10 @@
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="foehnix.iwls_logit.iwls_logit.html" title="foehnix.iwls_logit.iwls_logit"
+          <a href="foehnix.GaussianFamily.html" title="foehnix.GaussianFamily"
              >next</a> |</li>
         <li class="right" >
-          <a href="foehnix.families.Family.html" title="foehnix.families.Family"
+          <a href="foehnix.Foehnix.html" title="foehnix.Foehnix"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">foehnix-python 0.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../api.html" >API Reference</a> &#187;</li> 

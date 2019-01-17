@@ -1,49 +1,76 @@
 import numpy as np
 import scipy
+import logging
+
+# logger
+log = logging.getLogger(__name__)
 
 
 class Family:
-    """Common logic for the foehnix families
+    """
+    Common logic for the foehnix families
 
     """
 
     def __init__(self):
         self.name = 'Main family'
 
-    def density(y, mu, sigma):
+    def density(self, y, mu, sigma):
         raise NotImplementedError
 
-    def distribution(q, mu):
+    def distribution(self, q, mu):
         raise NotImplementedError
 
-    def loglik(y, post, prob, theta):
+    def loglik(self, y, post, prob, theta):
         raise NotImplementedError
 
-    def random_sample(n, mu, sigma):
+    def random_sample(self, n, mu, sigma):
         raise NotImplementedError
 
-    def posterior(y, prob, theta):
+    def posterior(self, y, prob, theta):
         raise NotImplementedError
 
-    def theta(y, post, init=False):
+    def theta(self, y, post, init=False):
         raise NotImplementedError
 
 
 class GaussianFamily(Family):
-    """Standard gaussian foehnix mixture mode family
+    """
+    Gaussian foehnix mixture model family
 
     """
 
     def __init__(self):
+        """
+        Initialize the Gaussian Family
+        """
         self.name = 'Gaussian'
 
-    def density(y, mu, sigma):
+    def density(self, y, mu, sigma):
         raise NotImplementedError
 
-    def distribution(q, mu):
+    def distribution(self, q, mu):
         raise NotImplementedError
 
-    def loglik(y, post, prob, theta):
+    def loglik(self, y, post, prob, theta):
+        """
+        Calculate log-likelihood sum of the two-component mixture model
+
+        Parameters
+        ----------
+        post : py:class:`numpy.array`
+            posteriori
+        prob : py:class:`numpy.array`
+            probability
+        theta : dict
+            contains mu1, mu2, logsd1, logsd2
+
+        Returns
+        -------
+        : dict
+            Component, concomitant and sum of both
+
+        """
         # limit prob to [eps, 1-eps]
         eps = np.sqrt(np.finfo(float).eps)
         prob = np.maximum(eps, np.minimum(1-eps, prob))
@@ -59,13 +86,14 @@ class GaussianFamily(Family):
 
         concomitant = np.sum((1-post) * np.log(1-prob) + post * np.log(prob))
 
-        # TODO do I need to return both components? if so list is not very sexy
-        return [component, concomitant]
+        return {'component': component,
+                'concomitant': concomitant,
+                'full': component+concomitant}
 
-    def random_sample(n, mu, sigma):
+    def random_sample(self, n, mu, sigma):
         raise NotImplementedError
 
-    def posterior(y, prob, theta):
+    def posterior(self, y, prob, theta):
         dnorm1 = scipy.stats.norm(loc=theta['mu1'],
                                   scale=np.exp(theta['logsd1'])).pdf(y)
         dnorm2 = scipy.stats.norm(loc=theta['mu2'],
@@ -74,7 +102,7 @@ class GaussianFamily(Family):
         post = prob * dnorm2 / ((1-prob) * dnorm1 + prob * dnorm2)
         return post
 
-    def theta(y, post, init=False):
+    def theta(self, y, post, init=False):
         # Emperical update of mu and std
         mu1 = np.sum((1-post) * y) / (np.sum(1-post))
         mu2 = np.sum(post * y) / np.sum(post)
@@ -94,6 +122,49 @@ class GaussianFamily(Family):
         return theta
 
 
-def logitprob(x, alpha):
-    x = alpha[0] + x * alpha[1]
-    return np.exp(x) / (1 + np.exp(x))
+def initialize_family(familyname='gaussian', left=float('-Inf'),
+                      right=float('Inf'), truncated=False):
+    """
+    Helper function to initialize a Foehnix Family based on arguments
+
+    Parameters
+    ----------
+    familyname : str
+
+        - `gaussian' (default)
+        - 'logistic'
+    truncated : bool
+    left : float
+    right : float
+
+    Returns
+    -------
+    py:class:`foehnix.Family` object
+
+    """
+
+    if not isinstance(truncated, bool):
+        raise ValueError('truncated must be boolean True or False')
+
+    if familyname == 'gaussian':
+        if np.isfinite([left, right]).any():
+            if truncated is True:
+                family = TruncatedGaussianFamily(left=left, right=right)
+            else:
+                family = CensoredGaussianFamily(left=left, right=right)
+        else:
+            family = GaussianFamily()
+
+    elif familyname == 'logistic':
+        if np.isfinite([left, right]).any():
+            if truncated is True:
+                family = TruncatedLogisticFamily(left=left, right=right)
+            else:
+                family = CensoredLogsticFamily(left=left, right=right)
+        else:
+            family = LogisticFamily()
+    else:
+        raise ValueError('familyname must be gaussian or logistic')
+
+    log.debug('%s model family initialized.' % family.name)
+    return family

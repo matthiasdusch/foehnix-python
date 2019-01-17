@@ -1,7 +1,7 @@
-foehnix.families.Family
-=======================
+foehnix.Family
+==============
 
-.. currentmodule:: foehnix.families
+.. currentmodule:: foehnix
 
 .. autoclass:: Family
 

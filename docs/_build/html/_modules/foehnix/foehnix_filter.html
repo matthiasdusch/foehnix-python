@@ -56,8 +56,58 @@
     <span class="k">return</span> <span class="n">filtered</span>
 
 
-<div class="viewcode-block" id="foehnix_filter"><a class="viewcode-back" href="../../generated/foehnix.foehnix_filter.foehnix_filter.html#foehnix.foehnix_filter.foehnix_filter">[docs]</a><span class="k">def</span> <span class="nf">foehnix_filter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">filter_method</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Foehnix filter function</span>
+<div class="viewcode-block" id="foehnix_filter"><a class="viewcode-back" href="../../generated/foehnix.foehnix_filter.html#foehnix.foehnix_filter">[docs]</a><span class="k">def</span> <span class="nf">foehnix_filter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">filter_method</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Evaluates Data Filter Rules for foehnix Mixture Model Calls</span>
+
+<span class="sd">    :py:class:`foehnix.Foehnix` models allow to specify an optional</span>
+<span class="sd">    :py:func:`foehnix.foehnix_filter`. If a filter is given only a subset of</span>
+<span class="sd">    the data set provided to :py:class:`foehnix.Foehnix` is used for the foehn</span>
+<span class="sd">    classification.</span>
+
+<span class="sd">    A typical example is a wind direction filter such that</span>
+<span class="sd">    only observations (times) are used where the observed</span>
+<span class="sd">    wind direction was within a user defined wind sector</span>
+<span class="sd">    corresponding to the wind direction during foehn events</span>
+<span class="sd">    for a specific location.</span>
+
+<span class="sd">    However, the filter option allows to even implement complex</span>
+<span class="sd">    filter rules if required. The &#39;Details&#39; section contains</span>
+<span class="sd">    further information and examples how this filter rules can be used.</span>
+
+<span class="sd">    The most common filter rule: The filter is a `dict` where the dict-keys</span>
+<span class="sd">    are column-names of the DataFrame `x`. The dict-values are lists of length</span>
+<span class="sd">    2 and define the range which should be used to filter the data. Example:</span>
+
+<span class="sd">    filter_method = {&#39;dd&#39;: [43, 223]}</span>
+
+<span class="sd">    This will keep all wind directions `dd` between 43 and 223 degrees</span>
+
+<span class="sd">    The dict can contain several items to filter, e.g. to also limit the wind</span>
+<span class="sd">    direction range at a crest station. Example:</span>
+
+<span class="sd">    filter_method = {&#39;dd&#39;: [43, 223], &#39;dd_crest&#39;: [90, 270]}</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : py:class:`pandas.DataFrame`</span>
+<span class="sd">        containing the observations</span>
+<span class="sd">    filter_method : None, custom function or dict</span>
+<span class="sd">        Can be one of the following:</span>
+
+<span class="sd">        - `None`: No filter will be applied</span>
+<span class="sd">        - `func`: A custom function which will be applied on x</span>
+<span class="sd">        - `dict`: Keys must be columns of x, values can either be a custom</span>
+<span class="sd">           function on x[key] or a list of length two.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary containing the following items:</span>
+
+<span class="sd">        - `dict[&#39;good&#39;]`: all indices of x within the filter values</span>
+<span class="sd">        - `dict[&#39;bad&#39;]` : all indices of x outside the filter values</span>
+<span class="sd">        - `dict[&#39;ugly&#39;]`: all indices where one of the filter variables is NAN</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># check x</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
@@ -99,7 +149,7 @@
 
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Key: </span><span class="si">%s</span><span class="s1"> of filterdict not found in data&#39;</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Filterdict key: </span><span class="si">%s</span><span class="s1"> not found in data&#39;</span>
                                        <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
 
                 <span class="n">tmp</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">(),</span> <span class="n">nr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -113,19 +163,15 @@
                     <span class="n">tmp</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">|</span>
                                  <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span> <span class="n">nr</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
-                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Applied limit-filter to key </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Applied limit-filter [</span><span class="si">%.1f</span><span class="s1"> </span><span class="si">%.1f</span><span class="s1">] to key </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="p">))</span>
 
-        <span class="n">filtered</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="c1"># - If at least one element is NAN     -&gt; set to NAN</span>
+        <span class="c1"># - If all elements are TRUE (=1)      -&gt; set to 1</span>
+        <span class="c1"># - Else: One ore more are FALSE (=0)  -&gt; set to 0</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">filtered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="n">filtered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">tmp</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="n">filtered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">tmp</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
-
-        <span class="c1"># TODO Retos &quot;tmp &lt;- apply(tmp, 1, all)&quot; macht entgegen der Doku</span>
-        <span class="c1"># aus 0 und NAN -&gt; FALSE und nicht NA. Kann man diskutieren.</span>
-        <span class="c1"># test in R:</span>
-        <span class="c1"># x &lt;- cbind(x1 = c(1,0,NaN,1,NaN), x2=c(0,NaN,1,NaN,0))</span>
-        <span class="c1"># print(x)</span>
-        <span class="c1"># apply(x, 1, all)</span>
-
 
     <span class="c1"># 4. error</span>
     <span class="k">else</span><span class="p">:</span>

@@ -1,7 +1,7 @@
-foehnix.foehnix.Foehnix
-=======================
+foehnix.Foehnix
+===============
 
-.. currentmodule:: foehnix.foehnix
+.. currentmodule:: foehnix
 
 .. autoclass:: Foehnix
 
