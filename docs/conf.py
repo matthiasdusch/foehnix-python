@@ -15,6 +15,12 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+try:
+    import sphinx_bootstrap_theme
+    print("sphinx_bootstrap_thme: %s, %s" %
+          (sphinx_bootstrap_theme.__version__, sphinx_bootstrap_theme.__file__))
+except ImportError:
+    print("no sphinx_bootstrap_theme")
 
 try:
     import IPython
@@ -122,7 +128,9 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 #
 # html_theme = 'alabaster'
-html_theme = 'classic'
+# html_theme = 'classic'
+html_theme = 'bootstrap'
+html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
