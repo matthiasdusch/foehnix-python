@@ -35,6 +35,36 @@ def standardize(x):
     return x
 
 
+def destandardize(x):
+    """
+    Function to DE-standardize the values of the concomitant matrix.
+
+    Parameters
+    ----------
+    x : dict
+        Must contain:
+        - ``'values'`` : :py:class:`numpy.ndarray` the model matrix
+        - ``'center'`` : list, containing the mean of each model matrix row
+        - ``'scale'`` : list, containing the standard deviation of matrix rows
+        - ``'is_standardized'``: bool, will trigger destandardization if True
+          and will be set to False afterwards
+
+    Returns
+    -------
+
+    x : dict
+        Same dict, with destandardized values if necessary
+    """
+    if x['is_standardized'] is True:
+        x['values'] = x['values'] * x['scale'] + x['center']
+        x['is_standardized'] = False
+        log.debug('Model matrix destandardized.')
+    else:
+        log.info('Destandardization called but data is not standardized.')
+
+    return x
+
+
 def destandardize_coefficients(beta, x):
     """
     Destandardize Regression Coefficients
@@ -69,7 +99,7 @@ def destandardize_coefficients(beta, x):
                                      x['center'][nic] /
                                      x['scale'][nic])
         # Descaling all other regression coefficients
-        beta[nic] <- beta[nic] / x['scale'][nic]
+        beta[nic] = beta[nic] / x['scale'][nic]
 
         log.debug('Regression coefficients destandardized (with Intercept).')
     else:

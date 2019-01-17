@@ -125,7 +125,8 @@ def foehnix_filter(x, filter_method=None):
                     tmp[np.where((x[key] >= value[0]) |
                                  (x[key] <= value[1])), nr] = 1
 
-                log.info('Applied limit-filter to key %s' % key)
+                log.info('Applied limit-filter [%.1f %.1f] to key %s' % (
+                    value[0], value[1], key))
 
         # - If at least one element is NAN     -> set to NAN
         # - If all elements are TRUE (=1)      -> set to 1

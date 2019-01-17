@@ -67,6 +67,8 @@ class GaussianFamily(Family):
 
         Returns
         -------
+        : dict
+            Component, concomitant and sum of both
 
         """
         # limit prob to [eps, 1-eps]
@@ -84,8 +86,9 @@ class GaussianFamily(Family):
 
         concomitant = np.sum((1-post) * np.log(1-prob) + post * np.log(prob))
 
-        # TODO do I need to return both components? if so list is not very sexy
-        return [component, concomitant]
+        return {'component': component,
+                'concomitant': concomitant,
+                'full': component+concomitant}
 
     def random_sample(self, n, mu, sigma):
         raise NotImplementedError

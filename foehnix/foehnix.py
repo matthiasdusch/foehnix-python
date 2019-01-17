@@ -4,9 +4,9 @@ import logging
 from scipy.stats import logistic
 import time
 
-from foehnix.families import *
+from foehnix.families import Family, initialize_family
 from foehnix.foehnix_filter import foehnix_filter
-from foehnix.iwls_logit import iwls_logit
+from foehnix.iwls_logit import iwls_logit, iwls_summary
 import foehnix.foehnix_functions as func
 
 # logger
@@ -268,7 +268,7 @@ class Foehnix:
 
             # store concomitant matrix in a dict
             logitx = {'values': _logitx,
-                      'names': ['Intercept'] + concomitant,
+                      'names': np.array(['Intercept'] + concomitant),
                       'scale': np.std(_logitx, axis=0),
                       'center': np.mean(_logitx, axis=0),
                       'is_standardized': False}
@@ -294,6 +294,8 @@ class Foehnix:
         #
         # - Call the according model
         #
+        self.optimizer = None
+
         if len(concomitant) == 0:
             log.info('Calling Foehnix.no_concomitant_fit')
             self.no_concomitant_fit(y, control)
@@ -303,6 +305,8 @@ class Foehnix:
 
         log.info('Estimation finished, create final object.')
 
+        # TODO ich mach das destandardice_coefficients im iwls_logit. Reto?
+        """
         # Final coefficients of the concomitant model have to be destandardized
         if self.optimizer['ccmodel'] is not None:
             if logitx['is_standardized'] is True:
@@ -310,6 +314,13 @@ class Foehnix:
                     self.optimizer['ccmodel']['coef'], logitx)
             else:
                 coef = self.optimizer['ccmodel']['coef']
+        else:
+            coef = None
+        """
+        if self.optimizer['ccmodel'] is not None:
+            coef = self.optimizer['ccmodel']['coef']
+        else:
+            coef = None
 
         # If there was only one iteration: drop a warning
         if self.optimizer['iter'] == 0:
@@ -331,9 +342,8 @@ class Foehnix:
         self.switch = switch
         # TODO struktur von coef
         self.coef = self.optimizer['theta']
-        self.coef_concomitants = coef
+        self.coef['concomitants'] = coef
 
-        # TODO some more stuff like weights and estimated coefficients
         # Calculate the weighted standard error of the estimated
         # coefficients for the test statistics.
         # 1. calculate weighted sum of squared residuals for both components
@@ -419,6 +429,11 @@ class Foehnix:
         delta = 1  # likelihood difference between to iteration: break criteria
         converged = True  # Set to False if we do not converge before maxit
 
+        # DataFrames to trace log-likelihood path and the development of
+        # the coefficients during EM optimization.
+        coefpath = pd.DataFrame([], columns=list(theta.keys()))
+        llpath = pd.DataFrame([], columns=['component', 'concomitant', 'full'])
+
         while delta > control.tol_em:
             # M-step: update probabilites and theta
             prob = np.mean(post)
@@ -430,17 +445,22 @@ class Foehnix:
             post = control.family.posterior(y, np.mean(prob), theta)
 
             # Store log-likelihood and coefficients of the current iteration.
+            _ll = control.family.loglik(y, post, prob, theta)
+            llpath.loc[i, _ll.keys()] = _ll
+            coefpath.loc[i, theta.keys()] = theta
+
+            # Store log-likelihood and coefficients of the current iteration.
             llpath.append(control.family.loglik(y, post, prob, theta))
             coefpath.append(theta)
             log.info('EM iteration %d/%d, ll = %10.2f' % (i, control.maxit_em,
-                                                          np.sum(llpath[i])))
-            if np.isnan(np.sum(llpath[i])):
+                                                          _ll['full']))
+            if np.isnan(_ll['full']):
                 log.critical('Likelihood got NaN!')
                 raise RuntimeError('Likelihood got NaN!')
 
             # update liklihood difference
             if i > 0:
-                delta = np.sum(llpath[i]) - np.sum(llpath[i-1])
+                delta = llpath.iloc[i].full - llpath.iloc[i-1].full
 
             # increase iteration variable
             i += 1
@@ -452,21 +472,22 @@ class Foehnix:
 
         # If converged, remove last likelihood and coefficient entries
         if converged:
-            llpath = llpath[:-1]
-            coefpath = coefpath[:-1]
-        ll = np.sum(llpath[-1])
+            llpath = llpath.iloc[:-1]
+            coefpath = coefpath.iloc[:-1]
 
-        # TODO might have to adjust the content of llpath and coefpath
-        colcoef = 1
+        ll = llpath.iloc[-1].full
+
+        # effective degree of freedom
+        edf = coefpath.shape[1]
 
         # create results dict
         fdict = {'prob': prob,
                  'post': post,
                  'theta': theta,
                  'loglik': ll,
-                 'edf': len(coefpath),
-                 'AIC': -2 * ll + 2 * colcoef,
-                 'BIC': -2 * ll + np.log(len(y)) * colcoef,
+                 'edf': edf,
+                 'AIC': -2 * ll + 2 * edf,
+                 'BIC': -2 * ll + np.log(len(y)) * edf,
                  'ccmodel': None,
                  'loglikpath': llpath,
                  'coefpath': coefpath,
@@ -493,11 +514,6 @@ class Foehnix:
         control : :py:class:`foehnix.foehnix.Control`
             Foehnix control object
         """
-
-        # Lists to trace log-likelihood path and the development of
-        # the coefficients during EM optimization.
-        llpath = []
-        coefpath = []
 
         # Given the initial probabilities: calculate parameters for the two
         # components (mu1, logsd1, mu2, logsd2) given the selected family and
@@ -526,6 +542,12 @@ class Foehnix:
         delta = 1  # likelihood difference between to iteration: break criteria
         converged = True  # Set to False if we do not converge before maxit
 
+        # DataFrames to trace log-likelihood path and the development of
+        # the coefficients during EM optimization.
+        coefpath = pd.DataFrame([], columns=list(theta.keys()) +
+                                logitx['names'].tolist())
+        llpath = pd.DataFrame([], columns=['component', 'concomitant', 'full'])
+
         while delta > control.tol_em:
             # M-step: update probabilites and theta
             ccmodel = iwls_logit(logitx, post, beta=ccmodel['beta'],
@@ -539,15 +561,16 @@ class Foehnix:
             post = control.family.posterior(y, prob, theta)
 
             # Store log-likelihood and coefficients of the current iteration.
-            llpath.append(control.family.loglik(y, post, prob, theta))
-            # TODO append theta and ccmodel.beta?
-            coefpath.append(theta)
+            _ll = control.family.loglik(y, post, prob, theta)
+            llpath.loc[i, _ll.keys()] = _ll
+            coefpath.loc[i, theta.keys()] = theta
+            coefpath.loc[i, logitx['names']] = ccmodel['beta'].squeeze()
 
             log.info('EM iteration %d/%d, ll = %10.2f' % (i, control.maxit_em,
-                                                          np.sum(llpath[i])))
+                                                          _ll['full']))
             # update liklihood difference
             if i > 0:
-                delta = np.sum(llpath[i]) - np.sum(llpath[i-1])
+                delta = llpath.iloc[i].full - llpath.iloc[i-1].full
 
             # increase iteration variable
             i += 1
@@ -559,30 +582,22 @@ class Foehnix:
 
         # If converged, remove last likelihood and coefficient entries
         if converged:
-            llpath = llpath[:-1]
-            coefpath = coefpath[:-1],
+            llpath = llpath.iloc[:-1]
+            coefpath = coefpath.iloc[:-1]
 
-        ll = np.sum(llpath[-1])
-        # TODO im em algorithmus:
-        # TODO - beta (Intercept und ff) zu coefpath dazu schreiben
-        # TODO - coefpath etwas anderes format wählen
-        # TODO
+        ll = llpath.iloc[-1].full
 
-        import pdb
-        pdb.set_trace()
-
-        # TODO hardcoded, muss noch die coefpath-Variable anpassen
-        # colcoef = ncol(coefpath)
-        colcoef = 6
+        # effective degree of freedom
+        edf = coefpath.shape[1]
 
         # create results dict
         fdict = {'prob': prob,
                  'post': post,
                  'theta': theta,
                  'loglik': ll,
-                 'edf': len(coefpath),
-                 'AIC': -2 * ll + 2 * colcoef,
-                 'BIC': -2 * llpath + np.log(len(y)) * colcoef,
+                 'edf': edf,
+                 'AIC': -2 * ll + 2 * edf,
+                 'BIC': -2 * ll + np.log(len(y)) * edf,
                  'ccmodel': ccmodel,
                  'loglikpath': llpath,
                  'coefpath': coefpath,
@@ -591,8 +606,17 @@ class Foehnix:
 
         self.optimizer = fdict
 
-    def summary(self):
-        """ print summary
+    def summary(self, detailed=False):
+        """
+        Prints information about the model
+
+        E.g. number of observations used for the classification,
+        the filter and its effect, and the corresponding information criteria.
+
+        Parameters
+        ----------
+        detailed : bool
+            If True, additional information will be printed
         """
 
         sum_na = self.prob.isna().sum()['flag']
@@ -613,11 +637,28 @@ class Foehnix:
               (sum_0, sum_0 / nr * 100))
         print("Used for classification        %8d (%3.1f percent)" %
               (sum_1, sum_1 / nr * 100))
+
         print("\nClimatological foehn occurance %.2f percent (on n = %d)" %
               (mean_occ, mean_n))
         print("Mean foehn probability %.2f percent (on n = %d)" %
               (mean_prob, mean_n))
+
         print("\nLog-likelihood: %.1f, %d effective degrees of freedom" %
-              (self.optimizer['loglik'], -999))
+              (self.optimizer['loglik'], self.optimizer['edf']))
         print("Corresponding AIC = %.1f, BIC = %.1f\n" %
               (self.optimizer['AIC'], self.optimizer['BIC']))
+        print("Number of EM iterations %d/%d (%s)" %
+              (self.optimizer['iter'], self.control.maxit_em,
+               ('converged' if self.optimizer['converged']
+                else 'not converged')))
+        if self.time < 60:
+            print("Time required for model estimation: %.1f seconds" %
+                  self.time)
+        else:
+            print("Time required for model estimation: %.1f minutes" %
+                  self.time/60)
+
+        if detailed:
+            print('\nTODO: print detailed stuff')
+
+            iwls_summary(self.optimizer['ccmodel'])
