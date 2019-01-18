@@ -39,3 +39,15 @@ IWLS
     :nosignatures:
 
     foehnix.iwls_logit
+
+
+Plotting
+========
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    foehnix.model_plots.loglik
+    foehnix.model_plots.loglikcontribution
+    foehnix.model_plots.coef

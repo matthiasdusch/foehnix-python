@@ -73,7 +73,6 @@ extensions = [
     'matplotlib.sphinxext.mathmpl',
     #'matplotlib.sphinxext.only_directives',
     'matplotlib.sphinxext.plot_directive',
-    #'matplotlib.sphinxext.ipython_directive'
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
