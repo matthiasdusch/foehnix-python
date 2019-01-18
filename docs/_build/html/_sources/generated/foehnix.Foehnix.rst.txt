@@ -15,6 +15,7 @@ foehnix.Foehnix
    
       ~Foehnix.__init__
       ~Foehnix.no_concomitant_fit
+      ~Foehnix.plot
       ~Foehnix.summary
       ~Foehnix.unreg_fit
    
