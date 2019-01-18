@@ -16,6 +16,12 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 try:
+    import matplotlib
+    matplotlib.use('TkAgg')
+    print("matplotlib: %s, %s" % (matplotlib.__version__, matplotlib.__file__))
+except ImportError:
+    print("no matplotlib")
+try:
     import sphinx_bootstrap_theme
     print("sphinx_bootstrap_thme: %s, %s" %
           (sphinx_bootstrap_theme.__version__, sphinx_bootstrap_theme.__file__))
@@ -37,12 +43,6 @@ try:
     print("pandas: %s, %s" % (pandas.__version__, pandas.__file__))
 except ImportError:
     print("no pandas")
-try:
-    import matplotlib
-    matplotlib.use('Agg')
-    print("matplotlib: %s, %s" % (matplotlib.__version__, matplotlib.__file__))
-except ImportError:
-    print("no matplotlib")
 
 import foehnix  # noqa: E402
 # print("foehnix: %s, %s" % (foehnix.__version__, foehnix.__file__))
@@ -70,6 +70,10 @@ release = '0.0.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'matplotlib.sphinxext.mathmpl',
+    #'matplotlib.sphinxext.only_directives',
+    'matplotlib.sphinxext.plot_directive',
+    #'matplotlib.sphinxext.ipython_directive'
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',

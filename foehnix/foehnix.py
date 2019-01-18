@@ -8,6 +8,7 @@ from foehnix.families import Family, initialize_family
 from foehnix.foehnix_filter import foehnix_filter
 from foehnix.iwls_logit import iwls_logit, iwls_summary
 import foehnix.foehnix_functions as func
+from foehnix import model_plots
 
 # logger
 log = logging.getLogger(__name__)
@@ -425,7 +426,7 @@ class Foehnix:
         # EM algorithm: estimate probabilities (prob; E-step), update the model
         # given the new probabilities (M-step). Always with respect to the
         # selected family.
-        i = 0  # iteration variable
+        i = 1  # iteration variable
         delta = 1  # likelihood difference between to iteration: break criteria
         converged = True  # Set to False if we do not converge before maxit
 
@@ -459,8 +460,8 @@ class Foehnix:
                 raise RuntimeError('Likelihood got NaN!')
 
             # update liklihood difference
-            if i > 0:
-                delta = llpath.iloc[i].full - llpath.iloc[i-1].full
+            if i > 1:
+                delta = llpath.iloc[-1].full - llpath.iloc[-2].full
 
             # increase iteration variable
             i += 1
@@ -491,7 +492,8 @@ class Foehnix:
                  'ccmodel': None,
                  'loglikpath': llpath,
                  'coefpath': coefpath,
-                 'converged': converged}
+                 'converged': converged,
+                 'iter': i-1}
 
         self.optimizer = fdict
 
@@ -538,7 +540,7 @@ class Foehnix:
         # EM algorithm: estimate probabilities (prob; E-step), update the model
         # given the new probabilities (M-step). Always with respect to the
         # selected family.
-        i = 0  # iteration variable
+        i = 1  # iteration variable
         delta = 1  # likelihood difference between to iteration: break criteria
         converged = True  # Set to False if we do not converge before maxit
 
@@ -569,8 +571,8 @@ class Foehnix:
             log.info('EM iteration %d/%d, ll = %10.2f' % (i, control.maxit_em,
                                                           _ll['full']))
             # update liklihood difference
-            if i > 0:
-                delta = llpath.iloc[i].full - llpath.iloc[i-1].full
+            if i > 1:
+                delta = llpath.iloc[-1].full - llpath.iloc[-2].full
 
             # increase iteration variable
             i += 1
@@ -662,3 +664,37 @@ class Foehnix:
             print('\nTODO: print detailed stuff')
 
             iwls_summary(self.optimizer['ccmodel'])
+
+    def plot(self, which, **kwargs):
+        """
+        Plotting method, helper function.
+
+        Parameters
+        ----------
+        which : str or list of strings
+            string(s) to select a specific plotting function. Available:
+
+            - ``loglik`` (default) :py:class:`foehnix.model_plots.loglik`
+            - ``loglikcontribution``
+              :py:class:`foehnix.model_plots.loglikcontribution`
+            - ``coef`` :py:class:`foehnix.model_plots.coef`
+        kwargs
+            additional keyword-arguments to pass to the plotting functions.
+            See description of the individual functions for details.
+        """
+        #
+        if isinstance(which, str):
+            which = [which]
+        elif not isinstance(which, list):
+            raise ValueError('Argument must be string or list of strings.')
+
+        for i in which:
+            if i == 'loglik':
+                model_plots.loglik(self, **kwargs)
+            elif i == 'loglikcontribution':
+                model_plots.loglikcontribution(self, **kwargs)
+            elif i == 'coef':
+                model_plots.coef(self, **kwargs)
+
+            else:
+                log.critical('Skipping "%s", not a valid plot argument' % i)
