@@ -119,7 +119,7 @@ def check_dependencies(package_names):
 req_packages = ['numpy',
                 'scipy',
                 'pandas',
-                'matplotlib',
+                'matplotlib'
                 ]
 check_dependencies(req_packages)
 

@@ -78,7 +78,7 @@ def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
     llpath = []
     coefpath = []
 
-    i = 0  # iteration variable
+    i = 1  # iteration variable
     delta = 1  # likelihood difference between to iteration: break criteria
     converged = True  # Set to False if we do not converge before maxit
     eps = np.finfo(float).eps
@@ -115,8 +115,8 @@ def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
 
         log.debug('Iteration %d, ll=%15.4f, %s' % (i, llpath[-1], pentext))
 
-        if i > 0:
-            delta = llpath[i] - llpath[i-1]
+        if i > 1:
+            delta = llpath[-1] - llpath[-2]
 
         # check if we converged
         if i == maxit:
