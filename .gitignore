@@ -18,3 +18,4 @@ foehnix/version.py
 /doctrees
 .buildinfo
 docs/generated
+docs/savefig

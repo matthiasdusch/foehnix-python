@@ -39,6 +39,8 @@ Some of the features:
 - Model assessment based on graphical output and information criteria.
 - Automatic handling of missing values in the data set.
 
+.. figure:: savefig/timeseries.png
+    :width: 100%
 
 
 
