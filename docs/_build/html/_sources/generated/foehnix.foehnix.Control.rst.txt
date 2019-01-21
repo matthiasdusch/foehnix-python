@@ -1,0 +1,22 @@
+foehnix.foehnix.Control
+=======================
+
+.. currentmodule:: foehnix.foehnix
+
+.. autoclass:: Control
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Control.__init__
+   
+   
+
+   
+   
+   

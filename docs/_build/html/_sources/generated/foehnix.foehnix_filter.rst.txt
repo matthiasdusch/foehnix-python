@@ -1,0 +1,6 @@
+foehnix.foehnix\_filter
+=======================
+
+.. currentmodule:: foehnix
+
+.. autofunction:: foehnix_filter

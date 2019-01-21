@@ -1,0 +1,28 @@
+foehnix.Family
+==============
+
+.. currentmodule:: foehnix
+
+.. autoclass:: Family
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Family.__init__
+      ~Family.density
+      ~Family.distribution
+      ~Family.loglik
+      ~Family.posterior
+      ~Family.random_sample
+      ~Family.theta
+   
+   
+
+   
+   
+   
