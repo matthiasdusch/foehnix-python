@@ -1,6 +1,0 @@
-foehnix.model\_plots.coef
-=========================
-
-.. currentmodule:: foehnix.model_plots
-
-.. autofunction:: coef
