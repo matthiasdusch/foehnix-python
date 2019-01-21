@@ -54,10 +54,11 @@ project = 'foehnix-python'
 copyright = '2019, Matthias Dusch'
 author = 'Matthias Dusch'
 
+import foehnix
 # The short X.Y version
-version = ''
-# The full version, including alpha/beta/rc tags
-release = '0.0.1'
+version = foehnix.__version__
+# The full version, including alpha/beta/rc tags.
+release = foehnix.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -71,7 +72,6 @@ release = '0.0.1'
 # ones.
 extensions = [
     'matplotlib.sphinxext.mathmpl',
-    #'matplotlib.sphinxext.only_directives',
     'matplotlib.sphinxext.plot_directive',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
@@ -88,6 +88,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
+    'sphinxcontrib.bibtex'
 ]
 
 autosummary_generate = True
@@ -139,7 +140,77 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    # Navigation bar title. (Default: ``project`` value)
+    # 'navbar_title': "foehnix",
+
+    # Tab name for entire site. (Default: "Site")
+    'navbar_site_name': "Site navigation",
+
+    # A list of tuples containing pages or urls to link to.
+    # Valid tuples should be in the following forms:
+    #    (name, page)                 # a link to a page
+    #    (name, "/aa/bb", 1)          # a link to an arbitrary relative url
+    #    (name, "http://example.com", True) # arbitrary absolute url
+    # Note the "1" or "True" value above as the third argument to indicate
+    # an arbitrary url.
+    'navbar_links': [
+        ("Getting started", "foehnix-demo"),
+        ("API reference", "api"),
+    #    ("Link", "http://example.com", True),
+    ],
+
+    # Render the next and previous page links in navbar. (Default: true)
+    'navbar_sidebarrel': False,
+
+    # Render the current pages TOC in the navbar. (Default: true)
+    'navbar_pagenav': False,
+
+    # Tab name for the current pages TOC. (Default: "Page")
+    'navbar_pagenav_name': "Page",
+
+    # Global TOC depth for "site" navbar tab. (Default: 1)
+    # Switching to -1 shows all levels.
+    'globaltoc_depth': 2,
+
+    # Include hidden TOCs in Site navbar?
+    #
+    # Note: If this is "false", you cannot have mixed ``:hidden:`` and
+    # non-hidden ``toctree`` directives in the same page, or else the build
+    # will break.
+    #
+    # Values: "true" (default) or "false"
+    'globaltoc_includehidden': "false",
+
+    # HTML navbar class (Default: "navbar") to attach to <div> element.
+    # For black navbar, do "navbar navbar-inverse"
+    # 'navbar_class': "navbar navbar-inverse",
+
+    # Fix navigation bar to top of page?
+    # Values: "true" (default) or "false"
+    'navbar_fixed_top': "true",
+
+    # Location of link to source.
+    # Options are "nav" (default), "footer" or anything else to exclude.
+    'source_link_position': "exclude",
+
+    # Bootswatch (http://bootswatch.com/) theme.
+    #
+    # Options are nothing (default) or the name of a valid theme
+    # such as "cosmo" or "sandstone".
+    #
+    # The set of valid themes depend on the version of Bootstrap
+    # that's used (the next config option).
+    #
+    # Currently, the supported themes are:
+    # - Bootstrap 2: https://bootswatch.com/2
+    # - Bootstrap 3: https://bootswatch.com/3
+    'bootswatch_theme': "flatly",
+
+    # Choose Bootstrap version.
+    # Values: "3" (default) or "2" (in quotes)
+    'bootstrap_version': "3",
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -238,3 +309,9 @@ epub_exclude_files = ['search.html']
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+intersphinx_mapping = {'numpy': ('http://docs.scipy.org/doc/numpy/', None),
+                       'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None),
+                       'matplotlib': ('http://matplotlib.org/', None),
+                       'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None)
+                       }

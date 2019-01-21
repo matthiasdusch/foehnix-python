@@ -19,6 +19,7 @@ Tools to set-up and run OGGM.
     foehnix.Foehnix
     foehnix.Family
     foehnix.GaussianFamily
+    foehnix.foehnix.Control
 
 
 Filter

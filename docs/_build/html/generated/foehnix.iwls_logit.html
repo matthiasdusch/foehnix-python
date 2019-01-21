@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>foehnix.iwls_logit &#8212; foehnix-python 0.0.1 documentation</title>
+    <title>foehnix.iwls_logit &#8212; foehnix-python 0.0.6 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -38,11 +38,14 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           foehnix-python</a>
-        <span class="navbar-text navbar-version pull-left"><b></b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.6</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
+            
+                <li><a href="../foehnix-demo.html">Getting started</a></li>
+                <li><a href="../api.html">API reference</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -50,57 +53,16 @@
      id="dLabelGlobalToc"
      data-toggle="dropdown"
      data-target="#"
-     href="../index.html">Site <b class="caret"></b></a>
+     href="../index.html">Site navigation <b class="caret"></b></a>
   <ul class="dropdown-menu globaltoc"
       role="menu"
-      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Started</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../foehnix-demo.html">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../simulation.html">simulation</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Python Implementation</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a></li>
-</ul>
-</ul>
-</li>
-              
-                <li class="dropdown">
-  <a role="button"
-     id="dLabelLocalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="#">Page <b class="caret"></b></a>
-  <ul class="dropdown-menu localtoc"
-      role="menu"
-      aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">foehnix.iwls_logit</a></li>
-</ul>
-</ul>
+      aria-labelledby="dLabelGlobalToc"></ul>
 </li>
               
             
             
-              
-                
-  <li>
-    <a href="foehnix.foehnix_filter.html" title="Previous Chapter: foehnix.foehnix_filter"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; foehnix.foehn...</span>
-    </a>
-  </li>
-  <li>
-    <a href="foehnix.model_plots.loglik.html" title="Next Chapter: foehnix.model_plots.loglik"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">foehnix.model... &raquo;</span>
-    </a>
-  </li>
-              
             
             
-            
-            
-              <li class="hidden-sm">
-<div id="sourcelink">
-  <a href="../_sources/generated/foehnix.iwls_logit.rst.txt"
-     rel="nofollow">Source</a>
-</div></li>
             
           </ul>
 
@@ -136,17 +98,17 @@
 <dt><strong>logitx</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
 <dd><p class="first">Must contain:</p>
 <ul class="last simple">
-<li><code class="docutils literal notranslate"><span class="pre">'values'</span></code> : <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> the model matrix</li>
+<li><code class="docutils literal notranslate"><span class="pre">'values'</span></code> : <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> the model matrix</li>
 <li><code class="docutils literal notranslate"><span class="pre">'center'</span></code> : list, containing the mean of each model matrix row</li>
 <li><code class="docutils literal notranslate"><span class="pre">'scale'</span></code> : list, containing the standard deviation of matrix rows</li>
 <li><code class="docutils literal notranslate"><span class="pre">'name'</span></code> : list, containing the names of the rows</li>
 <li><code class="docutils literal notranslate"><span class="pre">'is_standardized'</span></code>: boolean info if matrix is standardized</li>
 </ul>
 </dd>
-<dt><strong>y</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></span></dt>
+<dt><strong>y</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a></span></dt>
 <dd><p class="first last">predictor values of shape(len(observations), 1)</p>
 </dd>
-<dt><strong>beta</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code></span></dt>
+<dt><strong>beta</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a></span></dt>
 <dd><p class="first last">initial regression coefficients. If None will be initialized with 0.</p>
 </dd>
 <dt><strong>penalty</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>

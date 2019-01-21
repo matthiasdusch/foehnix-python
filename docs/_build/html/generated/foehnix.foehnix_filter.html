@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>foehnix.foehnix_filter &#8212; foehnix-python 0.0.1 documentation</title>
+    <title>foehnix.foehnix_filter &#8212; foehnix-python 0.0.6 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="foehnix.iwls_logit" href="foehnix.iwls_logit.html" />
-    <link rel="prev" title="foehnix.GaussianFamily" href="foehnix.GaussianFamily.html" />
+    <link rel="prev" title="foehnix.foehnix.Control" href="foehnix.foehnix.Control.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -38,11 +38,14 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           foehnix-python</a>
-        <span class="navbar-text navbar-version pull-left"><b></b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.6</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
+            
+                <li><a href="../foehnix-demo.html">Getting started</a></li>
+                <li><a href="../api.html">API reference</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -50,57 +53,16 @@
      id="dLabelGlobalToc"
      data-toggle="dropdown"
      data-target="#"
-     href="../index.html">Site <b class="caret"></b></a>
+     href="../index.html">Site navigation <b class="caret"></b></a>
   <ul class="dropdown-menu globaltoc"
       role="menu"
-      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Started</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../foehnix-demo.html">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../simulation.html">simulation</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Python Implementation</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a></li>
-</ul>
-</ul>
-</li>
-              
-                <li class="dropdown">
-  <a role="button"
-     id="dLabelLocalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="#">Page <b class="caret"></b></a>
-  <ul class="dropdown-menu localtoc"
-      role="menu"
-      aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">foehnix.foehnix_filter</a></li>
-</ul>
-</ul>
+      aria-labelledby="dLabelGlobalToc"></ul>
 </li>
               
             
             
-              
-                
-  <li>
-    <a href="foehnix.GaussianFamily.html" title="Previous Chapter: foehnix.GaussianFamily"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; foehnix.Gauss...</span>
-    </a>
-  </li>
-  <li>
-    <a href="foehnix.iwls_logit.html" title="Next Chapter: foehnix.iwls_logit"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">foehnix.iwls_logit &raquo;</span>
-    </a>
-  </li>
-              
             
             
-            
-            
-              <li class="hidden-sm">
-<div id="sourcelink">
-  <a href="../_sources/generated/foehnix.foehnix_filter.rst.txt"
-     rel="nofollow">Source</a>
-</div></li>
             
           </ul>
 
@@ -153,19 +115,16 @@ direction range at a crest station. Example:</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>x</strong> <span class="classifier-delimiter">:</span> <span class="classifier">py:class:<cite>pandas.DataFrame</cite></span></dt>
+<dt><strong>x</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.23.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></span></dt>
 <dd><p class="first last">containing the observations</p>
 </dd>
 <dt><strong>filter_method</strong> <span class="classifier-delimiter">:</span> <span class="classifier">None, custom function or dict</span></dt>
 <dd><p class="first">Can be one of the following:</p>
 <ul class="last simple">
 <li><cite>None</cite>: No filter will be applied</li>
-<li><cite>func</cite>: A custom function which will be applied on x</li>
-<li><dl class="first docutils">
-<dt><cite>dict</cite>: Keys must be columns of x, values can either be a custom</dt>
-<dd>function on x[key] or a list of length two.</dd>
-</dl>
-</li>
+<li><cite>func</cite>: A custom function which will be applied on <code class="docutils literal notranslate"><span class="pre">x</span></code></li>
+<li><cite>dict</cite>: Keys must be columns of <code class="docutils literal notranslate"><span class="pre">x</span></code>, values can either be a custom
+function on <code class="docutils literal notranslate"><span class="pre">x[key]</span></code> or a list of length two.</li>
 </ul>
 </dd>
 </dl>
@@ -175,8 +134,8 @@ direction range at a crest station. Example:</p>
 <dt><strong>dict</strong></dt>
 <dd><p class="first">A dictionary containing the following items:</p>
 <ul class="last simple">
-<li><cite>dict[‘good’]</cite>: all indices of x within the filter values</li>
-<li><cite>dict[‘bad’]</cite> : all indices of x outside the filter values</li>
+<li><cite>dict[‘good’]</cite>: all indices of <code class="docutils literal notranslate"><span class="pre">x</span></code> within the filter values</li>
+<li><cite>dict[‘bad’]</cite> : all indices of <code class="docutils literal notranslate"><span class="pre">x</span></code> outside the filter values</li>
 <li><cite>dict[‘ugly’]</cite>: all indices where one of the filter variables is NAN</li>
 </ul>
 </dd>

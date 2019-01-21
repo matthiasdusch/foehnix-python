@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>foehnix.foehnix_filter &#8212; foehnix-python 0.0.1 documentation</title>
+    <title>foehnix.foehnix_filter &#8212; foehnix-python 0.0.6 documentation</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -36,11 +36,14 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           foehnix-python</a>
-        <span class="navbar-text navbar-version pull-left"><b></b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.6</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
+            
+                <li><a href="../../foehnix-demo.html">Getting started</a></li>
+                <li><a href="../../api.html">API reference</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -48,42 +51,16 @@
      id="dLabelGlobalToc"
      data-toggle="dropdown"
      data-target="#"
-     href="../../index.html">Site <b class="caret"></b></a>
+     href="../../index.html">Site navigation <b class="caret"></b></a>
   <ul class="dropdown-menu globaltoc"
       role="menu"
-      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Started</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../foehnix-demo.html">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../simulation.html">simulation</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Python Implementation</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
-</ul>
-</ul>
-</li>
-              
-                <li class="dropdown">
-  <a role="button"
-     id="dLabelLocalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="#">Page <b class="caret"></b></a>
-  <ul class="dropdown-menu localtoc"
-      role="menu"
-      aria-labelledby="dLabelLocalToc"></ul>
+      aria-labelledby="dLabelGlobalToc"></ul>
 </li>
               
             
             
-              
-                
-              
             
             
-            
-            
-              <li class="hidden-sm"></li>
             
           </ul>
 
@@ -160,23 +137,23 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : py:class:`pandas.DataFrame`</span>
+<span class="sd">    x : :py:class:`pandas.DataFrame`</span>
 <span class="sd">        containing the observations</span>
 <span class="sd">    filter_method : None, custom function or dict</span>
 <span class="sd">        Can be one of the following:</span>
 
 <span class="sd">        - `None`: No filter will be applied</span>
-<span class="sd">        - `func`: A custom function which will be applied on x</span>
-<span class="sd">        - `dict`: Keys must be columns of x, values can either be a custom</span>
-<span class="sd">           function on x[key] or a list of length two.</span>
+<span class="sd">        - `func`: A custom function which will be applied on ``x``</span>
+<span class="sd">        - `dict`: Keys must be columns of ``x``, values can either be a custom</span>
+<span class="sd">          function on ``x[key]`` or a list of length two.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
 <span class="sd">        A dictionary containing the following items:</span>
 
-<span class="sd">        - `dict[&#39;good&#39;]`: all indices of x within the filter values</span>
-<span class="sd">        - `dict[&#39;bad&#39;]` : all indices of x outside the filter values</span>
+<span class="sd">        - `dict[&#39;good&#39;]`: all indices of ``x`` within the filter values</span>
+<span class="sd">        - `dict[&#39;bad&#39;]` : all indices of ``x`` outside the filter values</span>
 <span class="sd">        - `dict[&#39;ugly&#39;]`: all indices where one of the filter variables is NAN</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># check x</span>

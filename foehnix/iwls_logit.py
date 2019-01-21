@@ -28,7 +28,7 @@ def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
         - ``'is_standardized'``: boolean info if matrix is standardized
     y : :py:class:`numpy.ndarray`
         predictor values of shape(len(observations), 1)
-    beta : :py:class:`numpy.array`
+    beta : :py:class:`numpy.ndarray`
         initial regression coefficients. If None will be initialized with 0.
     penalty : float
         Penalty for regularization. Default is None.

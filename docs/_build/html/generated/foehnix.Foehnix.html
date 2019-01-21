@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>foehnix.Foehnix &#8212; foehnix-python 0.0.1 documentation</title>
+    <title>foehnix.Foehnix &#8212; foehnix-python 0.0.6 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -38,11 +38,14 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           foehnix-python</a>
-        <span class="navbar-text navbar-version pull-left"><b></b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.6</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
+            
+                <li><a href="../foehnix-demo.html">Getting started</a></li>
+                <li><a href="../api.html">API reference</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -50,57 +53,16 @@
      id="dLabelGlobalToc"
      data-toggle="dropdown"
      data-target="#"
-     href="../index.html">Site <b class="caret"></b></a>
+     href="../index.html">Site navigation <b class="caret"></b></a>
   <ul class="dropdown-menu globaltoc"
       role="menu"
-      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Started</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../foehnix-demo.html">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../simulation.html">simulation</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Python Implementation</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a></li>
-</ul>
-</ul>
-</li>
-              
-                <li class="dropdown">
-  <a role="button"
-     id="dLabelLocalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="#">Page <b class="caret"></b></a>
-  <ul class="dropdown-menu localtoc"
-      role="menu"
-      aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">foehnix.Foehnix</a></li>
-</ul>
-</ul>
+      aria-labelledby="dLabelGlobalToc"></ul>
 </li>
               
             
             
-              
-                
-  <li>
-    <a href="../api.html" title="Previous Chapter: API Reference"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; API Reference</span>
-    </a>
-  </li>
-  <li>
-    <a href="foehnix.Family.html" title="Next Chapter: foehnix.Family"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">foehnix.Family &raquo;</span>
-    </a>
-  </li>
-              
             
             
-            
-            
-              <li class="hidden-sm">
-<div id="sourcelink">
-  <a href="../_sources/generated/foehnix.Foehnix.rst.txt"
-     rel="nofollow">Source</a>
-</div></li>
             
           </ul>
 
@@ -143,7 +105,7 @@ mixture models for automated foehn classification.</p>
 <dd><p class="first last">Name of the main predictor (covariate) variable which is used to
 identify the foehn/no-foehn cluster. Must be present in <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p>
 </dd>
-<dt><strong>data</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></span></dt>
+<dt><strong>data</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.23.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></span></dt>
 <dd><p class="first last">Index must be a time object, rows must contain neccesary data</p>
 </dd>
 <dt><strong>concomitant</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or list of str</span></dt>
@@ -169,7 +131,7 @@ data to only use data from within a certain wind sector. See
 <li>‘logistic’</li>
 </ul>
 </dd>
-<dt><strong>control</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.foehnix.Control</span></code></span></dt>
+<dt><strong>control</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="foehnix.foehnix.Control.html#foehnix.foehnix.Control" title="foehnix.foehnix.Control"><code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.foehnix.Control</span></code></a></span></dt>
 <dd><p class="first last">If None (default) it will be initialized.</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">kwargs to pass to the control function</span></dt>
