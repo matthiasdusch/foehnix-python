@@ -1,0 +1,22 @@
+foehnix.timeseries\_plots.TSControl
+===================================
+
+.. currentmodule:: foehnix.timeseries_plots
+
+.. autoclass:: TSControl
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TSControl.__init__
+   
+   
+
+   
+   
+   

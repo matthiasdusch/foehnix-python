@@ -1,0 +1,6 @@
+foehnix.iwls\_logit
+===================
+
+.. currentmodule:: foehnix
+
+.. autofunction:: iwls_logit
