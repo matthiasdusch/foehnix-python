@@ -8,7 +8,7 @@ from foehnix.families import Family, initialize_family
 from foehnix.foehnix_filter import foehnix_filter
 from foehnix.iwls_logit import iwls_logit, iwls_summary
 import foehnix.foehnix_functions as func
-from foehnix import model_plots
+from foehnix import model_plots, timeseries_plots
 
 # logger
 log = logging.getLogger(__name__)
@@ -379,7 +379,8 @@ class Foehnix:
         #   to 0 (probability for foehn is 0), set the second column to FALSE.
 
         # Foehn probability (a-posteriori probability)
-        tmp = pd.DataFrame([], columns=['prob', 'flag'], index=data.index)
+        tmp = pd.DataFrame([], columns=['prob', 'flag'], index=data.index,
+                           dtype=float)
         # Store a-posteriory probability and flag = TRUE
         tmp.loc[idx_take, 'prob'] = self.optimizer['post'].reshape(len(y))
         tmp.loc[idx_take, 'flag'] = 1
@@ -695,6 +696,8 @@ class Foehnix:
                 model_plots.loglikcontribution(self, **kwargs)
             elif i == 'coef':
                 model_plots.coef(self, **kwargs)
+            elif i == 'timeseries':
+                timeseries_plots.tsplot(self, **kwargs)
 
             else:
                 log.critical('Skipping "%s", not a valid plot argument' % i)

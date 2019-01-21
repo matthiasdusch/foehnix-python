@@ -205,7 +205,7 @@ html_theme_options = {
     # Currently, the supported themes are:
     # - Bootstrap 2: https://bootswatch.com/2
     # - Bootstrap 3: https://bootswatch.com/3
-    'bootswatch_theme': "flatly",
+    'bootswatch_theme': "sandstone",
 
     # Choose Bootstrap version.
     # Values: "3" (default) or "2" (in quotes)

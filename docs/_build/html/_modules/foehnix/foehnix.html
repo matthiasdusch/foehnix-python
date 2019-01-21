@@ -93,7 +93,7 @@
 <span class="kn">from</span> <span class="nn">foehnix.foehnix_filter</span> <span class="k">import</span> <span class="n">foehnix_filter</span>
 <span class="kn">from</span> <span class="nn">foehnix.iwls_logit</span> <span class="k">import</span> <span class="n">iwls_logit</span><span class="p">,</span> <span class="n">iwls_summary</span>
 <span class="kn">import</span> <span class="nn">foehnix.foehnix_functions</span> <span class="k">as</span> <span class="nn">func</span>
-<span class="kn">from</span> <span class="nn">foehnix</span> <span class="k">import</span> <span class="n">model_plots</span>
+<span class="kn">from</span> <span class="nn">foehnix</span> <span class="k">import</span> <span class="n">model_plots</span><span class="p">,</span> <span class="n">timeseries_plots</span>
 
 <span class="c1"># logger</span>
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -464,7 +464,8 @@
         <span class="c1">#   to 0 (probability for foehn is 0), set the second column to FALSE.</span>
 
         <span class="c1"># Foehn probability (a-posteriori probability)</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;prob&#39;</span><span class="p">,</span> <span class="s1">&#39;flag&#39;</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;prob&#39;</span><span class="p">,</span> <span class="s1">&#39;flag&#39;</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                           <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="c1"># Store a-posteriory probability and flag = TRUE</span>
         <span class="n">tmp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_take</span><span class="p">,</span> <span class="s1">&#39;prob&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;post&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
         <span class="n">tmp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_take</span><span class="p">,</span> <span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
@@ -780,6 +781,8 @@
                 <span class="n">model_plots</span><span class="o">.</span><span class="n">loglikcontribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="s1">&#39;coef&#39;</span><span class="p">:</span>
                 <span class="n">model_plots</span><span class="o">.</span><span class="n">coef</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="s1">&#39;timeseries&#39;</span><span class="p">:</span>
+                <span class="n">timeseries_plots</span><span class="o">.</span><span class="n">tsplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Skipping &quot;</span><span class="si">%s</span><span class="s1">&quot;, not a valid plot argument&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span></div>

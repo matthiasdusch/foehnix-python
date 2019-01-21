@@ -52,3 +52,5 @@ Plotting
     foehnix.model_plots.loglik
     foehnix.model_plots.loglikcontribution
     foehnix.model_plots.coef
+    foehnix.timeseries_plots.TSControl
+    foehnix.timeseries_plots.tsplot
