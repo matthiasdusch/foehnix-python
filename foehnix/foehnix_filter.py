@@ -52,23 +52,23 @@ def foehnix_filter(x, filter_method=None):
 
     Parameters
     ----------
-    x : py:class:`pandas.DataFrame`
+    x : :py:class:`pandas.DataFrame`
         containing the observations
     filter_method : None, custom function or dict
         Can be one of the following:
 
         - `None`: No filter will be applied
-        - `func`: A custom function which will be applied on x
-        - `dict`: Keys must be columns of x, values can either be a custom
-           function on x[key] or a list of length two.
+        - `func`: A custom function which will be applied on ``x``
+        - `dict`: Keys must be columns of ``x``, values can either be a custom
+          function on ``x[key]`` or a list of length two.
 
     Returns
     -------
     dict
         A dictionary containing the following items:
 
-        - `dict['good']`: all indices of x within the filter values
-        - `dict['bad']` : all indices of x outside the filter values
+        - `dict['good']`: all indices of ``x`` within the filter values
+        - `dict['bad']` : all indices of ``x`` outside the filter values
         - `dict['ugly']`: all indices where one of the filter variables is NAN
     """
     # check x
