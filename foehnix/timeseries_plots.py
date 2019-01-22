@@ -146,6 +146,9 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
         raise AttributeError('First Attribute must be a foehnix mixture model '
                              ' instance.')
 
+    # difference between time steps
+    dt = fmm.data.index.to_series().diff().min()
+
     # check start and end values
     if start is not None:
         try:
@@ -154,6 +157,16 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
             log.critical('Could not convert start value to Datetime. Using '
                          'first data point instead.')
             start = fmm.data.index[0]
+        # check if provided start date matches exact time stamp. Else take
+        # closest value within two time stamps. This will take care if data
+        # is not at full hours but the user provides a date only as start.
+        if start not in fmm.data.index:
+            if np.abs(fmm.data.index - start).min() <= dt:
+                start = fmm.data.index[np.abs(fmm.data.index - start).argmin()]
+            else:
+                log.critical('Start value not within DataFrame, taking first '
+                             'data point instead.')
+                start = fmm.data.index[0]
     else:
         start = fmm.data.index[0]
 
@@ -164,13 +177,23 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
             log.critical('Could not convert end value to Datetime. Using '
                          'last data point instead.')
             end = fmm.data.index[-1]
+        # see equivalent info for start above
+        if end not in fmm.data.index:
+            if np.abs(fmm.data.index - end).min() <= dt:
+                end = fmm.data.index[np.abs(fmm.data.index - end).argmin()]
+            else:
+                log.critical('End value not within DataFrame, taking first '
+                             'data point instead.')
+                end = fmm.data.index[-1]
     else:
         end = fmm.data.index[-1]
 
-    # difference between time steps
-    dt = fmm.data.index.to_series().diff().min()
+    # starting dates to plot:
+    # First date is 0UTC of the starting date
+    # Then intervalls of ndays
+    # Last plot will contain end date, but still be ndays long
     dates = pd.date_range(start.date(),
-                          (end + pd.to_timedelta('1D')).date(),
+                          (end + pd.to_timedelta('23H')).date(),
                           freq='%dD' % ndays)
 
     # make sorted list of subplot keys
@@ -184,7 +207,13 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
     plt.rc('legend', fontsize=8)    # legend fontsize
     plt.rc('figure', titlesize=12)  # fontsize of the figure title
 
-    for i in dates[:3]:
+    for i in dates:
+
+        # check if all plotdates out of DataFrame index
+        if (i > fmm.data.index[-1]) or (i+1 < fmm.data.index[0]):
+            log.critical('No data for timeseries plot between %s and %s. '
+                         'Skipping.' % (i, i+1))
+            continue
 
         fig, axs = plt.subplots(nrows=tscontrol.subplots, ncols=1,
                                 figsize=(12, 2*tscontrol.subplots))
@@ -203,6 +232,8 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
                                  tscontrol.ctrldict['t'][0]].min()-0.2,
                                  fmm.data.loc[i:i+1,
                                  tscontrol.ctrldict['t'][0]].max()+0.2))
+                axs[j].set_zorder(3)
+                axs[j].patch.set_visible(False)
 
             if 'diff_t' in vals:
                 axs[j].plot(fmm.data.loc[i:i+1,
@@ -219,12 +250,12 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
                 axrh = axs[j].twinx()
 
                 axrh.plot(fmm.data.loc[i:i+1, tscontrol.ctrldict['rh'][0]],
-                          color=tscontrol.ctrldict['rh'][1], zorder=1)
+                          color=tscontrol.ctrldict['rh'][1])
                 axrh.fill_between(fmm.data.loc[i:i+1].index,
                                   fmm.data.loc[i:i+1,
                                   tscontrol.ctrldict['rh'][0]],
                                   facecolor=tscontrol.ctrldict['rh'][1],
-                                  alpha=0.3, zorder=1)
+                                  alpha=0.3)
                 axrh.set(ylabel=tscontrol.ctrldict['rh'][2],
                          ylim=(0, 140))
                 axrh.set_yticks([20, 40, 60, 80])
@@ -239,7 +270,7 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
                                   fmm.data.loc[i:i+1,
                                   tscontrol.ctrldict['ff'][0]],
                                   facecolor=tscontrol.ctrldict['ff'][1],
-                                  alpha=0.3)
+                                  alpha=0.3, zorder=1)
                 axff.set(ylabel=tscontrol.ctrldict['ff'][2],
                          ylim=(0, fmm.data.loc[i:i+1,
                                tscontrol.ctrldict['ff'][0]].max() + 0.5))
@@ -249,24 +280,27 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
                     axff = axs[j].twinx()
 
                 axff.plot(fmm.data.loc[i:i+1, tscontrol.ctrldict['ffx'][0]],
-                          color=tscontrol.ctrldict['ffx'][1], zorder=1,
-                          label='gust speed')
+                          color=tscontrol.ctrldict['ffx'][1], zorder=2,
+                          label=tscontrol.ctrldict['ffx'][2])
 
                 axff.set(ylim=(0, fmm.data.loc[i:i+1,
                          tscontrol.ctrldict['ffx'][0]].max() + 0.5))
                 if 'ff' not in vals:
                     axff.set(ylabel=tscontrol.ctrldict['ffx'][2])
                 else:
-                    axff.legend(loc=4)
+                    lffx = axff.legend(loc=4)
+                    lffx.set_zorder(100)
 
             if 'dd' in vals:
                 axs[j].plot(fmm.data.loc[i:i+1, tscontrol.ctrldict['dd'][0]],
                             '.',
-                            color=tscontrol.ctrldict['dd'][1], zorder=2)
+                            color=tscontrol.ctrldict['dd'][1], zorder=50)
                 axs[j].set(ylabel=tscontrol.ctrldict['dd'][2],
                            ylim=(0, 360))
 
                 axs[j].set_yticks([90, 180, 270])
+                axs[j].set_zorder(3)
+                axs[j].patch.set_visible(False)
 
             if 'prob' in vals:
                 axs[j].plot(fmm.prob.loc[i:i+1, 'prob']*100,
@@ -286,14 +320,14 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
         inan = fmm.prob.loc[i:i+1].index[np.where(fmm.prob.loc[i:i+1,
                                                   'prob'].isna())]
         if len(inan) > 0:
-            axs[-1].plot(inan, np.zeros(inan.shape), 'b+', ms=10,
+            axs[-1].plot(inan, np.zeros(inan.shape)-2, 'b+', ms=10,
                          color='C7',
                          clip_on=False, zorder=100)
         # prob > 50%
         i50 = fmm.prob.loc[i:i+1].index[np.where(fmm.prob.loc[i:i+1,
                                                  'prob'] > 0.5)]
         if len(i50) > 0:
-            axs[-1].plot(i50, np.zeros(i50.shape), 'b+', ms=10,
+            axs[-1].plot(i50, np.zeros(i50.shape)-2, 'b+', ms=10,
                          color=tscontrol.ctrldict['prob'][1],
                          clip_on=False, zorder=100)
 
@@ -304,7 +338,7 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
                 p50 = fmm.prob.loc[i:i+1, 'prob'].copy()*np.nan
                 p50.loc[i50] = ylim[1]
                 ax.fill_between(p50.index, p50, y2=ylim[0],
-                                facecolor='C7', alpha=0.2)
+                                facecolor='C7', alpha=0.2, zorder=50)
 
         axs[-1].xaxis.set_major_formatter(mdates.DateFormatter('\n%Y-%m-%d'))
         axs[-1].xaxis.set_major_locator(mdates.DayLocator())
