@@ -38,6 +38,7 @@ def loglik(fmm, log=True, **kwargs):
            title='foehnix log-likelihood path')
     ax.legend(loc=1, ncol=3)
     fig.tight_layout()
+    plt.show(block=False)
 
 
 def loglikcontribution(fmm, log=True, **kwargs):
@@ -73,6 +74,7 @@ def loglikcontribution(fmm, log=True, **kwargs):
            title='foehnix log-likelihood contribution')
     ax.legend(loc=1, ncol=3)
     fig.tight_layout()
+    plt.show(block=False)
 
 
 def coef(fmm, log=True, **kwargs):
@@ -126,5 +128,6 @@ def coef(fmm, log=True, **kwargs):
         ax1.legend(loc=1, ncol=4)
 
     fig.tight_layout()
+    plt.show(block=False)
 
     # TODO conditional histogram plot

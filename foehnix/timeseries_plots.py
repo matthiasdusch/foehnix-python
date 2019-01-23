@@ -18,7 +18,7 @@ class TSControl:
     Can be used to set variable names, colors and labels.
     """
 
-    def __init__(self, fmm, userdict={}, **kwargs):
+    def __init__(self, fmm, userdict=None, **kwargs):
         """
         Initializes a control object instance.
 
@@ -63,6 +63,9 @@ class TSControl:
             'ffx': ['ffx', 'C4', 'gust speed [m/s]'],
             'prob': [None, 'C6', 'probability']
         }
+
+        if userdict is None:
+            userdict = {}
 
         for key in userdict.keys():
             try:
@@ -119,23 +122,41 @@ class TSControl:
         self.doplot = doplot
 
 
-def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
-           userdict={}, **kwargs):
+def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, show_n_plots=3,
+           userdict=None, **kwargs):
     """
     Time series plot for foehnix models
 
     Parameters
     ----------
-    fmm
-    start
-    end
-    ndays
-    tscontrol
-    ask
-
-    Returns
-    -------
-
+    fmm : :py:class:`foehnix.Foehnix`
+        A foehnix mixture model object
+    start : str or Datetime timestamp
+        First day to plot. Will be converted to a timestamp, if possible.
+        Must be within the daterange of fmm.data.
+    end : str or Datetime timestamp
+        Last day to fully plot. Will be converted to a timestamp, if possible.
+        Must be within the daterange of fmm.data.
+    ndays : int
+        Number of days which one plot shows. Default 10.
+    tscontrol : :py:class:`foehnix.timeseries_plots.TSControl` object
+        Can be predefined before calling this function or else will be
+        initialized if None (default).
+    show_n_plots : int
+        How many figures will be opened, default is 1. After closing all, the
+        next ones will be opened.
+    userdict : dict
+        alternative plotting parameters (variable names, colors, labels) which
+        will be passed to TSControl. See
+        :py:class:`foehnix.timeseries_plots.TSControl` for more details.
+        If a suitable ``tscontrol`` argument is provided this dict will be
+        ignored.
+    kwargs
+        will be passed to TSControl and can be used to rename the variable
+        names of the ``fmm.data`` DataFrame. See
+        :py:class:`foehnix.timeseries_plots.TSControl` for more details.
+        If a suitable ``tscontrol`` argument is provided these argumetns will
+        be ignored.
     """
 
     # If no control object is provided: Use default one.
@@ -157,6 +178,7 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
             log.critical('Could not convert start value to Datetime. Using '
                          'first data point instead.')
             start = fmm.data.index[0]
+        """
         # check if provided start date matches exact time stamp. Else take
         # closest value within two time stamps. This will take care if data
         # is not at full hours but the user provides a date only as start.
@@ -167,6 +189,7 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
                 log.critical('Start value not within DataFrame, taking first '
                              'data point instead.')
                 start = fmm.data.index[0]
+        """
     else:
         start = fmm.data.index[0]
 
@@ -178,6 +201,7 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
                          'last data point instead.')
             end = fmm.data.index[-1]
         # see equivalent info for start above
+        """
         if end not in fmm.data.index:
             if np.abs(fmm.data.index - end).min() <= dt:
                 end = fmm.data.index[np.abs(fmm.data.index - end).argmin()]
@@ -185,6 +209,7 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
                 log.critical('End value not within DataFrame, taking first '
                              'data point instead.')
                 end = fmm.data.index[-1]
+        """
     else:
         end = fmm.data.index[-1]
 
@@ -207,7 +232,7 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
     plt.rc('legend', fontsize=8)    # legend fontsize
     plt.rc('figure', titlesize=12)  # fontsize of the figure title
 
-    for i in dates:
+    for nr, i in enumerate(dates):
 
         # check if all plotdates out of DataFrame index
         if (i > fmm.data.index[-1]) or (i+1 < fmm.data.index[0]):
@@ -225,26 +250,28 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
             if 't' in vals:
                 axs[j].plot(fmm.data.loc[i:i+1,
                             tscontrol.ctrldict['t'][0]],
-                            color=tscontrol.ctrldict['t'][1],
-                            )
-                axs[j].set(ylabel=tscontrol.ctrldict['t'][2])
-                axs[j].set(ylim=(fmm.data.loc[i:i+1,
-                                 tscontrol.ctrldict['t'][0]].min()-0.2,
-                                 fmm.data.loc[i:i+1,
-                                 tscontrol.ctrldict['t'][0]].max()+0.2))
+                            color=tscontrol.ctrldict['t'][1])
+                ylim = (fmm.data.loc[i:i+1, tscontrol.ctrldict['t'][0]].
+                        min()-0.2,
+                        fmm.data.loc[i:i+1, tscontrol.ctrldict['t'][0]].
+                        max()+0.2)
+                if np.isnan(ylim).any():
+                    ylim = (0, 1)
+                axs[j].set(ylabel=tscontrol.ctrldict['t'][2], ylim=ylim)
                 axs[j].set_zorder(3)
                 axs[j].patch.set_visible(False)
 
             if 'diff_t' in vals:
                 axs[j].plot(fmm.data.loc[i:i+1,
                             tscontrol.ctrldict['diff_t'][0]],
-                            color=tscontrol.ctrldict['diff_t'][1],
-                            )
-                axs[j].set(ylabel=tscontrol.ctrldict['diff_t'][2])
-                axs[j].set(ylim=(fmm.data.loc[i:i+1,
-                                 tscontrol.ctrldict['diff_t'][0]].min()-0.2,
-                                 fmm.data.loc[i:i+1,
-                                 tscontrol.ctrldict['diff_t'][0]].max()+0.2))
+                            color=tscontrol.ctrldict['diff_t'][1])
+                ylim = (fmm.data.loc[i:i+1, tscontrol.ctrldict['diff_t'][0]].
+                        min()-0.2,
+                        fmm.data.loc[i:i+1, tscontrol.ctrldict['diff_t'][0]].
+                        max()+0.2)
+                if np.isnan(ylim).any():
+                    ylim = (0, 1)
+                axs[j].set(ylabel=tscontrol.ctrldict['diff_t'][2], ylim=ylim)
 
             if 'rh' in vals:
                 axrh = axs[j].twinx()
@@ -271,9 +298,11 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
                                   tscontrol.ctrldict['ff'][0]],
                                   facecolor=tscontrol.ctrldict['ff'][1],
                                   alpha=0.3, zorder=1)
-                axff.set(ylabel=tscontrol.ctrldict['ff'][2],
-                         ylim=(0, fmm.data.loc[i:i+1,
-                               tscontrol.ctrldict['ff'][0]].max() + 0.5))
+                ylim = (0, fmm.data.loc[i:i+1, tscontrol.ctrldict['ff'][0]].
+                        max()+0.5)
+                if np.isnan(ylim).any():
+                    ylim = (0, 1)
+                axs[j].set(ylabel=tscontrol.ctrldict['ff'][2], ylim=ylim)
 
             if 'ffx' in vals:
                 if 'ff' not in vals:
@@ -282,9 +311,12 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
                 axff.plot(fmm.data.loc[i:i+1, tscontrol.ctrldict['ffx'][0]],
                           color=tscontrol.ctrldict['ffx'][1], zorder=2,
                           label=tscontrol.ctrldict['ffx'][2])
+                ylim = (0, fmm.data.loc[i:i+1, tscontrol.ctrldict['ffx'][0]].
+                        max()+0.5)
+                if np.isnan(ylim).any():
+                    ylim = (0, 1)
+                axs[j].set(ylim=ylim)
 
-                axff.set(ylim=(0, fmm.data.loc[i:i+1,
-                         tscontrol.ctrldict['ffx'][0]].max() + 0.5))
                 if 'ff' not in vals:
                     axff.set(ylabel=tscontrol.ctrldict['ffx'][2])
                 else:
@@ -316,6 +348,19 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
             axs[j].grid(True, color='C7', linestyle=':')
             axs[j].grid(True, which='major', axis='x', linestyle='-')
 
+            # xticks all axes
+            xticks = int(max(1, np.round(ndays/10)))
+            dloc = mdates.DayLocator(interval=xticks)
+            if ndays <= 5:
+                hloc = mdates.HourLocator(interval=6)
+                axs[j].xaxis.set_minor_locator(hloc)
+            axs[j].xaxis.set_major_locator(dloc)
+
+        # xtickslabels, last axes only
+        axs[-1].xaxis.set_major_formatter(mdates.DateFormatter('\n%Y-%m-%d'))
+        if ndays <= 5:
+            axs[-1].xaxis.set_minor_formatter(mdates.DateFormatter('%H:%M'))
+
         # mask nan periods
         inan = fmm.prob.loc[i:i+1].index[np.where(fmm.prob.loc[i:i+1,
                                                   'prob'].isna())]
@@ -334,16 +379,21 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, ask=True,
             # plot grey boxes
             for ax in axs:
                 ylim = ax.get_ylim()
-                # fake timeseries
-                p50 = fmm.prob.loc[i:i+1, 'prob'].copy()*np.nan
+                # fake timeseries, with dt/2 spacing
+                p50 = pd.Series(index=pd.date_range(i-dt/2, i+1+dt/2, freq=dt/2))
                 p50.loc[i50] = ylim[1]
+                p50.loc[i50-dt/2] = ylim[1]
+                p50.loc[i50+dt/2] = ylim[1]
                 ax.fill_between(p50.index, p50, y2=ylim[0],
-                                facecolor='C7', alpha=0.2, zorder=50)
+                                facecolor='C7', alpha=0.25, zorder=50)
 
-        axs[-1].xaxis.set_major_formatter(mdates.DateFormatter('\n%Y-%m-%d'))
-        axs[-1].xaxis.set_major_locator(mdates.DayLocator())
         fig.autofmt_xdate(rotation=0, ha='center')
         fig.suptitle('Foehn Diagnosis %s to %s' % (i.date(), (i+1).date()))
         fig.tight_layout(rect=[0, 0.02, 1, 0.98])
         fig.subplots_adjust(hspace=0.02)
-        plt.show()
+
+        if (nr+1) % show_n_plots == 0:
+            plt.show(block=True)
+            # TODO irgendwie gefaellt mir das noch nicht hier
+
+    plt.show()
