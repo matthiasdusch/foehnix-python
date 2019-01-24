@@ -49,3 +49,5 @@ Plot some model assessments
     model.plot('loglikcontribution', log=True)
     @savefig coef.png
     model.plot('coef', log=True)
+    @savefig hist.png
+    model.plot('hist')
