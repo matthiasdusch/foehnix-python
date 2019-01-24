@@ -178,18 +178,6 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, show_n_plots=3,
             log.critical('Could not convert start value to Datetime. Using '
                          'first data point instead.')
             start = fmm.data.index[0]
-        """
-        # check if provided start date matches exact time stamp. Else take
-        # closest value within two time stamps. This will take care if data
-        # is not at full hours but the user provides a date only as start.
-        if start not in fmm.data.index:
-            if np.abs(fmm.data.index - start).min() <= dt:
-                start = fmm.data.index[np.abs(fmm.data.index - start).argmin()]
-            else:
-                log.critical('Start value not within DataFrame, taking first '
-                             'data point instead.')
-                start = fmm.data.index[0]
-        """
     else:
         start = fmm.data.index[0]
 
@@ -200,16 +188,6 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, show_n_plots=3,
             log.critical('Could not convert end value to Datetime. Using '
                          'last data point instead.')
             end = fmm.data.index[-1]
-        # see equivalent info for start above
-        """
-        if end not in fmm.data.index:
-            if np.abs(fmm.data.index - end).min() <= dt:
-                end = fmm.data.index[np.abs(fmm.data.index - end).argmin()]
-            else:
-                log.critical('End value not within DataFrame, taking first '
-                             'data point instead.')
-                end = fmm.data.index[-1]
-        """
     else:
         end = fmm.data.index[-1]
 
@@ -380,7 +358,8 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, show_n_plots=3,
             for ax in axs:
                 ylim = ax.get_ylim()
                 # fake timeseries, with dt/2 spacing
-                p50 = pd.Series(index=pd.date_range(i-dt/2, i+1+dt/2, freq=dt/2))
+                p50 = pd.Series(index=pd.date_range(i-dt/2, i+1+dt/2,
+                                                    freq=dt/2))
                 p50.loc[i50] = ylim[1]
                 p50.loc[i50-dt/2] = ylim[1]
                 p50.loc[i50+dt/2] = ylim[1]
@@ -393,7 +372,6 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, show_n_plots=3,
         fig.subplots_adjust(hspace=0.02)
 
         if (nr+1) % show_n_plots == 0:
-            plt.show(block=True)
-            # TODO irgendwie gefaellt mir das noch nicht hier
+            plt.show()
 
     plt.show()

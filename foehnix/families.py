@@ -47,7 +47,8 @@ class GaussianFamily(Family):
         self.name = 'Gaussian'
 
     def density(self, y, mu, sigma):
-        raise NotImplementedError
+        dnorm = scipy.stats.norm(loc=mu, scale=sigma).pdf(y)
+        return dnorm
 
     def distribution(self, q, mu):
         raise NotImplementedError
