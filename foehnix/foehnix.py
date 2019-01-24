@@ -696,6 +696,8 @@ class Foehnix:
                 model_plots.loglikcontribution(self, **kwargs)
             elif i == 'coef':
                 model_plots.coef(self, **kwargs)
+            elif i == 'hist':
+                model_plots.hist(self)
             elif i == 'timeseries':
                 timeseries_plots.tsplot(self, **kwargs)
 

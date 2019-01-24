@@ -88,25 +88,49 @@
 <h1>foehnix.timeseries_plots.tsplot<a class="headerlink" href="#foehnix-timeseries-plots-tsplot" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="foehnix.timeseries_plots.tsplot">
-<code class="descclassname">foehnix.timeseries_plots.</code><code class="descname">tsplot</code><span class="sig-paren">(</span><em>fmm</em>, <em>start=None</em>, <em>end=None</em>, <em>ndays=10</em>, <em>tscontrol=None</em>, <em>ask=True</em>, <em>userdict={}</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/timeseries_plots.html#tsplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.timeseries_plots.tsplot" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">foehnix.timeseries_plots.</code><code class="descname">tsplot</code><span class="sig-paren">(</span><em>fmm</em>, <em>start=None</em>, <em>end=None</em>, <em>ndays=10</em>, <em>tscontrol=None</em>, <em>show_n_plots=3</em>, <em>userdict=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/timeseries_plots.html#tsplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.timeseries_plots.tsplot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Time series plot for foehnix models</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>fmm</strong></dt>
-<dd></dd>
-<dt><strong>start</strong></dt>
-<dd></dd>
-<dt><strong>end</strong></dt>
-<dd></dd>
-<dt><strong>ndays</strong></dt>
-<dd></dd>
-<dt><strong>tscontrol</strong></dt>
-<dd></dd>
-<dt><strong>ask</strong></dt>
-<dd></dd>
+<dt><strong>fmm</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="foehnix.Foehnix.html#foehnix.Foehnix" title="foehnix.Foehnix"><code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.Foehnix</span></code></a></span></dt>
+<dd><p class="first last">A foehnix mixture model object</p>
+</dd>
+<dt><strong>start</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or Datetime timestamp</span></dt>
+<dd><p class="first last">First day to plot. Will be converted to a timestamp, if possible.
+Must be within the daterange of fmm.data.</p>
+</dd>
+<dt><strong>end</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or Datetime timestamp</span></dt>
+<dd><p class="first last">Last day to fully plot. Will be converted to a timestamp, if possible.
+Must be within the daterange of fmm.data.</p>
+</dd>
+<dt><strong>ndays</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Number of days which one plot shows. Default 10.</p>
+</dd>
+<dt><strong>tscontrol</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="foehnix.timeseries_plots.TSControl.html#foehnix.timeseries_plots.TSControl" title="foehnix.timeseries_plots.TSControl"><code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.timeseries_plots.TSControl</span></code></a> object</span></dt>
+<dd><p class="first last">Can be predefined before calling this function or else will be
+initialized if None (default).</p>
+</dd>
+<dt><strong>show_n_plots</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">How many figures will be opened, default is 1. After closing all, the
+next ones will be opened.</p>
+</dd>
+<dt><strong>userdict</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">alternative plotting parameters (variable names, colors, labels) which
+will be passed to TSControl. See
+<a class="reference internal" href="foehnix.timeseries_plots.TSControl.html#foehnix.timeseries_plots.TSControl" title="foehnix.timeseries_plots.TSControl"><code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.timeseries_plots.TSControl</span></code></a> for more details.
+If a suitable <code class="docutils literal notranslate"><span class="pre">tscontrol</span></code> argument is provided this dict will be
+ignored.</p>
+</dd>
+<dt><strong>kwargs</strong></dt>
+<dd><p class="first last">will be passed to TSControl and can be used to rename the variable
+names of the <code class="docutils literal notranslate"><span class="pre">fmm.data</span></code> DataFrame. See
+<a class="reference internal" href="foehnix.timeseries_plots.TSControl.html#foehnix.timeseries_plots.TSControl" title="foehnix.timeseries_plots.TSControl"><code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.timeseries_plots.TSControl</span></code></a> for more details.
+If a suitable <code class="docutils literal notranslate"><span class="pre">tscontrol</span></code> argument is provided these argumetns will
+be ignored.</p>
+</dd>
 </dl>
 </td>
 </tr>

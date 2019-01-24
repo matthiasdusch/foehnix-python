@@ -1,13 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# TODO: think of a nice API
-#       - either foehnix.plot.plot(fmm, which = 'loglik', 'timeseries',
-#                                  'windrose', 'hovmoeller'...)
-#       -or : model.plot(which='loglike', 'timeseries', 'windrose', ...)
 
-
-def loglik(fmm, log=True, **kwargs):
+def loglik(fmm, log=True):
     """
     Plots the log-likelihood sum path through the iterations of the EM algorithm
 
@@ -40,7 +35,7 @@ def loglik(fmm, log=True, **kwargs):
     fig.tight_layout()
 
 
-def loglikcontribution(fmm, log=True, **kwargs):
+def loglikcontribution(fmm, log=True):
     """
     Plots the log-likelihood with respect to initial log-likelihood
 
@@ -75,7 +70,7 @@ def loglikcontribution(fmm, log=True, **kwargs):
     fig.tight_layout()
 
 
-def coef(fmm, log=True, **kwargs):
+def coef(fmm, log=True):
     """
     Plots the estimated coefficients
 
@@ -108,8 +103,8 @@ def coef(fmm, log=True, **kwargs):
     ylim = ([path.loc[:, comps].values.min(), path.loc[:, comps].values.max()]
             + np.array([-0.05, 0.15]) * (path.loc[:, comps].values.max() -
                                          path.loc[:, comps].values.min()))
-    path.loc[:, comps].plot(ax=ax, color=['xkcd:coral', 'xkcd:lightblue',
-                                          'xkcd:red', 'xkcd:azure'],
+    path.loc[:, comps].plot(ax=ax, color=['xkcd:coral', 'xkcd:azure',
+                                          'xkcd:red', 'xkcd:blue'],
                             style=['--', '--', '-', '-'])
     ax.set(xlabel=xlabel, ylabel='coefficient (components)', ylim=ylim,
            title='coefficient path (components)')
@@ -127,4 +122,58 @@ def coef(fmm, log=True, **kwargs):
 
     fig.tight_layout()
 
-    # TODO conditional histogram plot
+
+def hist(fmm):
+    """
+    Plots the estimated coefficients
+
+    Parameters
+    ----------
+    fmm : :py:class:`foehnix.Foehnix`
+        A foehnix mixture model object
+    log : bool
+        If True (default) the x-axis is shown on the log scale, else on
+        the iteration scale
+    """
+
+    # exclude missing values
+    idx = fmm.prob.flag[fmm.prob.flag == 1].dropna().index
+    # get y and probability
+    y = fmm.data.loc[idx, fmm.predictor].copy()
+    prob = fmm.prob.loc[idx, 'prob'].copy()
+
+    # if censoring or truncation is used
+    if np.isfinite(fmm.control.left):
+        y = np.maximum(y, fmm.control.left)
+    if np.isfinite(fmm.control.right):
+        y = np.minimum(y, fmm.control.right)
+
+    if len(y) > 0:
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+
+        at = np.linspace(y.min(), y.max(), 501)
+        bk = np.linspace(y.min(), y.max(), 50)
+
+        hi1 = ax1.hist(y[prob < 0.5], bins=bk, density=True,
+                       color='w', edgecolor='k')
+        hi2 = ax2.hist(y[prob >= 0.5], bins=bk, density=True,
+                       color='w', edgecolor='k')
+
+        # density
+        d1 = fmm.control.family.density(at, fmm.coef['mu1'],
+                                        np.exp(fmm.coef['logsd1']))
+        d2 = fmm.control.family.density(at, fmm.coef['mu2'],
+                                        np.exp(fmm.coef['logsd2']))
+        ax1.plot(at, d1, color='xkcd:red')
+        ax2.plot(at, d2, color='xkcd:blue')
+
+        ylim = (0, np.maximum(hi1[0].max(), hi2[0].max())+0.05)
+
+        ax1.set(title='Conditional Histogram\nComponent 1 (no foehn)',
+                ylim=ylim, xlim=(bk[0], bk[-1]), frame_on=False,
+                xlabel=r'y[$\pi < 0.5$]', ylabel='Density')
+        ax2.set(title='Conditional Histogram\nComponent 1 (no foehn)',
+                ylim=ylim, xlim=(bk[0], bk[-1]), frame_on=False,
+                xlabel=r'y[$\pi < 0.5$]', ylabel='Density')
+
+        fig.tight_layout(rect=[0, 0.02, 1, 0.98])
