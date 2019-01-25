@@ -125,15 +125,12 @@ def coef(fmm, log=True):
 
 def hist(fmm):
     """
-    Plots the estimated coefficients
+    Conditional histogram plot
 
     Parameters
     ----------
     fmm : :py:class:`foehnix.Foehnix`
         A foehnix mixture model object
-    log : bool
-        If True (default) the x-axis is shown on the log scale, else on
-        the iteration scale
     """
 
     # exclude missing values
@@ -172,7 +169,7 @@ def hist(fmm):
         ax1.set(title='Conditional Histogram\nComponent 1 (no foehn)',
                 ylim=ylim, xlim=(bk[0], bk[-1]), frame_on=False,
                 xlabel=r'y[$\pi < 0.5$]', ylabel='Density')
-        ax2.set(title='Conditional Histogram\nComponent 1 (no foehn)',
+        ax2.set(title='Conditional Histogram\nComponent 2 (foehn)',
                 ylim=ylim, xlim=(bk[0], bk[-1]), frame_on=False,
                 xlabel=r'y[$\pi < 0.5$]', ylabel='Density')
 
