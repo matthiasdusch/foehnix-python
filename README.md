@@ -14,7 +14,6 @@ description of the python specific interface there.
 More background information is provided with the R specific documentation:  
 http://retostauffer.github.io/Rfoehnix  
 
-
 # Installation
 Currently foehnix-python is only available on github:  
 `git clone https://github.com/matthiasdusch/foehnix-python`  
