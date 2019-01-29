@@ -2,10 +2,13 @@
 
    Adapted from the Python Packaging Authority template."""
 
+import sys
+import warnings
+import re
+
 from setuptools import setup, find_packages  # Always prefer setuptools
 from codecs import open  # To use a consistent encoding
 from os import path, walk
-import sys, warnings, importlib, re
 
 MAJOR = 0
 MINOR = 0
@@ -103,27 +106,6 @@ if write_version:
     write_version_py()
 
 
-def check_dependencies(package_names):
-    """Check if packages can be imported, if not throw a message."""
-    not_met = []
-    for n in package_names:
-        try:
-            _ = importlib.import_module(n)
-        except ImportError:
-            not_met.append(n)
-    if len(not_met) != 0:
-        errmsg = "Warning: the following packages could not be found: "
-        print(errmsg + ', '.join(not_met))
-
-
-req_packages = ['numpy',
-                'scipy',
-                'pandas',
-                'matplotlib'
-                ]
-check_dependencies(req_packages)
-
-
 def file_walk(top, remove=''):
     """
     Returns a generator of files from the top of the tree, removing
@@ -134,6 +116,7 @@ def file_walk(top, remove=''):
     for root, dirs, files in walk(top):
         for file in files:
             yield path.join(root, file).replace(remove, '')
+
 
 setup(
     # Project info
@@ -155,8 +138,13 @@ setup(
     python_requires='>=3.4',
     # Find packages automatically
     packages=find_packages(exclude=['docs']),
-    # Decided not to let pip install the dependencies, this is too brutal
-    install_requires=[],
+    # let pip install the dependencies. brutal but convenient
+    install_requires=[
+        'numpy',
+        'scipy',
+        'pandas',
+        'matplotlib'
+        ],
     # additional groups of dependencies here (e.g. development dependencies).
     extras_require={},
     # data files that need to be installed
