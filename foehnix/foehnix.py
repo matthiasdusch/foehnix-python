@@ -565,6 +565,7 @@ class Foehnix:
 
             # Store log-likelihood and coefficients of the current iteration.
             _ll = control.family.loglik(y, post, prob, theta)
+            _ll2 = control.family.ploglik(y, post, prob, theta)
             llpath.loc[i, _ll.keys()] = _ll
             coefpath.loc[i, theta.keys()] = theta
             coefpath.loc[i, logitx['names']] = ccmodel['beta'].squeeze()

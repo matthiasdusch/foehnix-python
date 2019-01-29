@@ -173,10 +173,6 @@ def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
         coef = beta.copy()
 
     coef = dict(zip(list(logitx['names']), coef.squeeze()))
-    # TODO und beta==coef
-
-    # TODO evtl beta oder coef als dict uebergeben:
-    # TODO  beta/coef = dict(zip(list(logitx['names']), beta.squeeze()))
 
     # final logliklihood
     ll = llpath[-1]
