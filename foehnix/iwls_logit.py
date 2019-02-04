@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.stats import logistic
+from scipy.stats import logistic, norm
 import logging
 import pandas as pd
 
@@ -136,7 +136,10 @@ def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
         xds = func.destandardize(logitx.copy())['values']
     else:
         xds = x
-    beta_se = np.sqrt(np.diag(np.linalg.inv((xds*w).T.dot(xds*w))))
+    _beta_se = np.sqrt(np.diag(np.linalg.inv((xds*w).T.dot(xds*w))))
+    beta_se = {}
+    for nr, name in enumerate(logitx['names']):
+        beta_se[name] = _beta_se[nr]
     del xds
 
     beta = coefpath[-1]
@@ -167,7 +170,9 @@ def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
     """
 
     # Keep coefficients destandardized
-    if logitx['is_standardized'] is True:
+    # TODO not really sure which way here
+    # if logitx['is_standardized'] is True:
+    if standardize is True:
         coef = func.destandardize_coefficients(beta.copy(), logitx)
     else:
         coef = beta.copy()
@@ -198,14 +203,30 @@ def iwls_summary(ccmodel):
     Parameters
     ----------
     ccmodel : dict
-        which is returnded by :py:class:`foehnix.iwls_logit`
+        which is returned by :py:class:`foehnix.iwls_logit`
     """
 
-    print('\nConcomitant model: z test of coefficients')
+    tmp = pd.DataFrame([], columns=['Estimate', 'Std. Error',
+                                    'z_value', 'Pr(>|z|)'],
+                       index=ccmodel['coef'].keys(),
+                       dtype=float)
 
     # TODO bei conomitant model z test sind Retos coefs standardized. Soll so?
+    # TODO falls nicht -> goto Zeile 173
+    tmp.loc[:, 'Estimate'] = ccmodel['coef'].values()
+    tmp.loc[:, 'Std. Error'] = ccmodel['beta_se'].values()
+    tmp.loc[:, 'z_value'] = (tmp.loc[:, 'Estimate'] /
+                             tmp.loc[:, 'Std. Error'])
+    tmp.loc[:, 'Pr(>|z|)'] = 2 * norm.pdf(0, loc=np.abs(tmp.loc[:, 'z_value']))
 
-    print('Number of IWLS iterations %d (%s)' %
+    idx = ['cc.' + k for k in list(ccmodel['coef'].keys())]
+    tmp.index = idx
+
+    print('\n------------------------------------------------------\n')
+    print('Concomitant model: z test of coefficients\n')
+    print(tmp)
+
+    print('\nNumber of IWLS iterations %d (%s)' %
           (ccmodel['iter'],
            ('converged' if ccmodel['converged'] else 'not converged')))
     print("Dispersion parameter for binomial family taken to be 1.")
