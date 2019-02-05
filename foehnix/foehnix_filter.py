@@ -6,16 +6,27 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def _check_filter_function(idx, filtered):
-    # helper function to check the results of a provided filter function
-    # check if filtered is a pandas index, else make one
-    if not isinstance(filtered, pd.Index):
-        filtered = pd.Index(filtered)
-    # check if all returned values exist in the original data frame
-    if not filtered.isin(idx).all():
-        raise RuntimeError('The provided filter function returned indices '
-                           'which are not in the original DataFrame')
-    return filtered
+def _check_filter_function(filtered, lenx):
+    """
+    helper function to check the results of a provided filter function
+
+    Parameters
+    ----------
+    filtered : :py:class:`numpy.ndarray`
+        must be of length lenx, and only contain 0, 1 or NaNs
+    lenx : int
+        length of the data frame provided to ``foehnix_filter``
+    """
+
+    # check length
+    if len(filtered) != lenx:
+        raise RuntimeError("The provided filter function returned a filtered "
+                           "array which's size does not match the data frame.")
+
+    if not np.isnan(filtered[np.isin(filtered, [0, 1], invert=True)]).all():
+        raise RuntimeError("The provided filter function must return a "
+                           "filtered array which only contains ``0``, ``1`` "
+                           " or ``nan`` values.")
 
 
 def foehnix_filter(x, filter_method=None):
@@ -86,10 +97,8 @@ def foehnix_filter(x, filter_method=None):
 
     # 2. Function: Apply function to x, check the result and return if sensible
     elif callable(filter_method):
-        # TODO:
-        raise RuntimeError('I have to rethink this part later...')
         filtered = filter_method(x)
-        filtered = _check_filter_function(x.index, filtered)
+        _check_filter_function(filtered, len(x))
         log.info('Applied filter function  %s' % filter_method.__name__)
 
     # 3. dict, where keys are columns of x and items are values or functions
@@ -100,13 +109,10 @@ def foehnix_filter(x, filter_method=None):
         # loop over dict and apply every filter
         for nr, (key, value) in enumerate(filter_method.items()):
 
-            #  _x = x.loc[good].copy()
-
             if callable(value):
-                # TODO:
-                raise RuntimeError('I have to rethink this part later...')
-                tmp = value(x.loc[good])
-                good = _check_filter_function(good, tmp)
+                _filtered = value(x[key])
+                _check_filter_function(_filtered, len(x))
+                tmp[:, nr] = _filtered
                 log.info('Applied filter function  %s' % value.__name__)
 
             elif len(value) == 2:
