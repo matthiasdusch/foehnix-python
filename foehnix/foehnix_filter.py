@@ -81,6 +81,8 @@ def foehnix_filter(x, filter_method=None):
         - `dict['good']`: all indices of ``x`` within the filter values
         - `dict['bad']` : all indices of ``x`` outside the filter values
         - `dict['ugly']`: all indices where one of the filter variables is NAN
+        - `dict['total']`: length of data
+        - `dict['call']`: the filter_method being provided and used to filter
     """
     # check x
     if not isinstance(x, pd.DataFrame):
@@ -151,4 +153,29 @@ def foehnix_filter(x, filter_method=None):
 
     return {'good': good,
             'bad': bad,
-            'ugly': ugly}
+            'ugly': ugly,
+            'total': len(filtered),
+            'call': filter_method}
+
+
+def filter_summary(ffo):
+    """
+    Print a summary of the applied foehnix_filter
+
+    Parameters
+    ----------
+    ffo : dict
+        foehnix filter object, as returned by the foehnix_filter function.
+    """
+
+    print('\nFoehnix Filter Object:\n')
+    print('Call: ', ffo['call'])
+    print('\nTotal data set length: %20d' % ffo['total'])
+    print('The good (within filter): %17d (%4.1f percent)' % (
+        len(ffo['good']), len(ffo['good'])/ffo['total']*100))
+
+    print('The bad (outside filter): %17d (%4.1f percent)' % (
+        len(ffo['bad']), len(ffo['bad'])/ffo['total']*100))
+
+    print('The ugly (NaN, missing values): %11d (%4.1f percent)' % (
+        len(ffo['ugly']), len(ffo['ugly'])/ffo['total']*100))
