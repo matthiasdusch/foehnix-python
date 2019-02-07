@@ -13,9 +13,11 @@ def standardize(x):
     ----------
     x : dict
         Must contain:
-        - ``'values'`` : :py:class:`numpy.ndarray` the model matrix
-        - ``'center'`` : list, containing the mean of each model matrix row
-        - ``'scale'`` : list, containing the standard deviation of matrix rows
+        - ``'values'`` : :py:class:`pandas.DataFrame` the model matrix
+        - ``'center'`` : :py:class:`pandas.Series`, containing the mean of each
+          model matrix row
+        - ``'scale'`` : :py:class:`pandas:Series`, containing the standard
+          deviation of matrix rows
         - ``'is_standardized'``: bool, will trigger standardization if False
           and will be set to True afterwards
 
@@ -43,9 +45,11 @@ def destandardize(x):
     ----------
     x : dict
         Must contain:
-        - ``'values'`` : :py:class:`numpy.ndarray` the model matrix
-        - ``'center'`` : list, containing the mean of each model matrix row
-        - ``'scale'`` : list, containing the standard deviation of matrix rows
+        - ``'values'`` : :py:class:`pandas.DataFrame` the model matrix
+        - ``'center'`` : :py:class:`pandas.Series`, containing the mean of each
+          model matrix row
+        - ``'scale'`` : :py:class:`pandas:Series`, containing the standard
+          deviation of matrix rows
         - ``'is_standardized'``: bool, will trigger destandardization if True
           and will be set to False afterwards
 
@@ -74,7 +78,7 @@ def destandardize_coefficients(beta, x):
 
     Parameters
     ----------
-    beta : list
+    beta : dict
         regression coefficients
     x : dict
         Must contain:
@@ -91,13 +95,12 @@ def destandardize_coefficients(beta, x):
     x : list
         Destandardized regression coefficients
     """
-    if 'Intercept' in x['names']:
-        ic = np.where(x['names'] == 'Intercept')
-        nic = np.where(x['names'] != 'Intercept')
+    if 'Intercept' in beta:
+        nic = beta.index[beta.index != 'Intercept']
         # Descaling intercept
-        beta[ic] = beta[ic] - np.sum(beta[nic] *
-                                     x['center'][nic] /
-                                     x['scale'][nic])
+        beta['Intercept'] = beta['Intercept'] - np.sum(beta[nic] *
+                                                       x['center'][nic] /
+                                                       x['scale'][nic])
         # Descaling all other regression coefficients
         beta[nic] = beta[nic] / x['scale'][nic]
 

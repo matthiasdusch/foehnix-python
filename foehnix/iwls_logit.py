@@ -21,11 +21,12 @@ def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
     logitx : dict
         Must contain:
 
-        - ``'values'`` : :py:class:`numpy.ndarray` the model matrix
-        - ``'center'`` : list, containing the mean of each model matrix row
-        - ``'scale'`` : list, containing the standard deviation of matrix rows
-        - ``'name'`` : list, containing the names of the rows
-        - ``'is_standardized'``: boolean info if matrix is standardized
+        - ``'values'`` : :py:class:`pandas.DataFrame` the model matrix
+        - ``'center'`` : :py:class:`pandas.Series`, containing the mean of
+          each model matrix row
+        - ``'scale'`` : :py:class:`pandas:Series`, containing the standard
+          deviation of matrix rows
+        - ``'is_standardized'``: boolean if matrix is standardized
     y : :py:class:`numpy.ndarray`
         predictor values of shape(len(observations), 1)
     beta : :py:class:`numpy.ndarray`
@@ -50,7 +51,7 @@ def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
     if standardize is True:
         logitx = func.standardize(logitx)
 
-    x = logitx['values']
+    x = logitx['values'].values
 
     if np.isnan(x).any():
         raise ValueError('Input logitx.values contains NaN!')
@@ -133,13 +134,12 @@ def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
 
     # calculate standard error
     if logitx['is_standardized'] is True:
-        xds = func.destandardize(logitx.copy())['values']
+        xds = func.destandardize(logitx.copy())['values'].values
     else:
         xds = x
-    _beta_se = np.sqrt(np.diag(np.linalg.inv((xds*w).T.dot(xds*w))))
-    beta_se = {}
-    for nr, name in enumerate(logitx['names']):
-        beta_se[name] = _beta_se[nr]
+
+    beta_se = pd.Series(np.sqrt(np.diag(np.linalg.inv((xds*w).T.dot(xds*w)))),
+                        index=logitx['values'].columns)
     del xds
 
     beta = coefpath[-1]
@@ -155,29 +155,13 @@ def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
     edf = np.sum(np.diag((x*w).T.dot(x*w).dot(
         np.linalg.inv((x*w).T.dot(x*w) + reg))))
 
-    # TODO Reto:
-    # rval$coef <- if ( standardize ) destandardize_coefficients(beta, X)
-    #              else beta
-    # aber später nocham destandardize??!??
-    # und again: standardize hier immer False??
-    # Meine Idee: coef hier immer destandardized
-    # TODO mit Reto besprechen
-    """
-    if standardize is True:
-        coef = func.destandardize_coefficients(beta, logitx)
-    else:
-        coef = beta
-    """
-
     # Keep coefficients destandardized
     # TODO not really sure which way here
     # if logitx['is_standardized'] is True:
-    if standardize is True:
-        coef = func.destandardize_coefficients(beta.copy(), logitx)
-    else:
-        coef = beta.copy()
+    coef = pd.Series(beta.copy().squeeze(), index=logitx['values'].columns)
 
-    coef = dict(zip(list(logitx['names']), coef.squeeze()))
+    if standardize is True:
+        coef = func.destandardize_coefficients(coef, logitx)
 
     # final logliklihood
     ll = llpath[-1]
@@ -212,14 +196,14 @@ def iwls_summary(ccmodel):
                        dtype=float)
 
     # TODO bei conomitant model z test sind Retos coefs standardized. Soll so?
-    # TODO falls nicht -> goto Zeile 173
-    tmp.loc[:, 'Estimate'] = ccmodel['coef'].values()
-    tmp.loc[:, 'Std. Error'] = ccmodel['beta_se'].values()
+    # TODO falls nicht -> goto Zeile 159
+    tmp.loc[:, 'Estimate'] = ccmodel['coef'].copy()
+    tmp.loc[:, 'Std. Error'] = ccmodel['beta_se'].copy()
     tmp.loc[:, 'z_value'] = (tmp.loc[:, 'Estimate'] /
                              tmp.loc[:, 'Std. Error'])
     tmp.loc[:, 'Pr(>|z|)'] = 2 * norm.pdf(0, loc=np.abs(tmp.loc[:, 'z_value']))
 
-    idx = ['cc.' + k for k in list(ccmodel['coef'].keys())]
+    idx = ['cc.' + k for k in list(ccmodel['coef'].index)]
     tmp.index = idx
 
     print('\n------------------------------------------------------\n')

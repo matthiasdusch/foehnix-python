@@ -263,6 +263,29 @@ class Foehnix:
         y = y.reshape(len(y), 1)
 
         if len(concomitant) > 0:
+            ix = np.arange(len(y))
+            cols = ['Intercept'] + concomitant
+            vals = pd.DataFrame([], columns=cols, index=ix, dtype=float)
+
+            for col in cols:
+                if col == 'Intercept':
+                    vals.loc[ix, col] = 1
+                else:
+                    vals.loc[ix, col] = subset.loc[idx_take, col].values
+
+            scale = vals.std()
+            center = vals.mean()
+            # If std == 0 (e.g. for the Intercept), set center=0 and scale=1
+            center[scale == 0] = 0
+            scale[scale == 0] = 1
+
+            logitx = {'values': vals,
+                      'scale': scale,
+                      'center': center,
+                      'is_standardized': False}
+
+            # TODO dataframe
+            """
             _logitx = np.ones([len(y), len(concomitant)+1])
             for nr, conc in enumerate(concomitant):
                 _logitx[:, nr+1] = subset.loc[idx_take, conc].values.copy()
@@ -277,6 +300,7 @@ class Foehnix:
             # If std == 0 (e.g. for the Intercept), set center=0 and scale=1
             logitx['center'][logitx['scale'] == 0] = 0
             logitx['scale'][logitx['scale'] == 0] = 1
+            """
 
             # standardize data if control.standardize = True (default)
             if control.standardize is True:
@@ -307,19 +331,14 @@ class Foehnix:
         log.info('Estimation finished, create final object.')
 
         # TODO ich mach das destandardice_coefficients im iwls_logit. Reto?
-        """
         # Final coefficients of the concomitant model have to be destandardized
         if self.optimizer['ccmodel'] is not None:
             if logitx['is_standardized'] is True:
                 coef = func.destandardize_coefficients(
-                    self.optimizer['ccmodel']['coef'], logitx)
+                    self.optimizer['ccmodel']['coef'].copy(), logitx)
             else:
                 coef = self.optimizer['ccmodel']['coef']
-        else:
-            coef = None
-        """
-        if self.optimizer['ccmodel'] is not None:
-            coef = self.optimizer['ccmodel']['coef']
+
         else:
             coef = None
 
@@ -341,8 +360,7 @@ class Foehnix:
         self.concomitant = concomitant
         self.control = control
         self.switch = switch
-        # TODO struktur von coef
-        self.coef = self.optimizer['theta']
+        self.coef = pd.Series(self.optimizer['theta']).copy()
         self.coef['concomitants'] = coef
         self.inflated = n_inflated
         self.predictions = None
@@ -448,9 +466,6 @@ class Foehnix:
             llpath.loc[i, _ll.keys()] = _ll
             coefpath.loc[i, theta.keys()] = theta
 
-            # Store log-likelihood and coefficients of the current iteration.
-            llpath.append(control.family.loglik(y, post, prob, theta))
-            coefpath.append(theta)
             log.info('EM iteration %d/%d, ll = %10.2f' % (i, control.maxit_em,
                                                           _ll['full']))
             if np.isnan(_ll['full']):
@@ -506,10 +521,11 @@ class Foehnix:
             Covariats for the concomitant model
             Must contain:
 
-            - ``'values'`` : :py:class:`numpy.ndarray` the model matrix
-            - ``'center'`` : list, mean of each model matrix row
-            - ``'scale'`` : list, standard deviation of matrix rows
-            - ``'name'`` : list, names of the rows
+            - ``'values'`` : :py:class:`pandas.DataFrame` the model matrix
+            - ``'center'`` : :py:class:`pandas.Series`, containing the mean of
+              each model matrix row
+            - ``'scale'`` : :py:class:`pandas:Series`, containing the standard
+              deviation of matrix rows
             - ``'is_standardized'``: boolean if matrix is standardized
         control : :py:class:`foehnix.foehnix.Control`
             Foehnix control object
@@ -532,7 +548,7 @@ class Foehnix:
                              maxit=control.maxit_iwls, tol=control.tol_iwls)
 
         # Initial probabilities and prior  probabilities
-        prob = logistic.cdf(logitx['values'].dot(ccmodel['beta']))
+        prob = logistic.cdf(logitx['values'].values.dot(ccmodel['beta']))
         post = control.family.posterior(y, prob, theta)
 
         # EM algorithm: estimate probabilities (prob; E-step), update the model
@@ -545,7 +561,7 @@ class Foehnix:
         # DataFrames to trace log-likelihood path and the development of
         # the coefficients during EM optimization.
         coefpath = pd.DataFrame([], columns=list(theta.keys()) +
-                                logitx['names'].tolist())
+                                logitx['values'].columns.tolist())
         llpath = pd.DataFrame([], columns=['component', 'concomitant', 'full'])
 
         while delta > control.tol_em:
@@ -565,7 +581,7 @@ class Foehnix:
             _ll = control.family.loglik(y, post, prob, theta)
             llpath.loc[i, _ll.keys()] = _ll
             coefpath.loc[i, theta.keys()] = theta
-            coefpath.loc[i, logitx['names']] = ccmodel['beta'].squeeze()
+            coefpath.loc[i, ccmodel['coef'].index] = ccmodel['beta'].squeeze()
 
             log.info('EM iteration %d/%d, ll = %10.2f' % (i, control.maxit_em,
                                                           _ll['full']))
