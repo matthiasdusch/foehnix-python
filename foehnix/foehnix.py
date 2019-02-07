@@ -284,24 +284,6 @@ class Foehnix:
                       'center': center,
                       'is_standardized': False}
 
-            # TODO dataframe
-            """
-            _logitx = np.ones([len(y), len(concomitant)+1])
-            for nr, conc in enumerate(concomitant):
-                _logitx[:, nr+1] = subset.loc[idx_take, conc].values.copy()
-
-            # store concomitant matrix in a dict
-            logitx = {'values': _logitx,
-                      'names': np.array(['Intercept'] + concomitant),
-                      'scale': np.std(_logitx, axis=0),
-                      'center': np.mean(_logitx, axis=0),
-                      'is_standardized': False}
-
-            # If std == 0 (e.g. for the Intercept), set center=0 and scale=1
-            logitx['center'][logitx['scale'] == 0] = 0
-            logitx['scale'][logitx['scale'] == 0] = 1
-            """
-
             # standardize data if control.standardize = True (default)
             if control.standardize is True:
                 logitx = func.standardize(logitx)
