@@ -78,7 +78,7 @@ def destandardize_coefficients(beta, x):
 
     Parameters
     ----------
-    beta : dict
+    beta : :py:class:`pandas.Series`
         regression coefficients
     x : dict
         Must contain:

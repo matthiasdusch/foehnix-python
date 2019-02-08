@@ -22,7 +22,7 @@ class Control:
     """
     def __init__(self, family, switch, left=float('-Inf'), right=float('Inf'),
                  truncated=False, standardize=True, maxit=100, tol=1e-8,
-                 force_inflate=False, alpha=None, verbose=True):
+                 force_inflate=False, verbose=True):
         """
         Initialization of the Control object
 
@@ -66,7 +66,6 @@ class Control:
             stop except the user forces inflation by specifying
             ``force_inflate = True``. This can cause a serious runtime
             increase. Default is False.
-        alpha : TODO parameter for the penalization of the concomitatnt model
         verbose : bool or str
             Sets the verbose level of the model logging
 
@@ -132,7 +131,6 @@ class Control:
         self.truncated = truncated
         self.standardize = standardize
         self.force_inflate = force_inflate
-        self.alpha = alpha
 
 
 class Foehnix:
@@ -306,13 +304,12 @@ class Foehnix:
         if len(concomitant) == 0:
             log.info('Calling Foehnix.no_concomitant_fit')
             self.no_concomitant_fit(y, control)
-        elif control.alpha is None:
+        else:
             log.info('Calling Foehnix.unreg_fit')
             self.unreg_fit(y, logitx, control)
 
         log.info('Estimation finished, create final object.')
 
-        # TODO ich mach das destandardice_coefficients im iwls_logit. Reto?
         # Final coefficients of the concomitant model have to be destandardized
         if self.optimizer['ccmodel'] is not None:
             if logitx['is_standardized'] is True:
@@ -736,8 +733,8 @@ class Foehnix:
             print("Time required for model estimation: %.1f seconds" %
                   self.time)
         else:
-            print('Time required for model estimation: %.1f minutes' %
-                  self.time/60)
+            print("Time required for model estimation: %.1f minutes" %
+                  (self.time/60))
 
         if detailed:
             # t value and corresponding p value based on a gaussian or t-test
