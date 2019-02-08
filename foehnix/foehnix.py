@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import logging
-from scipy.stats import logistic
+from scipy.stats import logistic, norm
 import time
 
 from foehnix.families import Family, initialize_family
@@ -22,7 +22,7 @@ class Control:
     """
     def __init__(self, family, switch, left=float('-Inf'), right=float('Inf'),
                  truncated=False, standardize=True, maxit=100, tol=1e-8,
-                 force_inflate=False, alpha=None, verbose=True):
+                 force_inflate=False, verbose=True):
         """
         Initialization of the Control object
 
@@ -66,7 +66,6 @@ class Control:
             stop except the user forces inflation by specifying
             ``force_inflate = True``. This can cause a serious runtime
             increase. Default is False.
-        alpha : TODO parameter for the penalization of the concomitatnt model
         verbose : bool or str
             Sets the verbose level of the model logging
 
@@ -132,7 +131,6 @@ class Control:
         self.truncated = truncated
         self.standardize = standardize
         self.force_inflate = force_inflate
-        self.alpha = alpha
 
 
 class Foehnix:
@@ -228,7 +226,7 @@ class Foehnix:
             raise RuntimeError('DataFrame gets inflated, see log for details!')
 
         # Keep the number of observations (rows) added due to inflation.
-        N_inflated = inflated - lendata
+        n_inflated = inflated - lendata
         # if inflation is ok or forced, create strictly increasing dataframe
         # with minimal spacing
         data = data.asfreq(mindiff)
@@ -263,20 +261,26 @@ class Foehnix:
         y = y.reshape(len(y), 1)
 
         if len(concomitant) > 0:
-            _logitx = np.ones([len(y), len(concomitant)+1])
-            for nr, conc in enumerate(concomitant):
-                _logitx[:, nr+1] = subset.loc[idx_take, conc].values.copy()
+            ix = np.arange(len(y))
+            cols = ['Intercept'] + concomitant
+            vals = pd.DataFrame([], columns=cols, index=ix, dtype=float)
 
-            # store concomitant matrix in a dict
-            logitx = {'values': _logitx,
-                      'names': np.array(['Intercept'] + concomitant),
-                      'scale': np.std(_logitx, axis=0),
-                      'center': np.mean(_logitx, axis=0),
-                      'is_standardized': False}
+            for col in cols:
+                if col == 'Intercept':
+                    vals.loc[ix, col] = 1
+                else:
+                    vals.loc[ix, col] = subset.loc[idx_take, col].values
 
+            scale = vals.std()
+            center = vals.mean()
             # If std == 0 (e.g. for the Intercept), set center=0 and scale=1
-            logitx['center'][logitx['scale'] == 0] = 0
-            logitx['scale'][logitx['scale'] == 0] = 1
+            center[scale == 0] = 0
+            scale[scale == 0] = 1
+
+            logitx = {'values': vals,
+                      'scale': scale,
+                      'center': center,
+                      'is_standardized': False}
 
             # standardize data if control.standardize = True (default)
             if control.standardize is True:
@@ -300,26 +304,20 @@ class Foehnix:
         if len(concomitant) == 0:
             log.info('Calling Foehnix.no_concomitant_fit')
             self.no_concomitant_fit(y, control)
-        elif control.alpha is None:
+        else:
             log.info('Calling Foehnix.unreg_fit')
             self.unreg_fit(y, logitx, control)
 
         log.info('Estimation finished, create final object.')
 
-        # TODO ich mach das destandardice_coefficients im iwls_logit. Reto?
-        """
         # Final coefficients of the concomitant model have to be destandardized
         if self.optimizer['ccmodel'] is not None:
             if logitx['is_standardized'] is True:
                 coef = func.destandardize_coefficients(
-                    self.optimizer['ccmodel']['coef'], logitx)
+                    self.optimizer['ccmodel']['coef'].copy(), logitx)
             else:
                 coef = self.optimizer['ccmodel']['coef']
-        else:
-            coef = None
-        """
-        if self.optimizer['ccmodel'] is not None:
-            coef = self.optimizer['ccmodel']['coef']
+
         else:
             coef = None
 
@@ -335,15 +333,16 @@ class Foehnix:
 
         # store relevant data within the Foehnix class
         self.data = data
-        self.foehnix_filter = foehnix_filter
+        self.filter_method = filter_method
         self.filter_obj = filter_obj
         self.predictor = predictor
         self.concomitant = concomitant
         self.control = control
         self.switch = switch
-        # TODO struktur von coef
-        self.coef = self.optimizer['theta']
+        self.coef = pd.Series(self.optimizer['theta']).copy()
         self.coef['concomitants'] = coef
+        self.inflated = n_inflated
+        self.predictions = None
 
         # Calculate the weighted standard error of the estimated
         # coefficients for the test statistics.
@@ -404,11 +403,6 @@ class Foehnix:
             Foehnix control object
         """
 
-        # Lists to trace log-likelihood path and the development of
-        # the coefficients during EM optimization.
-        llpath = []
-        coefpath = []
-
         # Given the initial probabilities: calculate parameters for the two
         # components (mu1, logsd1, mu2, logsd2) given the selected family and
         # calculate the a-posteriori probabilities.
@@ -451,9 +445,6 @@ class Foehnix:
             llpath.loc[i, _ll.keys()] = _ll
             coefpath.loc[i, theta.keys()] = theta
 
-            # Store log-likelihood and coefficients of the current iteration.
-            llpath.append(control.family.loglik(y, post, prob, theta))
-            coefpath.append(theta)
             log.info('EM iteration %d/%d, ll = %10.2f' % (i, control.maxit_em,
                                                           _ll['full']))
             if np.isnan(_ll['full']):
@@ -509,10 +500,11 @@ class Foehnix:
             Covariats for the concomitant model
             Must contain:
 
-            - ``'values'`` : :py:class:`numpy.ndarray` the model matrix
-            - ``'center'`` : list, mean of each model matrix row
-            - ``'scale'`` : list, standard deviation of matrix rows
-            - ``'name'`` : list, names of the rows
+            - ``'values'`` : :py:class:`pandas.DataFrame` the model matrix
+            - ``'center'`` : :py:class:`pandas.Series`, containing the mean of
+              each model matrix row
+            - ``'scale'`` : :py:class:`pandas:Series`, containing the standard
+              deviation of matrix rows
             - ``'is_standardized'``: boolean if matrix is standardized
         control : :py:class:`foehnix.foehnix.Control`
             Foehnix control object
@@ -535,7 +527,7 @@ class Foehnix:
                              maxit=control.maxit_iwls, tol=control.tol_iwls)
 
         # Initial probabilities and prior  probabilities
-        prob = logistic.cdf(logitx['values'].dot(ccmodel['beta']))
+        prob = logistic.cdf(logitx['values'].values.dot(ccmodel['beta']))
         post = control.family.posterior(y, prob, theta)
 
         # EM algorithm: estimate probabilities (prob; E-step), update the model
@@ -548,14 +540,15 @@ class Foehnix:
         # DataFrames to trace log-likelihood path and the development of
         # the coefficients during EM optimization.
         coefpath = pd.DataFrame([], columns=list(theta.keys()) +
-                                logitx['names'].tolist())
+                                logitx['values'].columns.tolist())
         llpath = pd.DataFrame([], columns=['component', 'concomitant', 'full'])
 
         while delta > control.tol_em:
             # M-step: update probabilites and theta
             ccmodel = iwls_logit(logitx, post, beta=ccmodel['beta'],
                                  standardize=False,
-                                 maxit=control.maxit_iwls, tol=control.tol_iwls)
+                                 maxit=control.maxit_iwls,
+                                 tol=control.tol_iwls)
             prob = logistic.cdf(logitx['values'].dot(ccmodel['beta']))
             # TODO was mach das theta=theta hier?
             theta = control.family.theta(y, post)
@@ -567,7 +560,7 @@ class Foehnix:
             _ll = control.family.loglik(y, post, prob, theta)
             llpath.loc[i, _ll.keys()] = _ll
             coefpath.loc[i, theta.keys()] = theta
-            coefpath.loc[i, logitx['names']] = ccmodel['beta'].squeeze()
+            coefpath.loc[i, ccmodel['coef'].index] = ccmodel['beta'].squeeze()
 
             log.info('EM iteration %d/%d, ll = %10.2f' % (i, control.maxit_em,
                                                           _ll['full']))
@@ -608,6 +601,88 @@ class Foehnix:
                  'iter': i-1}
 
         self.optimizer = fdict
+
+    def predict(self, newdata=None, returntype='response'):
+        """
+        Predict method for foehnix Mixture Models
+
+        Used for prediction (perform foehn diagnosis given the estimated
+        parameters on a new data set (``newdata``). If non new data set is
+        provided (``newdata = None``) the prediction is made on the internal
+        data set, the data set which has been used to train the
+        foehnix mixture model.
+        If a new data set is provided the foehn diagnosis will be performed on
+        this new data set, e.g., based on a set of new observations when using
+        foehnix for operational near real time foehn diagnosis.
+
+        Predictions will be stored in ``self.predictions``.
+
+        Parameters
+        ----------
+        newdata : None or :py:class:`pandas.DataFrame`
+            ``None`` (default) will return the prediction of the unerlying
+            training data. If a :py:class:`pandas.DataFrame` provided, which
+            contains the required variables used for model fitting and
+            filtering, a prediction for this new data set will be returned.
+        returntype : str
+            One of:
+
+            - `'response'` (default), to return the foehn probabilities
+            - `'all'`, the following additional values will be returned:
+
+                - ``density1``, density of the first component of the mixture
+                  model
+                - ``density2``, density of the second component (foehn
+                 component) of the mixture model
+                - ``ccmodel``, probability from the concomitant model
+        """
+
+        if (returntype != 'response') and (returntype != 'all'):
+            raise ValueError('Returntype must be "response" or "all".')
+
+        # If no new data is provided, use the date which has been fitted
+        if newdata is None:
+            newdata = self.data.copy()
+
+        if len(self.concomitant) == 0:
+            prob = np.mean(self.optimizer['prob'])
+        else:
+            logitx = np.ones([len(newdata), len(self.concomitant)+1])
+            concomitants = np.zeros((len(self.concomitant)+1, 1))
+            concomitants[0] = self.coef['concomitants']['Intercept']
+            for nr, conc in enumerate(self.concomitant):
+                logitx[:, nr+1] = newdata.loc[:, conc].values.copy()
+                concomitants[nr+1] = self.coef['concomitants'][conc]
+
+            prob = logistic.cdf(logitx.dot(concomitants))
+
+        # calculate density
+        y = newdata.loc[:, self.predictor].values.copy()
+        y = y.reshape(len(y), 1)
+        d1 = self.control.family.density(y, self.coef['mu1'],
+                                         np.exp(self.coef['logsd1']))
+        d2 = self.control.family.density(y, self.coef['mu2'],
+                                         np.exp(self.coef['logsd2']))
+        post = self.control.family.posterior(y, prob, self.coef)
+
+        # Apply wind filter on newdata to get the good, the bad, and the ugly.
+        filter_obj = foehnix_filter(newdata, filter_method=self.filter_method)
+
+        resp = pd.DataFrame([], columns=['prob', 'flag'], index=newdata.index,
+                            dtype=float)
+
+        resp.loc[:, 'flag'] = 1
+        resp.loc[:, 'prob'] = post
+
+        resp.loc[filter_obj['ugly']] = np.nan
+        resp.loc[filter_obj['bad']] = 0
+
+        if returntype == 'all':
+            resp.loc[:, 'density1'] = d1
+            resp.loc[:, 'density2'] = d2
+            resp.loc[:, 'ccmodel'] = prob
+
+        self.predictions = resp
 
     def summary(self, detailed=False):
         """
@@ -659,12 +734,30 @@ class Foehnix:
                   self.time)
         else:
             print("Time required for model estimation: %.1f minutes" %
-                  self.time/60)
+                  (self.time/60))
 
         if detailed:
-            print('\nTODO: print detailed stuff')
+            # t value and corresponding p value based on a gaussian or t-test
+            tmp = pd.DataFrame([], columns=['Estimate', 'Std. Error',
+                                            't_value', 'Pr(>|t|)'],
+                               index=['(Intercept).1', '(Intercept).2'],
+                               dtype=float)
 
-            iwls_summary(self.optimizer['ccmodel'])
+            tmp.loc['(Intercept).1', 'Estimate'] = self.coef['mu1']
+            tmp.loc['(Intercept).2', 'Estimate'] = self.coef['mu2']
+            tmp.loc['(Intercept).1', 'Std. Error'] = self.mu_se['mu1_se']
+            tmp.loc['(Intercept).2', 'Std. Error'] = self.mu_se['mu2_se']
+            tmp.loc[:, 't_value'] = (tmp.loc[:, 'Estimate'] /
+                                     tmp.loc[:, 'Std. Error'])
+            tmp.loc[:, 'Pr(>|t|)'] = 2 * norm.pdf(0, loc=tmp.loc[:, 't_value'])
+
+            print('\n------------------------------------------------------\n')
+            print('Components: t test of coefficients\n')
+            print(tmp)
+
+            # If concomitants are used, print summary
+            if self.optimizer['ccmodel'] is not None:
+                iwls_summary(self.optimizer['ccmodel'])
 
     def plot(self, which, **kwargs):
         """

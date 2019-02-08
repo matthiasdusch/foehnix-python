@@ -1,5 +1,5 @@
 import numpy as np
-import scipy
+from scipy.stats import logistic, norm
 import logging
 
 # logger
@@ -15,11 +15,8 @@ class Family:
         self.name = 'Main family'
         self.scale_factor = None
 
-    def density(self, y, mu, sigma, log=False):
+    def density(self, y, mu, sigma, logpdf=False):
         raise NotImplementedError
-
-    # def distribution(self, q, mu):
-    #    raise NotImplementedError
 
     def loglik(self, y, post, prob, theta):
         """
@@ -47,8 +44,10 @@ class Family:
         prob = np.maximum(eps, np.minimum(1-eps, prob))
 
         # calculate densities, logistic/gaussian specific
-        d1 = self.density(y, theta['mu1'], np.exp(theta['logsd1']), log=True)
-        d2 = self.density(y, theta['mu2'], np.exp(theta['logsd2']), log=True)
+        d1 = self.density(y, theta['mu1'], np.exp(theta['logsd1']),
+                          logpdf=True)
+        d2 = self.density(y, theta['mu2'], np.exp(theta['logsd2']),
+                          logpdf=True)
 
         # calculate log liklihood
         component = np.sum(post * d2) + np.sum((1-post) * d1)
@@ -58,9 +57,6 @@ class Family:
         return {'component': component,
                 'concomitant': concomitant,
                 'full': component+concomitant}
-
-    # def random_sample(self, n, mu, sigma):
-    #     raise NotImplementedError
 
     def posterior(self, y, prob, theta):
         """
@@ -81,8 +77,10 @@ class Family:
             (updated) posterior probabilites
         """
         # calculate densities, logistic/gaussian specific
-        d1 = self.density(y, theta['mu1'], np.exp(theta['logsd1']), log=False)
-        d2 = self.density(y, theta['mu2'], np.exp(theta['logsd2']), log=False)
+        d1 = self.density(y, theta['mu1'], np.exp(theta['logsd1']),
+                          logpdf=False)
+        d2 = self.density(y, theta['mu2'], np.exp(theta['logsd2']),
+                          logpdf=False)
 
         post = prob * d2 / ((1-prob) * d1 + prob * d2)
         return post
@@ -145,7 +143,7 @@ class GaussianFamily(Family):
         self.name = 'Gaussian'
         self.scale_factor = 1  # factor for the scale of the distribution
 
-    def density(self, y, mu, sigma, log=False):
+    def density(self, y, mu, sigma, logpdf=False):
         """
         Density function of the mixture distribution
 
@@ -157,7 +155,7 @@ class GaussianFamily(Family):
             location of the distribution
         sigma : float
             scale of the distribution
-        log : bool
+        logpdf : bool
             If True, log of the probability density function will be returned.
 
         Returns
@@ -165,10 +163,10 @@ class GaussianFamily(Family):
         :py:class:`numpy.ndarray`
             Probability density function or log of it.
         """
-        if log is True:
-            dnorm = scipy.stats.norm(loc=mu, scale=sigma).logpdf(y)
+        if logpdf is True:
+            dnorm = norm(loc=mu, scale=sigma).logpdf(y)
         else:
-            dnorm = scipy.stats.norm(loc=mu, scale=sigma).pdf(y)
+            dnorm = norm(loc=mu, scale=sigma).pdf(y)
 
         return dnorm
 
@@ -188,7 +186,7 @@ class LogisticFamily(Family):
         self.name = 'Logistic'
         self.scale_factor = np.sqrt(3)/np.pi  # distribution scale factor
 
-    def density(self, y, mu, sigma, log=False):
+    def density(self, y, mu, sigma, logpdf=False):
         """
         Density function of the logistic mixture model distribution
 
@@ -200,7 +198,7 @@ class LogisticFamily(Family):
             location of the distribution
         sigma : float
             scale of the distribution
-        log : bool
+        logpdf : bool
             If True, log of the probability density function will be returned.
 
         Returns
@@ -208,10 +206,10 @@ class LogisticFamily(Family):
         :py:class:`numpy.ndarray`
             Probability density function or log of it.
         """
-        if log is True:
-            dlogis = scipy.stats.logistic(loc=mu, scale=sigma).logpdf(y)
+        if logpdf is True:
+            dlogis = logistic(loc=mu, scale=sigma).logpdf(y)
         else:
-            dlogis = scipy.stats.logistic(loc=mu, scale=sigma).pdf(y)
+            dlogis = logistic(loc=mu, scale=sigma).pdf(y)
 
         return dlogis
 
@@ -243,18 +241,22 @@ def initialize_family(familyname='gaussian', left=float('-Inf'),
     if familyname == 'gaussian':
         if np.isfinite([left, right]).any():
             if truncated is True:
-                family = TruncatedGaussianFamily(left=left, right=right)
+                raise NotImplementedError
+                # family = TruncatedGaussianFamily(left=left, right=right)
             else:
-                family = CensoredGaussianFamily(left=left, right=right)
+                raise NotImplementedError
+                # family = CensoredGaussianFamily(left=left, right=right)
         else:
             family = GaussianFamily()
 
     elif familyname == 'logistic':
         if np.isfinite([left, right]).any():
             if truncated is True:
-                family = TruncatedLogisticFamily(left=left, right=right)
+                raise NotImplementedError
+                # family = TruncatedLogisticFamily(left=left, right=right)
             else:
-                family = CensoredLogsticFamily(left=left, right=right)
+                raise NotImplementedError
+                # family = CensoredLogsticFamily(left=left, right=right)
         else:
             family = LogisticFamily()
     else:
