@@ -1,0 +1,6 @@
+foehnix.Foehnix.unreg\_fit
+==========================
+
+.. currentmodule:: foehnix
+
+.. automethod:: Foehnix.unreg_fit

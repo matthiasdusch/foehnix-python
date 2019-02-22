@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>foehnix.Foehnix &#8212; foehnix-python 0.0.6 documentation</title>
+    <title>foehnix.Foehnix &#8212; foehnix-python 0.0.9 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -38,7 +38,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           foehnix-python</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.6</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.9</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -46,6 +46,7 @@
             
                 <li><a href="../foehnix-demo.html">Getting started</a></li>
                 <li><a href="../api.html">API reference</a></li>
+                <li><a href="https://retostauffer.github.io/Rfoehnix">foehnix R package</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -105,7 +106,7 @@ mixture models for automated foehn classification.</p>
 <dd><p class="first last">Name of the main predictor (covariate) variable which is used to
 identify the foehn/no-foehn cluster. Must be present in <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p>
 </dd>
-<dt><strong>data</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.23.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></span></dt>
+<dt><strong>data</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.24.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></span></dt>
 <dd><p class="first last">Index must be a time object, rows must contain neccesary data</p>
 </dd>
 <dt><strong>concomitant</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or list of str</span></dt>
@@ -153,16 +154,19 @@ data to only use data from within a certain wind sector. See
 <tr class="row-odd"><td><a class="reference internal" href="#foehnix.Foehnix.__init__" title="foehnix.Foehnix.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(predictor,&nbsp;data[,&nbsp;concomitant,&nbsp;…])</td>
 <td>Initialize parmeters which all methods need.</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">no_concomitant_fit</span></code>(y,&nbsp;control)</td>
+<tr class="row-even"><td><a class="reference internal" href="foehnix.Foehnix.no_concomitant_fit.html#foehnix.Foehnix.no_concomitant_fit" title="foehnix.Foehnix.no_concomitant_fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">no_concomitant_fit</span></code></a>(y,&nbsp;control)</td>
 <td>Fitting foehnix Mixture Model Without Concomitant Model.</td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>(which,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="foehnix.Foehnix.plot.html#foehnix.Foehnix.plot" title="foehnix.Foehnix.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(which,&nbsp;**kwargs)</td>
 <td>Plotting method, helper function.</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary</span></code>([detailed])</td>
+<tr class="row-even"><td><a class="reference internal" href="foehnix.Foehnix.predict.html#foehnix.Foehnix.predict" title="foehnix.Foehnix.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>([newdata,&nbsp;returntype])</td>
+<td>Predict method for foehnix Mixture Models</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="foehnix.Foehnix.summary.html#foehnix.Foehnix.summary" title="foehnix.Foehnix.summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary</span></code></a>([detailed])</td>
 <td>Prints information about the model</td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">unreg_fit</span></code>(y,&nbsp;logitx,&nbsp;control)</td>
+<tr class="row-even"><td><a class="reference internal" href="foehnix.Foehnix.unreg_fit.html#foehnix.Foehnix.unreg_fit" title="foehnix.Foehnix.unreg_fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unreg_fit</span></code></a>(y,&nbsp;logitx,&nbsp;control)</td>
 <td>Fitting foehnix Mixture Model Without Concomitant Model.</td>
 </tr>
 </tbody>

@@ -1,6 +1,8 @@
 # Foehnix
 is a software tool for Foehn classification written in both R and python.
-It is still under development and especially this code here is still missing bigger chunks. We are looking forward to push or first release candidate (version 1.0) in the first half of 2019.
+**Foehnix is still under development**.
+We are looking forward to push or first release candidate (version 1.0) in the
+first half of 2019.
 
 # R Version
 The R package is at this stage more mature then this python version and can be found here:

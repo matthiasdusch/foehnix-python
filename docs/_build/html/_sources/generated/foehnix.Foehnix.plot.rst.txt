@@ -1,0 +1,6 @@
+foehnix.Foehnix.plot
+====================
+
+.. currentmodule:: foehnix
+
+.. automethod:: Foehnix.plot

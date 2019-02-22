@@ -1,0 +1,6 @@
+foehnix.Foehnix.summary
+=======================
+
+.. currentmodule:: foehnix
+
+.. automethod:: Foehnix.summary

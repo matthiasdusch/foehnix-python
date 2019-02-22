@@ -7,10 +7,8 @@ API Reference
 Here all foehnix classes and functions will be listed.
 
 
-Classes
-=======
-
-Tools to set-up and run OGGM.
+Main classes and functions
+==========================
 
 .. autosummary::
     :toctree: generated/
@@ -19,7 +17,11 @@ Tools to set-up and run OGGM.
     foehnix.Foehnix
     foehnix.Family
     foehnix.GaussianFamily
+    foehnix.LogisticFamily
     foehnix.foehnix.Control
+    foehnix.Foehnix.no_concomitant_fit
+    foehnix.Foehnix.unreg_fit
+    foehnix.Foehnix.predict
 
 
 Filter
@@ -32,14 +34,18 @@ Filter
     foehnix.foehnix_filter
 
 
-IWLS
-====
+Support functions
+=================
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
 
+    foehnix.Foehnix.summary
+    foehnix.Foehnix.plot
     foehnix.iwls_logit
+    foehnix.iwls_logit.iwls_summary
+    foehnix.get_demodata
 
 
 Plotting
@@ -55,3 +61,4 @@ Plotting
     foehnix.model_plots.hist
     foehnix.timeseries_plots.TSControl
     foehnix.timeseries_plots.tsplot
+    foehnix.timeseries_plots.image

@@ -1,0 +1,6 @@
+foehnix.get\_demodata
+=====================
+
+.. currentmodule:: foehnix
+
+.. autofunction:: get_demodata

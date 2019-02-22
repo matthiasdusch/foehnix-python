@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>API Reference &#8212; foehnix-python 0.0.6 documentation</title>
+    <title>API Reference &#8212; foehnix-python 0.0.9 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -38,7 +38,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           foehnix-python</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.6</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.9</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -46,6 +46,7 @@
             
                 <li><a href="foehnix-demo.html">Getting started</a></li>
                 <li><a href="#">API reference</a></li>
+                <li><a href="https://retostauffer.github.io/Rfoehnix">foehnix R package</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -87,9 +88,8 @@
   <div class="section" id="api-reference">
 <h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
 <p>Here all foehnix classes and functions will be listed.</p>
-<div class="section" id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
-<p>Tools to set-up and run OGGM.</p>
+<div class="section" id="main-classes-and-functions">
+<h2>Main classes and functions<a class="headerlink" href="#main-classes-and-functions" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
@@ -105,8 +105,20 @@
 <tr class="row-odd"><td><a class="reference internal" href="generated/foehnix.GaussianFamily.html#foehnix.GaussianFamily" title="foehnix.GaussianFamily"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foehnix.GaussianFamily</span></code></a></td>
 <td>Gaussian foehnix mixture model family</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/foehnix.foehnix.Control.html#foehnix.foehnix.Control" title="foehnix.foehnix.Control"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foehnix.foehnix.Control</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="generated/foehnix.LogisticFamily.html#foehnix.LogisticFamily" title="foehnix.LogisticFamily"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foehnix.LogisticFamily</span></code></a></td>
+<td>Logistic foehnix mixture model family</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/foehnix.foehnix.Control.html#foehnix.foehnix.Control" title="foehnix.foehnix.Control"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foehnix.foehnix.Control</span></code></a></td>
 <td>Foehnix Two-Component Mixture-Model Control Object</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/foehnix.Foehnix.no_concomitant_fit.html#foehnix.Foehnix.no_concomitant_fit" title="foehnix.Foehnix.no_concomitant_fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foehnix.Foehnix.no_concomitant_fit</span></code></a></td>
+<td>Fitting foehnix Mixture Model Without Concomitant Model.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/foehnix.Foehnix.unreg_fit.html#foehnix.Foehnix.unreg_fit" title="foehnix.Foehnix.unreg_fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foehnix.Foehnix.unreg_fit</span></code></a></td>
+<td>Fitting foehnix Mixture Model Without Concomitant Model.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/foehnix.Foehnix.predict.html#foehnix.Foehnix.predict" title="foehnix.Foehnix.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foehnix.Foehnix.predict</span></code></a></td>
+<td>Predict method for foehnix Mixture Models</td>
 </tr>
 </tbody>
 </table>
@@ -125,16 +137,28 @@
 </tbody>
 </table>
 </div>
-<div class="section" id="iwls">
-<h2>IWLS<a class="headerlink" href="#iwls" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="support-functions">
+<h2>Support functions<a class="headerlink" href="#support-functions" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/foehnix.Foehnix.summary.html#foehnix.Foehnix.summary" title="foehnix.Foehnix.summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foehnix.Foehnix.summary</span></code></a></td>
+<td>Prints information about the model</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/foehnix.Foehnix.plot.html#foehnix.Foehnix.plot" title="foehnix.Foehnix.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foehnix.Foehnix.plot</span></code></a></td>
+<td>Plotting method, helper function.</td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="generated/foehnix.iwls_logit.html#foehnix.iwls_logit" title="foehnix.iwls_logit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foehnix.iwls_logit</span></code></a></td>
 <td>Iterative weighted least squares solver for a logistic regression model.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/foehnix.iwls_logit.iwls_summary.html#foehnix.iwls_logit.iwls_summary" title="foehnix.iwls_logit.iwls_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foehnix.iwls_logit.iwls_summary</span></code></a></td>
+<td>Prints some statistics for a given concomitant model</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/foehnix.get_demodata.html#foehnix.get_demodata" title="foehnix.get_demodata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foehnix.get_demodata</span></code></a></td>
+<td>Returns a demo data set from <cite>Ellboegen</cite> and <cite>Sattelberg</cite>.</td>
 </tr>
 </tbody>
 </table>
@@ -164,6 +188,9 @@
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="generated/foehnix.timeseries_plots.tsplot.html#foehnix.timeseries_plots.tsplot" title="foehnix.timeseries_plots.tsplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foehnix.timeseries_plots.tsplot</span></code></a></td>
 <td>Time series plot for foehnix models</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/foehnix.timeseries_plots.image.html#foehnix.timeseries_plots.image" title="foehnix.timeseries_plots.image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foehnix.timeseries_plots.image</span></code></a></td>
+<td>foehnix Image Plot - Hovmoeller Diagram</td>
 </tr>
 </tbody>
 </table>

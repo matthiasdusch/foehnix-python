@@ -395,10 +395,10 @@ def image(fmm, fun='freq', deltat=None, deltad=7,
         Determines how to aggregate the Foehn probability
         Possible strings are:
 
-        - ``'freq': frequency of foehn occurrence (probability >= 0.5)
-        - ``'mean': mean probability
-        - ``'occ': absolute occurrence of foehn (probabiliy >= 0.5)
-        - ``'occ': absolute occurrence of no foehn (probabiliy < 0.5)
+        - ``'freq'``: frequency of foehn occurrence (probability >= 0.5)
+        - ``'mean'``: mean probability
+        - ``'occ'``: absolute occurrence of foehn (probabiliy >= 0.5)
+        - ``'occ'``: absolute occurrence of no foehn (probabiliy < 0.5)
     deltat : int
         interval in seconds for time aggregation. Has to be a fraction of
         86400 (24h in seconds). If ``None`` (default) the interval of the time
@@ -417,9 +417,9 @@ def image(fmm, fun='freq', deltat=None, deltad=7,
     kwargs :
         Possible keyword arguments for the figure:
 
-        - ``'title'
-        - ``'ylabel'
-        - ``'xlabel'
+        - ``'title'``
+        - ``'ylabel'``
+        - ``'xlabel'``
     """
 
     if not isinstance(fmm, foehnix.Foehnix):
@@ -613,4 +613,3 @@ def image(fmm, fun='freq', deltat=None, deltad=7,
     # --- overall figure
     ax.set_title(title)
     fig.tight_layout()
-    plt.show()

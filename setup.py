@@ -12,7 +12,7 @@ from os import path, walk
 
 MAJOR = 0
 MINOR = 0
-MICRO = 6
+MICRO = 9
 ISRELEASED = False
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 QUALIFIER = ''
