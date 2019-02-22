@@ -1,0 +1,6 @@
+foehnix.timeseries\_plots.image
+===============================
+
+.. currentmodule:: foehnix.timeseries_plots
+
+.. autofunction:: image
