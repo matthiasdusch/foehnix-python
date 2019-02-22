@@ -793,6 +793,8 @@ class Foehnix:
                 model_plots.hist(self)
             elif i == 'timeseries':
                 timeseries_plots.tsplot(self, **kwargs)
+            elif i == 'image':
+                timeseries_plots.image(self, **kwargs)
 
             else:
                 log.critical('Skipping "%s", not a valid plot argument' % i)

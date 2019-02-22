@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+from matplotlib import cm
 import numpy as np
 import pandas as pd
 import logging
@@ -374,4 +375,242 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, show_n_plots=3,
         if (nr+1) % show_n_plots == 0:
             plt.show()
 
+    plt.show()
+
+
+def image(fmm, fun='freq', deltat=None, deltad=7,
+          cmap=cm.get_cmap('Greys', 20), contours=False, contour_color='k',
+          contour_levels=10, **kwargs):
+    """
+    foehnix Image Plot - Hovmoeller Diagram
+
+    This plots a Hovmoeller Diagram with aggregated days on the x-axis and
+    aggregated time on the y-axis.
+
+    Parameters
+    ----------
+    fmm : :py:class:`foehnix.Foehnix`
+        A foehnix mixture model object
+    fun : str or custom function
+        Determines how to aggregate the Foehn probability
+        Possible strings are:
+
+        - ``'freq': frequency of foehn occurrence (probability >= 0.5)
+        - ``'mean': mean probability
+        - ``'occ': absolute occurrence of foehn (probabiliy >= 0.5)
+        - ``'occ': absolute occurrence of no foehn (probabiliy < 0.5)
+    deltat : int
+        interval in seconds for time aggregation. Has to be a fraction of
+        86400 (24h in seconds). If ``None`` (default) the interval of the time
+        series will be used.
+    deltad : int
+        interval in days for daily aggregation. Default is 7.
+    cmap : :py:class:`matplotlib.colormap`
+        colormap to use for the Hovmoeller Diagram
+    contours : Bool
+        If ``True`` additional contour lines will be ploted. Default ``False``.
+    contour_color : str
+        Color of the contour lines. Default 'k' for black.
+    contour_levels : float or sequence of floats
+        Default ``10`` will plot 10 contour levels. If a sequence is provided
+        contour levels will be plotted at the sequence values.
+    kwargs :
+        Possible keyword arguments for the figure:
+
+        - ``'title'
+        - ``'ylabel'
+        - ``'xlabel'
+    """
+
+    if not isinstance(fmm, foehnix.Foehnix):
+        raise AttributeError('First Attribute must be a foehnix mixture model '
+                             ' instance.')
+    # copy foehnix probability for easy access
+    x = fmm.prob.prob.copy()
+
+    # make sure index is a DatetimeIndex
+    x.index = pd.to_datetime(x.index)
+    mindt = x.index.to_series().diff().min().seconds
+    # check if regular
+    if not x.index.is_monotonic_increasing:
+        raise RuntimeError('DataFrame index is not monotonic increasing!')
+    # check if data is strictly increasing
+    if not (mindt == x.index.to_series().diff().max().seconds):
+        raise RuntimeError('DataFrame index is not strictly regular '
+                           'increasing. This should be the case if a standard '
+                           'Foehnix Mixture Model object is provided to the '
+                           'function. If you provide a custom object, make '
+                           'sure the index is strictly regular increasing!')
+
+    # check deltat
+    if deltat is None:
+        deltat = mindt
+        # TODO: das muss nicht aufgehen (%==0)! Bessere loesung ueberlegen!
+    elif isinstance(deltat, int) and (86400 % deltat == 0):
+        pass
+    else:
+        raise ValueError('`deltat` must be a fraction of 86400 seconds '
+                         ' (1 day), provided as integer value.')
+    if deltat < mindt:
+        log.warning('Upsampling is not allowed: `deltat` must be greater or '
+                    'equal to the time step of the DataFrame! Will use the'
+                    'time step of the DataFrame instead.')
+        # TODO: das muss nicht aufgehen (%==0)! Bessere loesung ueberlegen!
+        deltat = mindt
+
+    # check deltad
+    if (not isinstance(deltad, int)) or (deltad > 365) or (deltad < 1):
+        raise ValueError('`deltad` must be a integer within [1, 365]!')
+
+    # checking colors
+    # TODO
+
+    # Aggregation function
+    if fun == 'freq':
+        def fun(fx): return (fx.dropna() >= 0.5).sum()/fx.notna().sum()
+    elif fun == 'occ':
+        def fun(fx): return (fx.dropna() >= 0.5).sum()
+    elif fun == 'noocc':
+        def fun(fx): return (fx.dropna() < 0.5).sum()
+    elif fun == 'mean':
+        def fun(fx): return fx.dropna().mean()
+    elif callable(fun):
+        log.info('Using provided aggregaton function %s' % fun.__name__)
+        pass
+    else:
+        raise ValueError('Aggregation function `fun` must either be one of '
+                         '"freq", "occ", "noocc" or "mean". Or a suitable '
+                         'self provided function.')
+
+    #
+    # ----------- Regroup data -------------
+    # make dataframe
+    x = x.to_frame()
+    # store day_of_year for deltad grouping
+    x['doy'] = pd.TimedeltaIndex(x.index.dayofyear, 'd')
+
+    # store seconds of day for deltat grouping
+    secs = (x.index.values - x.index.values.astype('datetime64[D]')) /\
+        np.timedelta64(1, 's')
+    # 0 is end of day
+    secs[secs == 0] = 3600*24
+    # make secs a Timedeltaindex in order to use it as group frequency
+    x['sod'] = pd.TimedeltaIndex(secs, 's')
+
+    # TODO reto laesst den 29 Feber drinne und schneidet den Plot hinten ab
+    # correct for leap years
+    # x.loc[x.index.is_leap_year & (x['doy'] > 59), 'doy'] -= 1
+
+    # 2. group by day and time
+    grouper1 = pd.Grouper(key='doy', freq='%dd' % deltad)
+    grouper2 = pd.Grouper(key='sod', freq='%ds' % deltat)
+    x = x.groupby([grouper1, grouper2]).agg(lambda xx: fun(xx))
+    x.index = x.index.remove_unused_levels()
+
+    # ---------- plot stuff
+    lenx = len(x.index.levels[0])
+    leny = len(x.index.levels[1])
+    Z = np.zeros((leny, lenx))
+
+    fig, (ax, cax) = plt.subplots(1, 2, figsize=(12, 6.5),
+                                  gridspec_kw={'width_ratios': [1, 0.03]})
+    for nr, day in enumerate(x.index.levels[0]):
+        Z[:, nr] = x.loc[day].values.squeeze()
+
+    im = ax.imshow(Z, origin='lower', cmap=cmap, aspect='auto')
+
+    # --- colorbar
+    cbar = fig.colorbar(im, cax=cax)
+
+    # --- contours
+    if contours is True:
+        # make cyclic boundaries
+        zcon = np.zeros((Z.shape[0]+2, Z.shape[1]+2))
+
+        # center
+        zcon[1:-1, 1:-1] = Z
+
+        # lower
+        zcon[0, 1:-1] = Z[-1, :]
+        zcon[0, 0] = Z[-1, -1]
+
+        # upper
+        zcon[-1, 1:-1] = Z[0, :]
+        zcon[-1, -1] = Z[0, 0]
+
+        # left
+        zcon[1:-1, 0] = Z[:, -1]
+        zcon[-1, 0] = Z[0, -1]
+
+        # right
+        zcon[1:-1, -1] = Z[:, 0]
+        zcon[0, -1] = Z[-1, 0]
+
+        # TODO : for nice cyclic boundaries I have to use higher resolution...
+
+        """
+        # lower
+        zcon[0, 2:] = Z[-1, :]
+        zcon[0, 1] = Z[-1, -1]
+        zcon[0, 0] = Z[-1, -2]
+
+        # upper
+        zcon[-1, :-2] = Z[0, :]
+        zcon[-1, -2] = Z[0, 0]
+        zcon[-1, -1] = Z[0, 1]
+
+        # left
+        zcon[1:-1, 0] = Z[:, -1]
+
+        # right
+        zcon[1:-1, -1] = Z[:, 0]
+
+
+        """
+        xcon, ycon = np.meshgrid(np.arange(zcon.shape[1])-1,
+                                 np.arange(zcon.shape[0])-1)
+
+        ax.contour(xcon, ycon, zcon, colors=contour_color,
+                   levels=contour_levels)
+
+    # ---- kwargs for plotting
+    if 'title' in kwargs:
+        title = kwargs['title']
+    else:
+        title = 'foehnix Hovmoeller Diagram'
+
+    if 'xlabel' in kwargs:
+        xlabel = kwargs['xlabel']
+    else:
+        xlabel = 'time of the year'
+
+    if 'ylabel' in kwargs:
+        ylabel = kwargs['ylabel']
+    else:
+        ylabel = 'time of the day'
+
+    # --- x axis:
+    yrindex = pd.DatetimeIndex(start='1900', end='1901', freq='d')
+    month = [yr[:3] for yr in yrindex.month_name().unique()]
+    yrindex = yrindex[yrindex.day == 1].dayofyear[:-1] - 1
+    xt = np.arange(-0.5, lenx, 1/deltad)[yrindex]
+    xt_minor = xt + np.append(np.diff(xt)/2, np.diff(xt[:2]/2))
+    ax.set_xticks(xt)
+    ax.set_xticklabels('', minor=False)
+    ax.set_xticks(xt_minor, 'minor')
+    ax.set_xticklabels(month, minor=True)
+    ax.tick_params(axis='x', which='minor', length=0)
+    ax.set_xlim(-0.5, lenx-1.5)
+    ax.set_xlabel(xlabel)
+
+    # --- y axis:
+    ax.set_yticks(np.arange(-0.5, leny, 3600/deltat))
+    hindex = pd.DatetimeIndex(start='1900', end='1900-01-02', freq='h')
+    ax.set_yticklabels(hindex.strftime('%H:%M'))
+    ax.set_ylabel(ylabel)
+    ax.set_ylim(-0.5, leny-0.5)
+
+    # --- overall figure
+    ax.set_title(title)
+    fig.tight_layout()
     plt.show()
