@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>foehnix.foehnix &#8212; foehnix-python 0.0.6 documentation</title>
+    <title>foehnix.foehnix &#8212; foehnix-python 0.0.9 documentation</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -36,7 +36,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           foehnix-python</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.6</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.9</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -44,6 +44,7 @@
             
                 <li><a href="../../foehnix-demo.html">Getting started</a></li>
                 <li><a href="../../api.html">API reference</a></li>
+                <li><a href="https://retostauffer.github.io/Rfoehnix">foehnix R package</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -86,7 +87,7 @@
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="k">import</span> <span class="n">logistic</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="k">import</span> <span class="n">logistic</span><span class="p">,</span> <span class="n">norm</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
 <span class="kn">from</span> <span class="nn">foehnix.families</span> <span class="k">import</span> <span class="n">Family</span><span class="p">,</span> <span class="n">initialize_family</span>
@@ -107,7 +108,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="Control.__init__"><a class="viewcode-back" href="../../generated/foehnix.foehnix.Control.html#foehnix.Control.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">family</span><span class="p">,</span> <span class="n">switch</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-Inf&#39;</span><span class="p">),</span> <span class="n">right</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;Inf&#39;</span><span class="p">),</span>
                  <span class="n">truncated</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">maxit</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-                 <span class="n">force_inflate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                 <span class="n">force_inflate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization of the Control object</span>
 
@@ -151,7 +152,6 @@
 <span class="sd">            stop except the user forces inflation by specifying</span>
 <span class="sd">            ``force_inflate = True``. This can cause a serious runtime</span>
 <span class="sd">            increase. Default is False.</span>
-<span class="sd">        alpha : TODO parameter for the penalization of the concomitatnt model</span>
 <span class="sd">        verbose : bool or str</span>
 <span class="sd">            Sets the verbose level of the model logging</span>
 
@@ -216,8 +216,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">truncated</span> <span class="o">=</span> <span class="n">truncated</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">standardize</span> <span class="o">=</span> <span class="n">standardize</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">force_inflate</span> <span class="o">=</span> <span class="n">force_inflate</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">force_inflate</span> <span class="o">=</span> <span class="n">force_inflate</span></div></div>
 
 
 <div class="viewcode-block" id="Foehnix"><a class="viewcode-back" href="../../generated/foehnix.Foehnix.html#foehnix.Foehnix">[docs]</a><span class="k">class</span> <span class="nc">Foehnix</span><span class="p">:</span>
@@ -313,7 +312,7 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;DataFrame gets inflated, see log for details!&#39;</span><span class="p">)</span>
 
         <span class="c1"># Keep the number of observations (rows) added due to inflation.</span>
-        <span class="n">N_inflated</span> <span class="o">=</span> <span class="n">inflated</span> <span class="o">-</span> <span class="n">lendata</span>
+        <span class="n">n_inflated</span> <span class="o">=</span> <span class="n">inflated</span> <span class="o">-</span> <span class="n">lendata</span>
         <span class="c1"># if inflation is ok or forced, create strictly increasing dataframe</span>
         <span class="c1"># with minimal spacing</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">asfreq</span><span class="p">(</span><span class="n">mindiff</span><span class="p">)</span>
@@ -348,20 +347,26 @@
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">concomitant</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">_logitx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">concomitant</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
-            <span class="k">for</span> <span class="n">nr</span><span class="p">,</span> <span class="n">conc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">concomitant</span><span class="p">):</span>
-                <span class="n">_logitx</span><span class="p">[:,</span> <span class="n">nr</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_take</span><span class="p">,</span> <span class="n">conc</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">ix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Intercept&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">concomitant</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">ix</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 
-            <span class="c1"># store concomitant matrix in a dict</span>
-            <span class="n">logitx</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="n">_logitx</span><span class="p">,</span>
-                      <span class="s1">&#39;names&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s1">&#39;Intercept&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">concomitant</span><span class="p">),</span>
-                      <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">_logitx</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-                      <span class="s1">&#39;center&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">_logitx</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-                      <span class="s1">&#39;is_standardized&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="s1">&#39;Intercept&#39;</span><span class="p">:</span>
+                    <span class="n">vals</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ix</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">vals</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ix</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_take</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
+            <span class="n">scale</span> <span class="o">=</span> <span class="n">vals</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+            <span class="n">center</span> <span class="o">=</span> <span class="n">vals</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
             <span class="c1"># If std == 0 (e.g. for the Intercept), set center=0 and scale=1</span>
-            <span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;center&#39;</span><span class="p">][</span><span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">][</span><span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">center</span><span class="p">[</span><span class="n">scale</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">scale</span><span class="p">[</span><span class="n">scale</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="n">logitx</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="n">vals</span><span class="p">,</span>
+                      <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="n">scale</span><span class="p">,</span>
+                      <span class="s1">&#39;center&#39;</span><span class="p">:</span> <span class="n">center</span><span class="p">,</span>
+                      <span class="s1">&#39;is_standardized&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 
             <span class="c1"># standardize data if control.standardize = True (default)</span>
             <span class="k">if</span> <span class="n">control</span><span class="o">.</span><span class="n">standardize</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
@@ -385,26 +390,20 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">concomitant</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Calling Foehnix.no_concomitant_fit&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">no_concomitant_fit</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">control</span><span class="o">.</span><span class="n">alpha</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Calling Foehnix.unreg_fit&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">unreg_fit</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">logitx</span><span class="p">,</span> <span class="n">control</span><span class="p">)</span>
 
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Estimation finished, create final object.&#39;</span><span class="p">)</span>
 
-        <span class="c1"># TODO ich mach das destandardice_coefficients im iwls_logit. Reto?</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        # Final coefficients of the concomitant model have to be destandardized</span>
-<span class="sd">        if self.optimizer[&#39;ccmodel&#39;] is not None:</span>
-<span class="sd">            if logitx[&#39;is_standardized&#39;] is True:</span>
-<span class="sd">                coef = func.destandardize_coefficients(</span>
-<span class="sd">                    self.optimizer[&#39;ccmodel&#39;][&#39;coef&#39;], logitx)</span>
-<span class="sd">            else:</span>
-<span class="sd">                coef = self.optimizer[&#39;ccmodel&#39;][&#39;coef&#39;]</span>
-<span class="sd">        else:</span>
-<span class="sd">            coef = None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Final coefficients of the concomitant model have to be destandardized</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;ccmodel&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">coef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;ccmodel&#39;</span><span class="p">][</span><span class="s1">&#39;coef&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;is_standardized&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">coef</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">destandardize_coefficients</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;ccmodel&#39;</span><span class="p">][</span><span class="s1">&#39;coef&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">logitx</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">coef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;ccmodel&#39;</span><span class="p">][</span><span class="s1">&#39;coef&#39;</span><span class="p">]</span>
+
         <span class="k">else</span><span class="p">:</span>
             <span class="n">coef</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -420,15 +419,16 @@
 
         <span class="c1"># store relevant data within the Foehnix class</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">foehnix_filter</span> <span class="o">=</span> <span class="n">foehnix_filter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_method</span> <span class="o">=</span> <span class="n">filter_method</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filter_obj</span> <span class="o">=</span> <span class="n">filter_obj</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span> <span class="o">=</span> <span class="n">predictor</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">concomitant</span> <span class="o">=</span> <span class="n">concomitant</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="n">control</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">switch</span> <span class="o">=</span> <span class="n">switch</span>
-        <span class="c1"># TODO struktur von coef</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;theta&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coef</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;theta&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;concomitants&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">coef</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inflated</span> <span class="o">=</span> <span class="n">n_inflated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">predictions</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Calculate the weighted standard error of the estimated</span>
         <span class="c1"># coefficients for the test statistics.</span>
@@ -478,7 +478,7 @@
         <span class="c1"># Store execution time in seconds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span></div>
 
-    <span class="k">def</span> <span class="nf">no_concomitant_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">control</span><span class="p">):</span>
+<div class="viewcode-block" id="Foehnix.no_concomitant_fit"><a class="viewcode-back" href="../../generated/foehnix.Foehnix.no_concomitant_fit.html#foehnix.Foehnix.no_concomitant_fit">[docs]</a>    <span class="k">def</span> <span class="nf">no_concomitant_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">control</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fitting foehnix Mixture Model Without Concomitant Model.</span>
 
 <span class="sd">        Parameters</span>
@@ -488,11 +488,6 @@
 <span class="sd">        control : :py:class:`foehnix.foehnix.Control`</span>
 <span class="sd">            Foehnix control object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># Lists to trace log-likelihood path and the development of</span>
-        <span class="c1"># the coefficients during EM optimization.</span>
-        <span class="n">llpath</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">coefpath</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c1"># Given the initial probabilities: calculate parameters for the two</span>
         <span class="c1"># components (mu1, logsd1, mu2, logsd2) given the selected family and</span>
@@ -536,9 +531,6 @@
             <span class="n">llpath</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">_ll</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span> <span class="o">=</span> <span class="n">_ll</span>
             <span class="n">coefpath</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">theta</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span> <span class="o">=</span> <span class="n">theta</span>
 
-            <span class="c1"># Store log-likelihood and coefficients of the current iteration.</span>
-            <span class="n">llpath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">loglik</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">theta</span><span class="p">))</span>
-            <span class="n">coefpath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
             <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;EM iteration </span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">, ll = </span><span class="si">%10.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">control</span><span class="o">.</span><span class="n">maxit_em</span><span class="p">,</span>
                                                           <span class="n">_ll</span><span class="p">[</span><span class="s1">&#39;full&#39;</span><span class="p">]))</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">_ll</span><span class="p">[</span><span class="s1">&#39;full&#39;</span><span class="p">]):</span>
@@ -581,9 +573,9 @@
                  <span class="s1">&#39;converged&#39;</span><span class="p">:</span> <span class="n">converged</span><span class="p">,</span>
                  <span class="s1">&#39;iter&#39;</span><span class="p">:</span> <span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">}</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">fdict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">fdict</span></div>
 
-    <span class="k">def</span> <span class="nf">unreg_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">logitx</span><span class="p">,</span> <span class="n">control</span><span class="p">):</span>
+<div class="viewcode-block" id="Foehnix.unreg_fit"><a class="viewcode-back" href="../../generated/foehnix.Foehnix.unreg_fit.html#foehnix.Foehnix.unreg_fit">[docs]</a>    <span class="k">def</span> <span class="nf">unreg_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">logitx</span><span class="p">,</span> <span class="n">control</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fitting foehnix Mixture Model Without Concomitant Model.</span>
 
 <span class="sd">        Parameters</span>
@@ -594,10 +586,11 @@
 <span class="sd">            Covariats for the concomitant model</span>
 <span class="sd">            Must contain:</span>
 
-<span class="sd">            - ``&#39;values&#39;`` : :py:class:`numpy.ndarray` the model matrix</span>
-<span class="sd">            - ``&#39;center&#39;`` : list, mean of each model matrix row</span>
-<span class="sd">            - ``&#39;scale&#39;`` : list, standard deviation of matrix rows</span>
-<span class="sd">            - ``&#39;name&#39;`` : list, names of the rows</span>
+<span class="sd">            - ``&#39;values&#39;`` : :py:class:`pandas.DataFrame` the model matrix</span>
+<span class="sd">            - ``&#39;center&#39;`` : :py:class:`pandas.Series`, containing the mean of</span>
+<span class="sd">              each model matrix row</span>
+<span class="sd">            - ``&#39;scale&#39;`` : :py:class:`pandas:Series`, containing the standard</span>
+<span class="sd">              deviation of matrix rows</span>
 <span class="sd">            - ``&#39;is_standardized&#39;``: boolean if matrix is standardized</span>
 <span class="sd">        control : :py:class:`foehnix.foehnix.Control`</span>
 <span class="sd">            Foehnix control object</span>
@@ -620,7 +613,7 @@
                              <span class="n">maxit</span><span class="o">=</span><span class="n">control</span><span class="o">.</span><span class="n">maxit_iwls</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">control</span><span class="o">.</span><span class="n">tol_iwls</span><span class="p">)</span>
 
         <span class="c1"># Initial probabilities and prior  probabilities</span>
-        <span class="n">prob</span> <span class="o">=</span> <span class="n">logistic</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;values&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ccmodel</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]))</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">logistic</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;values&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ccmodel</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]))</span>
         <span class="n">post</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">posterior</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
 
         <span class="c1"># EM algorithm: estimate probabilities (prob; E-step), update the model</span>
@@ -633,14 +626,15 @@
         <span class="c1"># DataFrames to trace log-likelihood path and the development of</span>
         <span class="c1"># the coefficients during EM optimization.</span>
         <span class="n">coefpath</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">theta</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span>
-                                <span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;names&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+                                <span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;values&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
         <span class="n">llpath</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;component&#39;</span><span class="p">,</span> <span class="s1">&#39;concomitant&#39;</span><span class="p">,</span> <span class="s1">&#39;full&#39;</span><span class="p">])</span>
 
         <span class="k">while</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="n">control</span><span class="o">.</span><span class="n">tol_em</span><span class="p">:</span>
             <span class="c1"># M-step: update probabilites and theta</span>
             <span class="n">ccmodel</span> <span class="o">=</span> <span class="n">iwls_logit</span><span class="p">(</span><span class="n">logitx</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">ccmodel</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">],</span>
                                  <span class="n">standardize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                 <span class="n">maxit</span><span class="o">=</span><span class="n">control</span><span class="o">.</span><span class="n">maxit_iwls</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">control</span><span class="o">.</span><span class="n">tol_iwls</span><span class="p">)</span>
+                                 <span class="n">maxit</span><span class="o">=</span><span class="n">control</span><span class="o">.</span><span class="n">maxit_iwls</span><span class="p">,</span>
+                                 <span class="n">tol</span><span class="o">=</span><span class="n">control</span><span class="o">.</span><span class="n">tol_iwls</span><span class="p">)</span>
             <span class="n">prob</span> <span class="o">=</span> <span class="n">logistic</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;values&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ccmodel</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]))</span>
             <span class="c1"># TODO was mach das theta=theta hier?</span>
             <span class="n">theta</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">theta</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">post</span><span class="p">)</span>
@@ -652,7 +646,7 @@
             <span class="n">_ll</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">loglik</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
             <span class="n">llpath</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">_ll</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span> <span class="o">=</span> <span class="n">_ll</span>
             <span class="n">coefpath</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">theta</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span> <span class="o">=</span> <span class="n">theta</span>
-            <span class="n">coefpath</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;names&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ccmodel</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+            <span class="n">coefpath</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">ccmodel</span><span class="p">[</span><span class="s1">&#39;coef&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccmodel</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
 
             <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;EM iteration </span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">, ll = </span><span class="si">%10.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">control</span><span class="o">.</span><span class="n">maxit_em</span><span class="p">,</span>
                                                           <span class="n">_ll</span><span class="p">[</span><span class="s1">&#39;full&#39;</span><span class="p">]))</span>
@@ -692,9 +686,93 @@
                  <span class="s1">&#39;converged&#39;</span><span class="p">:</span> <span class="n">converged</span><span class="p">,</span>
                  <span class="s1">&#39;iter&#39;</span><span class="p">:</span> <span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">}</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">fdict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">fdict</span></div>
 
-    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detailed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Foehnix.predict"><a class="viewcode-back" href="../../generated/foehnix.Foehnix.predict.html#foehnix.Foehnix.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newdata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">returntype</span><span class="o">=</span><span class="s1">&#39;response&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict method for foehnix Mixture Models</span>
+
+<span class="sd">        Used for prediction (perform foehn diagnosis given the estimated</span>
+<span class="sd">        parameters on a new data set (``newdata``). If non new data set is</span>
+<span class="sd">        provided (``newdata = None``) the prediction is made on the internal</span>
+<span class="sd">        data set, the data set which has been used to train the</span>
+<span class="sd">        foehnix mixture model.</span>
+<span class="sd">        If a new data set is provided the foehn diagnosis will be performed on</span>
+<span class="sd">        this new data set, e.g., based on a set of new observations when using</span>
+<span class="sd">        foehnix for operational near real time foehn diagnosis.</span>
+
+<span class="sd">        Predictions will be stored in ``self.predictions``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        newdata : None or :py:class:`pandas.DataFrame`</span>
+<span class="sd">            ``None`` (default) will return the prediction of the unerlying</span>
+<span class="sd">            training data. If a :py:class:`pandas.DataFrame` provided, which</span>
+<span class="sd">            contains the required variables used for model fitting and</span>
+<span class="sd">            filtering, a prediction for this new data set will be returned.</span>
+<span class="sd">        returntype : str</span>
+<span class="sd">            One of:</span>
+
+<span class="sd">            - ``&#39;response&#39;`` (default), to return the foehn probabilities</span>
+<span class="sd">            - ``&#39;all&#39;``, the following additional values will be returned:</span>
+
+
+<span class="sd">                - ``density1``, density of the first component of the mixture</span>
+<span class="sd">                  model</span>
+<span class="sd">                - ``density2``, density of the second component (foehn</span>
+<span class="sd">                  component) of the mixture model</span>
+<span class="sd">                - ``ccmodel``, probability from the concomitant model</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">returntype</span> <span class="o">!=</span> <span class="s1">&#39;response&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">returntype</span> <span class="o">!=</span> <span class="s1">&#39;all&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Returntype must be &quot;response&quot; or &quot;all&quot;.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># If no new data is provided, use the date which has been fitted</span>
+        <span class="k">if</span> <span class="n">newdata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">newdata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concomitant</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">prob</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;prob&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logitx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">newdata</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concomitant</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">concomitants</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concomitant</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">concomitants</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;concomitants&#39;</span><span class="p">][</span><span class="s1">&#39;Intercept&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">nr</span><span class="p">,</span> <span class="n">conc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concomitant</span><span class="p">):</span>
+                <span class="n">logitx</span><span class="p">[:,</span> <span class="n">nr</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">newdata</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">conc</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">concomitants</span><span class="p">[</span><span class="n">nr</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;concomitants&#39;</span><span class="p">][</span><span class="n">conc</span><span class="p">]</span>
+
+            <span class="n">prob</span> <span class="o">=</span> <span class="n">logistic</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">logitx</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">concomitants</span><span class="p">))</span>
+
+        <span class="c1"># calculate density</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">newdata</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">d1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">density</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;mu1&#39;</span><span class="p">],</span>
+                                         <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;logsd1&#39;</span><span class="p">]))</span>
+        <span class="n">d2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">density</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;mu2&#39;</span><span class="p">],</span>
+                                         <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;logsd2&#39;</span><span class="p">]))</span>
+        <span class="n">post</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">posterior</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">)</span>
+
+        <span class="c1"># Apply wind filter on newdata to get the good, the bad, and the ugly.</span>
+        <span class="n">filter_obj</span> <span class="o">=</span> <span class="n">foehnix_filter</span><span class="p">(</span><span class="n">newdata</span><span class="p">,</span> <span class="n">filter_method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_method</span><span class="p">)</span>
+
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;prob&#39;</span><span class="p">,</span> <span class="s1">&#39;flag&#39;</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">newdata</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                            <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="n">resp</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">resp</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;prob&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">post</span>
+
+        <span class="n">resp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filter_obj</span><span class="p">[</span><span class="s1">&#39;ugly&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">resp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filter_obj</span><span class="p">[</span><span class="s1">&#39;bad&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="n">returntype</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+            <span class="n">resp</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;density1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d1</span>
+            <span class="n">resp</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;density2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d2</span>
+            <span class="n">resp</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;ccmodel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">predictions</span> <span class="o">=</span> <span class="n">resp</span></div>
+
+<div class="viewcode-block" id="Foehnix.summary"><a class="viewcode-back" href="../../generated/foehnix.Foehnix.summary.html#foehnix.Foehnix.summary">[docs]</a>    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detailed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prints information about the model</span>
 
@@ -744,14 +822,32 @@
                   <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Time required for model estimation: </span><span class="si">%.1f</span><span class="s2"> minutes&quot;</span> <span class="o">%</span>
-                  <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">/</span><span class="mi">60</span><span class="p">)</span>
+                  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">/</span><span class="mi">60</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">detailed</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">TODO: print detailed stuff&#39;</span><span class="p">)</span>
+            <span class="c1"># t value and corresponding p value based on a gaussian or t-test</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Estimate&#39;</span><span class="p">,</span> <span class="s1">&#39;Std. Error&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;t_value&#39;</span><span class="p">,</span> <span class="s1">&#39;Pr(&gt;|t|)&#39;</span><span class="p">],</span>
+                               <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;(Intercept).1&#39;</span><span class="p">,</span> <span class="s1">&#39;(Intercept).2&#39;</span><span class="p">],</span>
+                               <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 
-            <span class="n">iwls_summary</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;ccmodel&#39;</span><span class="p">])</span>
+            <span class="n">tmp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;(Intercept).1&#39;</span><span class="p">,</span> <span class="s1">&#39;Estimate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;mu1&#39;</span><span class="p">]</span>
+            <span class="n">tmp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;(Intercept).2&#39;</span><span class="p">,</span> <span class="s1">&#39;Estimate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;mu2&#39;</span><span class="p">]</span>
+            <span class="n">tmp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;(Intercept).1&#39;</span><span class="p">,</span> <span class="s1">&#39;Std. Error&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu_se</span><span class="p">[</span><span class="s1">&#39;mu1_se&#39;</span><span class="p">]</span>
+            <span class="n">tmp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;(Intercept).2&#39;</span><span class="p">,</span> <span class="s1">&#39;Std. Error&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu_se</span><span class="p">[</span><span class="s1">&#39;mu2_se&#39;</span><span class="p">]</span>
+            <span class="n">tmp</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;t_value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;Estimate&#39;</span><span class="p">]</span> <span class="o">/</span>
+                                     <span class="n">tmp</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;Std. Error&#39;</span><span class="p">])</span>
+            <span class="n">tmp</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;Pr(&gt;|t|)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="n">tmp</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;t_value&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">------------------------------------------------------</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Components: t test of coefficients</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
+            <span class="c1"># If concomitants are used, print summary</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;ccmodel&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">iwls_summary</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;ccmodel&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Foehnix.plot"><a class="viewcode-back" href="../../generated/foehnix.Foehnix.plot.html#foehnix.Foehnix.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plotting method, helper function.</span>
 
@@ -785,9 +881,11 @@
                 <span class="n">model_plots</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="s1">&#39;timeseries&#39;</span><span class="p">:</span>
                 <span class="n">timeseries_plots</span><span class="o">.</span><span class="n">tsplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="s1">&#39;image&#39;</span><span class="p">:</span>
+                <span class="n">timeseries_plots</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Skipping &quot;</span><span class="si">%s</span><span class="s1">&quot;, not a valid plot argument&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span></div>
+                <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Skipping &quot;</span><span class="si">%s</span><span class="s1">&quot;, not a valid plot argument&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span></div></div>
 </pre></div>
 
     </div>

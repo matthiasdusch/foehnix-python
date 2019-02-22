@@ -627,14 +627,16 @@ class Foehnix:
         returntype : str
             One of:
 
-            - `'response'` (default), to return the foehn probabilities
-            - `'all'`, the following additional values will be returned:
+            - ``'response'`` (default), to return the foehn probabilities
+            - ``'all'``, the following additional values will be returned:
+
 
                 - ``density1``, density of the first component of the mixture
                   model
                 - ``density2``, density of the second component (foehn
-                 component) of the mixture model
+                  component) of the mixture model
                 - ``ccmodel``, probability from the concomitant model
+
         """
 
         if (returntype != 'response') and (returntype != 'all'):

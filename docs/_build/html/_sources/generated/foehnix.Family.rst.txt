@@ -15,10 +15,8 @@ foehnix.Family
    
       ~Family.__init__
       ~Family.density
-      ~Family.distribution
       ~Family.loglik
       ~Family.posterior
-      ~Family.random_sample
       ~Family.theta
    
    

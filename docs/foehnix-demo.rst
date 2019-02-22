@@ -2,8 +2,8 @@
 
 .. _foehnix-demo:
 
-Getting started
-===============
+Foehnix Demo
+============
 
 .. ipython:: python
    :suppress:
@@ -37,9 +37,17 @@ Run the model and show a summary
 .. ipython:: python
 
     model = foehnix.Foehnix('diff_t', train, concomitant='ff', filter_method=ddfilter, switch=True, verbose=True)
-    model.summary()
 
-Plot some model assessments
+Check the model
+---------------
+
+Show a summary of the model results
+
+.. ipython:: python
+
+    model.summary(detailed=True)
+
+Plot some model assessment plots
 
 .. ipython:: python
 
@@ -51,3 +59,15 @@ Plot some model assessments
     model.plot('coef', log=True)
     @savefig hist.png
     model.plot('hist')
+
+
+Hovmoeller Diagram
+------------------
+
+The image function plots a Hovmoeller Diagram to assess foehn freqency
+
+.. ipython:: python
+
+    @savefig hovmoeller.png
+    model.plot('image', deltat=3600, deltad=7)
+

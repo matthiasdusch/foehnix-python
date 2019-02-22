@@ -157,7 +157,8 @@ html_theme_options = {
     'navbar_links': [
         ("Getting started", "foehnix-demo"),
         ("API reference", "api"),
-    #    ("Link", "http://example.com", True),
+        ("foehnix R package", "https://retostauffer.github.io/Rfoehnix", True),
+        #    ("Link", "http://example.com", True),
     ],
 
     # Render the next and previous page links in navbar. (Default: true)

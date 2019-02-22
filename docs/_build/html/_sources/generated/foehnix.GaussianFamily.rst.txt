@@ -15,10 +15,8 @@ foehnix.GaussianFamily
    
       ~GaussianFamily.__init__
       ~GaussianFamily.density
-      ~GaussianFamily.distribution
       ~GaussianFamily.loglik
       ~GaussianFamily.posterior
-      ~GaussianFamily.random_sample
       ~GaussianFamily.theta
    
    
