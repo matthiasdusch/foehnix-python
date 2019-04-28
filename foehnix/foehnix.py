@@ -247,10 +247,6 @@ class Foehnix:
         if len(idx_take) == 0:
             raise RuntimeError('No data left after applying required filters.')
 
-        # TODO check with Reto: constant value and truncated check should be
-        # TODO   after filtering in my opinion. Else the filtered data might
-        # TODO   contain constant values or values outside truncation
-
         # check if we have columns with constant values.
         # This would lead to a non-identifiable problem
         if (subset.loc[idx_take].nunique() == 1).any():
@@ -286,6 +282,7 @@ class Foehnix:
             if control.standardize is True:
                 logitx = func.standardize(logitx)
 
+        # TODO trncated check for filter, bzw erstmal ganz raus
         # If truncated family is used: y has to lie within the truncation
         # points as density is not defined outside the range ]left, right[.
         if (control.truncated is True) and (
@@ -433,7 +430,6 @@ class Foehnix:
         while delta > control.tol_em:
             # M-step: update probabilites and theta
             prob = np.mean(post)
-            # TODO was mach das theta=theta hier?
             # theta = control.family.theta(y, post, theta=theta)
             theta = control.family.theta(y, post)
 
@@ -490,7 +486,7 @@ class Foehnix:
         self.optimizer = fdict
 
     def unreg_fit(self, y, logitx, control):
-        """Fitting foehnix Mixture Model Without Concomitant Model.
+        """Fitting unregularized foehnix Mixture Model with Concomitant Model.
 
         Parameters
         ----------
@@ -550,7 +546,6 @@ class Foehnix:
                                  maxit=control.maxit_iwls,
                                  tol=control.tol_iwls)
             prob = logistic.cdf(logitx['values'].dot(ccmodel['beta']))
-            # TODO was mach das theta=theta hier?
             theta = control.family.theta(y, post)
 
             # E-step: update expected a-posteriori

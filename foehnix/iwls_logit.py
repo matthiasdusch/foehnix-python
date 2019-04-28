@@ -11,8 +11,7 @@ log = logging.getLogger(__name__)
 # TODO: Think about making iwls_logit a class ccmodel with an method iwls_logit
 
 
-def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
-               tol=1e-8):
+def iwls_logit(logitx, y, beta=None, standardize=True, maxit=100, tol=1e-8):
     """
     Iterative weighted least squares solver for a logistic regression model.
 
@@ -31,8 +30,6 @@ def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
         predictor values of shape(len(observations), 1)
     beta : :py:class:`numpy.ndarray`
         initial regression coefficients. If None will be initialized with 0.
-    penalty : float
-        Penalty for regularization. Default is None.
     standardize : bool
         If True (default) the model matrix will be standardized
     maxit : int
@@ -47,7 +44,6 @@ def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
 
     """
     # do we have to standardize the model matrix?
-    # TODO: do we actually call iwls_logit with standardize=True somewhere?
     if standardize is True:
         logitx = func.standardize(logitx)
 
@@ -89,14 +85,7 @@ def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
         # new weights
         w = np.sqrt(prob * (1-prob)) + eps
 
-        # TODO reg is constant. Or will it change in later versions?
-        if penalty is None:
-            reg = 0
-        else:
-            reg = np.diag(np.ones_like(beta)*penalty)
-            reg[0, 0] = 0
-
-        beta = np.linalg.inv((x*w).T.dot(x*w) + reg).dot((x*w).T).dot(
+        beta = np.linalg.inv((x*w).T.dot(x*w)).dot((x*w).T).dot(
             eta*w + (y-prob) / w)
 
         # update latent response eta
@@ -109,12 +98,7 @@ def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
         llpath.append(np.sum(y * eta - np.log(1+np.exp(eta))))
         coefpath.append(beta)
 
-        if penalty is None:
-            pentext = 'unregularized'
-        else:
-            pentext = 'lambda = %10.4f' % penalty
-
-        log.debug('Iteration %d, ll=%15.4f, %s' % (i, llpath[-1], pentext))
+        log.debug('Iteration %d, ll=%15.4f' % (i, llpath[-1]))
 
         if i > 1:
             delta = llpath[-1] - llpath[-2]
@@ -144,30 +128,19 @@ def iwls_logit(logitx, y, beta=None, penalty=None, standardize=True, maxit=100,
 
     beta = coefpath[-1]
 
-    # TODO reg is still the same as within the while loop!?
-    if penalty is None:
-        reg = 0
-    else:
-        reg = np.diag(np.ones_like(beta)*penalty)
-        reg[0, 0] = 0
-
     # Effective degree of freedom
     edf = np.sum(np.diag((x*w).T.dot(x*w).dot(
-        np.linalg.inv((x*w).T.dot(x*w) + reg))))
+        np.linalg.inv((x*w).T.dot(x*w)))))
 
     # Keep coefficients destandardized
-    # TODO not really sure which way here
-    # if logitx['is_standardized'] is True:
     coef = pd.Series(beta.copy().squeeze(), index=logitx['values'].columns)
-
     if standardize is True:
         coef = func.destandardize_coefficients(coef, logitx)
 
     # final logliklihood
     ll = llpath[-1]
 
-    rval = {'lambda': penalty,
-            'edf': edf,
+    rval = {'edf': edf,
             'loglik': ll,
             'AIC': -2*ll + 2*edf,
             'BIC': -2*ll + np.log(len(x)) * edf,
@@ -195,13 +168,11 @@ def iwls_summary(ccmodel):
                        index=ccmodel['coef'].keys(),
                        dtype=float)
 
-    # TODO bei conomitant model z test sind Retos coefs standardized. Soll so?
-    # TODO falls nicht -> goto Zeile 159
     tmp.loc[:, 'Estimate'] = ccmodel['coef'].copy()
     tmp.loc[:, 'Std. Error'] = ccmodel['beta_se'].copy()
     tmp.loc[:, 'z_value'] = (tmp.loc[:, 'Estimate'] /
                              tmp.loc[:, 'Std. Error'])
-    tmp.loc[:, 'Pr(>|z|)'] = 2 * norm.pdf(0, loc=np.abs(tmp.loc[:, 'z_value']))
+    tmp.loc[:, 'Pr(>|z|)'] = 2 * norm.cdf(0, loc=np.abs(tmp.loc[:, 'z_value']))
 
     idx = ['cc.' + k for k in list(ccmodel['coef'].index)]
     tmp.index = idx
