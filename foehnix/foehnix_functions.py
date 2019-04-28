@@ -28,13 +28,14 @@ def standardize(x):
         Same dict, with standardized values if necessary
     """
     if x['is_standardized'] is False:
-        x['values'] = (x['values'] - x['center']) / x['scale']
-        x['is_standardized'] = True
+        std_x = x.copy()
+        std_x['values'] = (x['values'] - x['center']) / x['scale']
+        std_x['is_standardized'] = True
         log.debug('Model matrix standardized.')
     else:
         log.info('Standardization called but data is already standardized.')
 
-    return x
+    return std_x
 
 
 def destandardize(x):
