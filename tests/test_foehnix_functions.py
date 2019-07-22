@@ -42,3 +42,22 @@ def test_foehnix_functions_standardize(logitx):
     assert (stdlogitx['values']['concomitant'] !=
             logitx['values']['concomitant']).all()
 
+
+def test_foehnix_functions_standardize2(logitx):
+    # test wrong inputs
+    with pytest.raises(Exception):
+        standardize(3)
+
+    # test standardization
+    stdlogitx = standardize(logitx)
+    assert stdlogitx['is_standardized'] is True
+    assert (stdlogitx['scale'] == logitx['scale']).all()
+    assert (stdlogitx['center'] == logitx['center']).all()
+
+    np.testing.assert_almost_equal(stdlogitx['scale']['concomitant'],
+                                   logitx['values']['concomitant'].std())
+    np.testing.assert_almost_equal(stdlogitx['center']['concomitant'],
+                                   logitx['values']['concomitant'].mean())
+
+    assert (stdlogitx['values']['concomitant'] !=
+            logitx['values']['concomitant']).all()
