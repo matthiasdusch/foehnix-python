@@ -20,5 +20,9 @@ Currently foehnix-python is only available on github:
 `cd foehnix-python`  
 `pip install -e .`
  
+# Tests
+[![Coverage Status](https://coveralls.io/repos/github/matthiasdusch/foehnix-python/badge.svg?branch=master)](https://coveralls.io/github/matthiasdusch/foehnix-python?branch=master)
+[![Build Status](https://travis-ci.com/matthiasdusch/foehnix-python.svg?branch=master)](https://travis-ci.com/matthiasdusch/foehnix-python)
+ 
 # Contributors
 Reto, Matthias, Georg, and Fabien.
