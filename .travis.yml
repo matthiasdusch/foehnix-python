@@ -13,3 +13,4 @@ script: pytest --cov=foehnix/
 
 after_success:
   - coveralls
+  - codecov
