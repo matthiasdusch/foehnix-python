@@ -4,6 +4,12 @@ python:
   - "3.7"
 
 install:
+  - pip install pytest
+  - pip install pytest-cov
+  - pip install coveralls
   - pip install -e .
 
-script: pytest
+script: pytest --cov=foehnix-python/
+
+after_success:
+  - coveralls

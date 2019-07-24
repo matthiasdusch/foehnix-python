@@ -280,7 +280,7 @@ class Foehnix:
 
             # standardize data if control.standardize = True (default)
             if control.standardize is True:
-                logitx = func.standardize(logitx)
+                func.standardize(logitx)
 
         # TODO trncated check for filter, bzw erstmal ganz raus
         # If truncated family is used: y has to lie within the truncation
@@ -310,8 +310,8 @@ class Foehnix:
         # Final coefficients of the concomitant model have to be destandardized
         if self.optimizer['ccmodel'] is not None:
             if logitx['is_standardized'] is True:
-                coef = func.destandardize_coefficients(
-                    self.optimizer['ccmodel']['coef'].copy(), logitx)
+                coef = func.destandardized_coefficients(
+                    self.optimizer['ccmodel']['coef'], logitx)
             else:
                 coef = self.optimizer['ccmodel']['coef']
 
@@ -703,7 +703,8 @@ class Foehnix:
 
         # Additional information about the data/model
         nr = len(self.prob)
-        print("\nNumber of observations (total) %8d" % nr)
+        print("\nNumber of observations (total) %8d (%d due to inflation)" %
+              (nr, self.inflated))
         print("Removed due to missing values  %8d (%3.1f percent)" %
               (sum_na, sum_na / nr * 100))
         print("Outside defined wind sector    %8d (%3.1f percent)" %

@@ -45,7 +45,7 @@ def iwls_logit(logitx, y, beta=None, standardize=True, maxit=100, tol=1e-8):
     """
     # do we have to standardize the model matrix?
     if standardize is True:
-        logitx = func.standardize(logitx)
+        func.standardize(logitx)
 
     x = logitx['values'].values
 
@@ -118,10 +118,9 @@ def iwls_logit(logitx, y, beta=None, standardize=True, maxit=100, tol=1e-8):
 
     # calculate standard error
     if logitx['is_standardized'] is True:
-        xds = func.destandardize(logitx.copy())['values'].values
+        xds = func.destandardized_values(logitx)
     else:
         xds = x
-
     beta_se = pd.Series(np.sqrt(np.diag(np.linalg.inv((xds*w).T.dot(xds*w)))),
                         index=logitx['values'].columns)
     del xds
@@ -135,7 +134,7 @@ def iwls_logit(logitx, y, beta=None, standardize=True, maxit=100, tol=1e-8):
     # Keep coefficients destandardized
     coef = pd.Series(beta.copy().squeeze(), index=logitx['values'].columns)
     if standardize is True:
-        coef = func.destandardize_coefficients(coef, logitx)
+        coef = func.destandardized_coefficients(coef, logitx)
 
     # final logliklihood
     ll = llpath[-1]
