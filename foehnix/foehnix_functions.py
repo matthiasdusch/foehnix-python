@@ -20,12 +20,6 @@ def standardize(x):
           deviation of matrix rows
         - ``'is_standardized'``: bool, will trigger standardization if False
           and will be set to True afterwards
-
-    Returns
-    -------
-
-    x : dict
-        Same dict, with standardized values if necessary
     """
     if x['is_standardized'] is False:
         x['values'] = (x['values'] - x['center']) / x['scale']
@@ -34,16 +28,14 @@ def standardize(x):
     else:
         log.info('Standardization called but data is already standardized.')
 
-    return x
 
-
-def destandardize(x):
+def destandardized_values(stdx):
     """
-    Function to DE-standardize the values of the concomitant matrix.
+    Function returns the DE-standardize values of the concomitant matrix.
 
     Parameters
     ----------
-    x : dict
+    stdx : dict
         Must contain:
         - ``'values'`` : :py:class:`pandas.DataFrame` the model matrix
         - ``'center'`` : :py:class:`pandas.Series`, containing the mean of each
@@ -55,23 +47,22 @@ def destandardize(x):
 
     Returns
     -------
-
-    x : dict
-        Same dict, with destandardized values if necessary
+    destdx : :py:class:`numpy.ndarray`
+        the
     """
-    if x['is_standardized'] is True:
-        x['values'] = x['values'] * x['scale'] + x['center']
-        x['is_standardized'] = False
+    if stdx['is_standardized'] is True:
+        destdx = (stdx['values'] * stdx['scale'] + stdx['center']).values
         log.debug('Model matrix destandardized.')
     else:
-        log.info('Destandardization called but data is not standardized.')
+        destdx = stdx['values'].values
+        log.info('Trying to destandardize values but data not standardized.')
 
-    return x
+    return destdx
 
 
-def destandardize_coefficients(beta, x):
+def destandardized_coefficients(beta, x):
     """
-    Destandardize Regression Coefficients
+    Returns DE-standardizes the Regression Coefficients
 
     Brings coefficients back to the "real" scale if standardized coefficients
     are used when estimating the logistic regression model (concomitant model).
@@ -85,28 +76,25 @@ def destandardize_coefficients(beta, x):
         - ``'values'`` : :py:class:`numpy.ndarray` the model matrix
         - ``'center'`` : list, containing the mean of each model matrix row
         - ``'scale'`` : list, containing the standard deviation of matrix rows
-        - ``'name'`` : list, containing the names of the rows
-        - ``'is_standardized'``: bool, will trigger standardization if False
-          and will be set to True afterwards
 
     Returns
     -------
-
-    x : list
-        Destandardized regression coefficients
+    destdbeta : :py:class:`pandas.Series`
+        destandardized regression coefficients
     """
+    destdbeta = beta.copy()
+
     if 'Intercept' in beta:
-        nic = beta.index[beta.index != 'Intercept']
+        nic = destdbeta.index[destdbeta.index != 'Intercept']
         # Descaling intercept
-        beta['Intercept'] = beta['Intercept'] - np.sum(beta[nic] *
-                                                       x['center'][nic] /
-                                                       x['scale'][nic])
+        destdbeta['Intercept'] = destdbeta['Intercept'] - np.sum(
+            destdbeta[nic] * x['center'][nic] / x['scale'][nic])
         # Descaling all other regression coefficients
-        beta[nic] = beta[nic] / x['scale'][nic]
+        destdbeta[nic] = destdbeta[nic] / x['scale'][nic]
 
         log.debug('Regression coefficients destandardized (with Intercept).')
     else:
-        beta = beta / x['scale']
+        destdbeta = destdbeta / x['scale']
         log.debug('Regression coefficients destandardized (no Intercept).')
 
-    return beta
+    return destdbeta

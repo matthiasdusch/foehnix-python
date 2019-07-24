@@ -545,8 +545,7 @@ def image(fmm, fun='freq', deltat=None, deltad=7,
         # right
         zcon[1:-1, -1] = Z[:, 0]
         zcon[0, -1] = Z[-1, 0]
-
-        # TODO : for nice cyclic boundaries I have to use higher resolution...
+        # TODO: test larger border around the actual data (e.g. 2-5 point)
 
         """
         # lower
