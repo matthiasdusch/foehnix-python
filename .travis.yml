@@ -9,7 +9,7 @@ install:
   - pip install coveralls
   - pip install -e .
 
-script: pytest --cov=foehnix-python/
+script: pytest --cov=foehnix/
 
 after_success:
   - coveralls
