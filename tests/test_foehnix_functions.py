@@ -39,6 +39,10 @@ def test_foehnix_functions_standardize(logitx, caplog):
     dstd_values = destandardized_values(stdlogitx)
     np.testing.assert_array_almost_equal(dstd_values, logitx['values'])
 
+    # destandardize initial logitx and catch INFO warning
+    _ = destandardized_values(logitx)
+    assert 'data not standardized' in caplog.records[-1].message
+
 
 def test_foehnix_functions_destandardize_coefs(random_logitx):
     beta = pd.Series([2., -5, -5], index=random_logitx['values'].columns)

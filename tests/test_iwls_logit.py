@@ -3,6 +3,7 @@ import numpy as np
 from copy import deepcopy
 
 from foehnix import iwls_logit
+from foehnix.iwls_logit import iwls_summary
 
 
 def test_wrong_input(logitx, model_response):
@@ -67,3 +68,15 @@ def test_iwls_logit_model(logitx, model_response, caplog):
 
     # but if not standardized, beta and coef should be equal
     np.testing.assert_array_almost_equal(ccm1['beta'].squeeze(), ccm1['coef'])
+
+
+def test_iwls_summary(logitx, model_response, capfd):
+    ccmodel = iwls_logit(logitx, model_response)
+    iwls_summary(ccmodel)
+
+    out, err = capfd.readouterr()
+    assert 'Estimate' in out
+    assert 'cc.Intercept     %0.0f' % ccmodel['coef']['Intercept'] in out
+    assert 'cc.concomitantA  %0.0f' % ccmodel['coef']['concomitantA'] in out
+    assert 'cc.concomitantB  %0.0f' % ccmodel['coef']['concomitantB'] in out
+    assert 'Number of IWLS iterations %d (converged)' % ccmodel['iter'] in out
