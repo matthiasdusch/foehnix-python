@@ -75,7 +75,6 @@ def test_iwls_summary(logitx, model_response, capfd):
     iwls_summary(ccmodel)
 
     out, err = capfd.readouterr()
-    assert 'Estimate' in out
     assert 'cc.Intercept     %0.0f' % ccmodel['coef']['Intercept'] in out
     assert 'cc.concomitantA  %0.0f' % ccmodel['coef']['concomitantA'] in out
     assert 'cc.concomitantB  %0.0f' % ccmodel['coef']['concomitantB'] in out

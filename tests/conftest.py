@@ -6,7 +6,7 @@ from foehnix.foehnix_functions import standardize
 
 
 @pytest.fixture(scope="function")
-def logitx(sample_data):
+def logitx(data):
     """
     Pytest fixture for a concomitant matrix dictionary
 
@@ -17,17 +17,14 @@ def logitx(sample_data):
     dict
 
     """
+    ix = np.arange(len(data))
+    vals = pd.DataFrame([],
+                        columns=['Intercept', 'concomitantA', 'concomitantB'],
+                        index=ix, dtype=float)
 
-    ix = np.arange(len(sample_data))
-    concomitants = [con for con in sample_data.columns if 'concomitant' in con]
-    cols = ['Intercept'] + concomitants
-    vals = pd.DataFrame([], columns=cols, index=ix, dtype=float)
-
-    for col in cols:
-        if col == 'Intercept':
-            vals.loc[ix, col] = 1
-        else:
-            vals.loc[ix, col] = sample_data.loc[:, col].values
+    vals.loc[ix, 'Intercept'] = 1
+    vals.loc[ix, 'concomitantA'] = data.loc[:, 'rh'].values
+    vals.loc[ix, 'concomitantB'] = data.loc[:, 'rand'].values
 
     scale = vals.std()
     center = vals.mean()
@@ -71,8 +68,8 @@ def random_logitx(logitx):
     return logitx
 
 
-@pytest.fixture(scope="function")
-def sample_data():
+@pytest.fixture(scope="session")
+def data():
     """
     n = 100
     data = pd.DataFrame([], columns=['predictor', 'concomitantA',
@@ -104,17 +101,22 @@ def sample_data():
     # some random stuff as concomitantB
     cc_b = np.random.normal(loc=-5, scale=1, size=n)
 
+    # wind direction with some NaNs
+    dd = np.random.randint(0, 360, n).astype(float)
+    dd[np.random.randint(0, n, int(n/10))] = np.nan
+
     # make a pandas data frame
-    data = pd.DataFrame({'predictor': ff,
-                         'concomitantA': rh,
-                         'concomitantB': cc_b})
+    data = pd.DataFrame({'ff': ff,
+                         'rh': rh,
+                         'dd': dd,
+                         'rand': cc_b})
 
     return data
 
 
 @pytest.fixture(scope="function")
-def model_response(sample_data):
-    y = sample_data.loc[:, 'predictor'].values.copy()
+def model_response(data):
+    y = data.loc[:, 'ff'].values.copy()
     y = y.reshape(len(y), 1)
 
     z = np.zeros_like(y)

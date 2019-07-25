@@ -96,12 +96,13 @@ def foehnix_filter(x, filter_method=None):
     # 1. None: return full index
     if filter_method is None:
         filtered = np.ones(len(x))
+        log.critical('No filter method specified! Will use all data.')
 
     # 2. Function: Apply function to x, check the result and return if sensible
     elif callable(filter_method):
         filtered = filter_method(x)
         _check_filter_function(filtered, len(x))
-        log.info('Applied filter function  %s' % filter_method.__name__)
+        log.info('Applied filter function %s' % filter_method.__name__)
 
     # 3. dict, where keys are columns of x and items are values or functions
     elif isinstance(filter_method, dict):
@@ -111,16 +112,16 @@ def foehnix_filter(x, filter_method=None):
         # loop over dict and apply every filter
         for nr, (key, value) in enumerate(filter_method.items()):
 
+            if key not in x.columns:
+                raise RuntimeError('Filterdict key: %s not found in data'
+                                   % key)
             if callable(value):
                 _filtered = value(x[key])
                 _check_filter_function(_filtered, len(x))
                 tmp[:, nr] = _filtered
-                log.info('Applied filter function  %s' % value.__name__)
+                log.info('Applied filter function %s' % value.__name__)
 
             elif len(value) == 2:
-                if key not in x.columns:
-                    raise RuntimeError('Filterdict key: %s not found in data'
-                                       % key)
 
                 tmp[x[key].isna(), nr] = np.nan
 
@@ -135,6 +136,10 @@ def foehnix_filter(x, filter_method=None):
 
                 log.info('Applied limit-filter [%.1f %.1f] to key %s' % (
                     value[0], value[1], key))
+            else:
+                raise RuntimeError('Not a valid value for Filterdict key: %s. '
+                                   'Only callable functions or len(2) limits '
+                                   'are allowed.' % key)
 
         # - If at least one element is NAN     -> set to NAN
         # - If all elements are TRUE (=1)      -> set to 1
