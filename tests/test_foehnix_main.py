@@ -9,6 +9,9 @@ from foehnix.foehnix import Control
 from foehnix import families, Foehnix
 
 
+# TODO add and test some nans in the ff data
+
+
 def test_control_class():
     # family and switch are mandatory arguments
     with pytest.raises(TypeError):

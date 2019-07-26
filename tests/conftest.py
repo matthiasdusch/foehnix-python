@@ -94,8 +94,6 @@ def data():
     # reasonable windspeed cluster as predictor
     ff = np.random.normal(loc=mu1, scale=sd1, size=int(3*n/4))
     ff = np.append(ff, np.random.normal(loc=mu2, scale=sd2, size=int(n/4)))
-    # add some NaNs
-    ff[np.random.randint(0, n, 10)] = np.nan
 
     # relative humidity as concomitantA
     rh = 70 - ff + np.random.normal(loc=0, scale=5, size=n)
