@@ -3,6 +3,7 @@ import pandas as pd
 import logging
 from scipy.stats import logistic, norm
 import time
+from copy import deepcopy
 
 from foehnix.families import Family, initialize_family
 from foehnix.foehnix_filter import foehnix_filter
@@ -73,6 +74,9 @@ class Control:
             - False: Only critical errors and warnings will be provided
             - 'DEBUG': More detailed information will be provided
         """
+        # check switch
+        if not isinstance(switch, bool):
+            raise ValueError('switch is mandatory and either True or False')
 
         # set logging
         if verbose is True:
@@ -81,6 +85,8 @@ class Control:
             logging_level = 'CRITICAL'
         elif verbose == 'DEBUG':
             logging_level = 'DEBUG'
+        else:
+            raise ValueError("Verbose must be one of True, False or 'DEBUG'.")
         logging.basicConfig(format='%(asctime)s: %(name)s: %(message)s',
                             datefmt='%Y-%m-%d %H:%M:%S',
                             level=getattr(logging, logging_level))
@@ -96,33 +102,43 @@ class Control:
         # Check if family object is provided or initialize it
         if isinstance(family, Family):
             log.debug('custom foehnix.Family object provided.')
-        else:
+        elif family == 'gaussian' or family == 'logistic':
             family = initialize_family(familyname=family, left=left,
                                        right=right, truncated=truncated)
+        else:
+            raise ValueError('family must be a foehnix-family object or one of'
+                             ' "gaussian" or "logistic".')
 
         # Maxit and tol are the maximum number of iterations for the
         # optimization. Need to be numeric. If one value is given it will
         # be used for both, the EM algorithm and the IWLS optimization for
         # the concomitants. If two values are given the first one is used
         # for the EM algorithm, the second for the IWLS solver.
-        try:
-            if len(maxit) == 2:
-                self.maxit_em = maxit[0]
-                self.maxit_iwls = maxit[1]
-            else:
-                raise ValueError('maxit must be integer or list of length 2')
-        except TypeError:
+        if isinstance(maxit, int):
             self.maxit_em = maxit
             self.maxit_iwls = maxit
-        try:
-            if len(tol) == 2:
-                self.tol_em = tol[0]
-                self.tol_iwls = tol[1]
-            else:
-                raise ValueError('tol must be float or list of length 2')
-        except TypeError:
+        elif np.size(maxit) == 2 and np.isfinite(maxit).all():
+            self.maxit_em = maxit[0]
+            self.maxit_iwls = maxit[1]
+        else:
+            raise ValueError('maxit must be single integer or list of len 2')
+        if self.maxit_em == 0:
+            log.critical('Iteration limit for the EM algorithm is turned off! '
+                         'If the optimization fails to converge it will run '
+                         'forever ever...')
+        if self.maxit_iwls == 0:
+            log.critical('Iteration limit for the IWLS solver is turned off! '
+                         'If the optimization fails to converge it will run '
+                         'forever ever...')
+
+        if isinstance(tol, float):
             self.tol_em = tol
             self.tol_iwls = tol
+        elif np.size(tol) == 2 and np.isreal(tol).all():
+            self.tol_em = tol[0]
+            self.tol_iwls = tol[1]
+        else:
+            raise ValueError('tol must be single float or list of length 2')
 
         self.family = family
         self.switch = switch
@@ -193,16 +209,19 @@ class Foehnix:
             if con not in data:
                 raise ValueError('Concomitant "%s" not found in data' % con)
 
+        # make a copy of the data frame, do not mess with the original
+        self.data = deepcopy(data)
+
         # Convert index to datetime
-        data.index = pd.to_datetime(data.index)
+        self.data.index = pd.to_datetime(self.data.index)
         # check if regular
-        if not data.index.is_monotonic_increasing:
+        if not self.data.index.is_monotonic_increasing:
             raise RuntimeError('DataFrame index is not monotonic increasing!')
 
         # calculate minimal difference to make data strictly increasing
-        mindiff = data.index.to_series().diff().min()
-        inflated = data.asfreq(mindiff).index.size
-        lendata = len(data)
+        mindiff = self.data.index.to_series().diff().min()
+        inflated = self.data.asfreq(mindiff).index.size
+        lendata = len(self.data)
 
         if (inflated/lendata > 2) and (control.force_inflate is False):
             log.critical('You have provided a time series object spanning the '
@@ -218,10 +237,11 @@ class Foehnix:
                          'This condition can be overruled by setting the '
                          'input argument ``force_inflate = True`` if needed. '
                          'For more details please read the foehnix.control '
-                         'manual page.' % (data.index[0], data.index[-1],
+                         'manual page.' % (self.data.index[0],
+                                           self.data.index[-1],
                                            mindiff.seconds/3600,
-                                           inflated, data.shape[1],
-                                           inflated*data.shape[1],
+                                           inflated, self.data.shape[1],
+                                           inflated*self.data.shape[1],
                                            inflated/lendata))
             raise RuntimeError('DataFrame gets inflated, see log for details!')
 
@@ -229,17 +249,17 @@ class Foehnix:
         n_inflated = inflated - lendata
         # if inflation is ok or forced, create strictly increasing dataframe
         # with minimal spacing
-        data = data.asfreq(mindiff)
+        self.data = self.data.asfreq(mindiff)
 
         # create a subset of the needed data
         columns = concomitant + [predictor]
-        subset = data.reindex(columns, axis=1).copy()
+        subset = self.data.reindex(columns, axis=1).copy()
 
         # create index where predictor or concomitant is NaN
         idx_notnan = subset.dropna().index
 
         # Apply foehnix filter
-        filter_obj = foehnix_filter(data, filter_method=filter_method)
+        filter_obj = foehnix_filter(self.data, filter_method=filter_method)
 
         # Take all elements which are not NaN and which are within
         # filter_obj['good']
@@ -319,7 +339,7 @@ class Foehnix:
             coef = None
 
         # If there was only one iteration: drop a warning
-        if self.optimizer['iter'] == 0:
+        if self.optimizer['iter'] == 1:
             log.critical('The EM algorithm stopped after one iteration!\n'
                          'The coefficients returned are the initial '
                          'coefficients. This indicates that the model as '
@@ -329,7 +349,6 @@ class Foehnix:
                          'model specification (change/add concomitants).')
 
         # store relevant data within the Foehnix class
-        self.data = data
         self.filter_method = filter_method
         self.filter_obj = filter_obj
         self.predictor = predictor
@@ -375,7 +394,7 @@ class Foehnix:
         #   to 0 (probability for foehn is 0), set the second column to FALSE.
 
         # Foehn probability (a-posteriori probability)
-        tmp = pd.DataFrame([], columns=['prob', 'flag'], index=data.index,
+        tmp = pd.DataFrame([], columns=['prob', 'flag'], index=self.data.index,
                            dtype=float)
         # Store a-posteriory probability and flag = TRUE
         tmp.loc[idx_take, 'prob'] = self.optimizer['post'].reshape(len(y))
@@ -418,7 +437,7 @@ class Foehnix:
         # EM algorithm: estimate probabilities (prob; E-step), update the model
         # given the new probabilities (M-step). Always with respect to the
         # selected family.
-        i = 1  # iteration variable
+        i = 0  # iteration variable
         delta = 1  # likelihood difference between to iteration: break criteria
         converged = True  # Set to False if we do not converge before maxit
 
@@ -448,7 +467,7 @@ class Foehnix:
                 raise RuntimeError('Likelihood got NaN!')
 
             # update liklihood difference
-            if i > 1:
+            if i > 0:
                 delta = llpath.iloc[-1].full - llpath.iloc[-2].full
 
             # increase iteration variable
@@ -481,7 +500,7 @@ class Foehnix:
                  'loglikpath': llpath,
                  'coefpath': coefpath,
                  'converged': converged,
-                 'iter': i-1}
+                 'iter': i}
 
         self.optimizer = fdict
 

@@ -96,7 +96,7 @@ def foehnix_filter(x, filter_method=None):
     # 1. None: return full index
     if filter_method is None:
         filtered = np.ones(len(x))
-        log.critical('No filter method specified! Will use all data.')
+        log.debug('No filter method specified! Will use all data.')
 
     # 2. Function: Apply function to x, check the result and return if sensible
     elif callable(filter_method):

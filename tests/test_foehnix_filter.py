@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+import numpy.testing as npt
 import logging
 
 from foehnix import foehnix_filter, filter_summary
@@ -17,6 +18,7 @@ def test_various_input(data, caplog):
     assert e.match('Filter method not understood')
 
     # test None filter method. This is no error!
+    caplog.set_level(logging.DEBUG)
     _ = foehnix_filter(data)
     assert 'No filter method specified' in caplog.records[-1].message
 
@@ -85,7 +87,7 @@ def test_limit_filter_and_summary(data, caplog, capfd):
 
     # compare with manual result
     mandd = data['dd'].loc[(data['dd'] >= 90) & (data['dd'] <= 270)].index
-    np.testing.assert_array_equal(ffo['good'], mandd)
+    npt.assert_array_equal(ffo['good'], mandd)
 
     # test reverse limits
     ffo2 = foehnix_filter(data, filter_method={'dd': [270, 90]})
@@ -94,7 +96,7 @@ def test_limit_filter_and_summary(data, caplog, capfd):
 
     # compare reverse limits with manual result
     mandd2 = data['dd'].loc[(data['dd'] <= 90) | (data['dd'] >= 270)].index
-    np.testing.assert_array_equal(ffo2['good'], mandd2)
+    npt.assert_array_equal(ffo2['good'], mandd2)
 
     # test summary
     filter_summary(ffo)
@@ -114,4 +116,4 @@ def test_multi_filter(data):
     manf = data.loc[(data['dd'] >= 10) &
                     (data['dd'] <= 190) &
                     (data['ff'] >= 25)].index
-    np.testing.assert_array_equal(ffo['good'], manf)
+    npt.assert_array_equal(ffo['good'], manf)

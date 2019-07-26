@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-import numpy as np
+import numpy.testing as npt
 from copy import deepcopy
 import logging
 
@@ -22,9 +22,9 @@ def test_foehnix_functions_standardize(logitx, caplog):
     assert (stdlogitx['scale'] == logitx['scale']).all()
     assert (stdlogitx['center'] == logitx['center']).all()
 
-    np.testing.assert_almost_equal(stdlogitx['scale']['concomitantA'],
+    npt.assert_almost_equal(stdlogitx['scale']['concomitantA'],
                                    logitx['values']['concomitantA'].std())
-    np.testing.assert_almost_equal(stdlogitx['center']['concomitantA'],
+    npt.assert_almost_equal(stdlogitx['center']['concomitantA'],
                                    logitx['values']['concomitantA'].mean())
 
     assert (stdlogitx['values']['concomitantA'] !=
@@ -37,7 +37,7 @@ def test_foehnix_functions_standardize(logitx, caplog):
 
     # destandardize again and test results with original data
     dstd_values = destandardized_values(stdlogitx)
-    np.testing.assert_array_almost_equal(dstd_values, logitx['values'])
+    npt.assert_array_almost_equal(dstd_values, logitx['values'])
 
     # destandardize initial logitx and catch INFO warning
     _ = destandardized_values(logitx)
@@ -48,4 +48,4 @@ def test_foehnix_functions_destandardize_coefs(random_logitx):
     beta = pd.Series([2., -5, -5], index=random_logitx['values'].columns)
     beta2 = destandardized_coefficients(beta, random_logitx)
     # TODO: this needs some attention first
-    # np.testing.assert_array_almost_equal(beta2, beta/logitx_2['scale'])
+    # npt.assert_array_almost_equal(beta2, beta/logitx_2['scale'])
