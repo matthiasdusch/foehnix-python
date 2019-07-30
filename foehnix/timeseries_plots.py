@@ -380,7 +380,8 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, show_n_plots=3,
 
 def image(fmm, fun='freq', deltat=None, deltad=7,
           cmap=cm.get_cmap('Greys', 20), contours=False, contour_color='k',
-          contour_levels=10, **kwargs):
+          contour_levels=10, contour_labels=False, clabel_format="%.0f",
+          clabel_size=8, **kwargs):
     """
     foehnix Image Plot - Hovmoeller Diagram
 
@@ -414,6 +415,13 @@ def image(fmm, fun='freq', deltat=None, deltad=7,
     contour_levels : float or sequence of floats
         Default ``10`` will plot 10 contour levels. If a sequence is provided
         contour levels will be plotted at the sequence values.
+    contour_labels : bool
+        Default ``False``. If ``True`` contour labels will be added.
+    clabel_format : str
+        Formatstring for the contour labels. Default ``"%.0f"`` Switch to
+        ``"%.2f"`` to show to decimal digits.
+    clabel_size : int
+        Fontsize of the contour lables. Default 8.
     kwargs :
         Possible keyword arguments for the figure:
 
@@ -545,32 +553,15 @@ def image(fmm, fun='freq', deltat=None, deltad=7,
         # right
         zcon[1:-1, -1] = Z[:, 0]
         zcon[0, -1] = Z[-1, 0]
-        # TODO: test larger border around the actual data (e.g. 2-5 point)
 
-        """
-        # lower
-        zcon[0, 2:] = Z[-1, :]
-        zcon[0, 1] = Z[-1, -1]
-        zcon[0, 0] = Z[-1, -2]
-
-        # upper
-        zcon[-1, :-2] = Z[0, :]
-        zcon[-1, -2] = Z[0, 0]
-        zcon[-1, -1] = Z[0, 1]
-
-        # left
-        zcon[1:-1, 0] = Z[:, -1]
-
-        # right
-        zcon[1:-1, -1] = Z[:, 0]
-
-
-        """
         xcon, ycon = np.meshgrid(np.arange(zcon.shape[1])-1,
                                  np.arange(zcon.shape[0])-1)
 
-        ax.contour(xcon, ycon, zcon, colors=contour_color,
-                   levels=contour_levels)
+        con = ax.contour(xcon, ycon, zcon, colors=contour_color,
+                         levels=contour_levels)
+        if contour_labels is True:
+            ax.clabel(con, contour_levels, inline=True, fmt=clabel_format,
+                      fontsize=clabel_size, inline_spacing=2)
 
     # ---- kwargs for plotting
     if 'title' in kwargs:
