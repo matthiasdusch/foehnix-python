@@ -8,11 +8,12 @@ from copy import deepcopy
 from foehnix.foehnix import Control
 from foehnix import families, Foehnix
 
-
+log = logging.getLogger(__name__)
 # TODO add and test some nans in the ff data
+# TODO test foehnix.predict with Ellboegen data
 
 
-def test_control_class():
+def test_control_class(caplog):
     # family and switch are mandatory arguments
     with pytest.raises(TypeError):
         _ = Control('gaussian')
@@ -32,6 +33,12 @@ def test_control_class():
     with pytest.raises(ValueError) as e:
         _ = Control('gaussian', True, verbose='aus')
     assert e.match('Verbose must be one of True, False or')
+
+    # test DEBUG logging level
+    caplog.set_level(logging.DEBUG)
+    _ = Control('gaussian', True, verbose='DEBUG')
+    assert ('foehnix control object successfully initialised' in
+            caplog.records[-1].message)
 
     # test for maxiter
     with pytest.raises(ValueError) as e:
@@ -106,9 +113,8 @@ def test_main_class_input(data, caplog):
     assert e.match('Columns with constant values in the data!')
 
     # check maxiteration settings, 1 and 0 should pass but raise a log warning
-    caplog.set_level(logging.CRITICAL)
-
-    mod = Foehnix('ff', data, maxit=1)
+    # if we switch of verbose, we should still get this CRITICAL warning
+    mod = Foehnix('ff', data, maxit=1, verbose=False)
     assert ('The EM algorithm stopped after one iteration!' in
             caplog.records[-1].message)
     assert mod.optimizer['converged'] is False
@@ -149,7 +155,7 @@ def test_inflated_data(data, caplog):
     assert mod.inflated == 147
 
 
-def test_no_concomitant_fit(data):
+def test_no_concomitant_fit(data, capfd):
     # simple but working model
     mod = Foehnix('ff', data, maxit=150)
 
@@ -165,11 +171,11 @@ def test_no_concomitant_fit(data):
                      -2*mod.optimizer['loglik'] + mod.optimizer['edf'] *
                      np.log(sum_1))
 
-    # data is set up to have around 25% foehn probability
+    # data is set up to have around 25% foehn probability and 25% occurance
     mean_n = mod.prob.notna().sum()['flag']
     mean_occ = 100 * (mod.prob['prob'] >= .5).sum() / mean_n
     mean_prob = 100 * mod.prob['prob'][mod.prob['flag'].notna()].mean()
-    npt.assert_almost_equal(mean_occ, 25, 0)
+    npt.assert_equal(mean_occ, 25)
     npt.assert_almost_equal(mean_prob, 25, 0)
 
     # mean and standard deviation should match theta
@@ -178,5 +184,90 @@ def test_no_concomitant_fit(data):
     npt.assert_almost_equal(mod.optimizer['theta']['logsd1'], np.log(4), 0)
     npt.assert_almost_equal(mod.optimizer['theta']['logsd2'], np.log(7), 0)
 
-    # with switch
+    # test summary function
+    mod.summary()
+    out, err = capfd.readouterr()
+    assert ('Number of observations (total) %8d (0 due to inflation' %
+            len(data)) in out
+    assert 'Used for classification %15d (100.0 percent)' % len(data) in out
+    # detailded summary yes/no
+    assert 'Components: t test of coefficients' not in out
+    mod.summary(detailed=True)
+    out, err = capfd.readouterr()
+    assert 'Components: t test of coefficients' in out
+
+    # make a second model with switch=True
     mod_switch = Foehnix('ff', data, switch=True)
+
+    # AIC, BIC should be equal
+    npt.assert_equal(mod.optimizer['AIC'], mod_switch.optimizer['AIC'])
+    npt.assert_equal(mod.optimizer['BIC'], mod_switch.optimizer['BIC'])
+
+    # foehn occurance should be 75% and probability around 75%
+    mean_n_sw = mod_switch.prob.notna().sum()['flag']
+    mean_occ_sw = 100 * (mod_switch.prob['prob'] >= .5).sum() / mean_n_sw
+    mean_prob_sw = 100 * mod_switch.prob['prob'][
+        mod_switch.prob['flag'].notna()].mean()
+    npt.assert_equal(mean_occ_sw, 75)
+    npt.assert_almost_equal(mean_prob_sw, 75, 0)
+
+    # adding the probabilites
+    npt.assert_equal(mean_occ+mean_occ_sw, 100)
+    npt.assert_equal(mean_prob+mean_prob_sw, 100)
+
+
+def test_unreg_fit(data, capfd):
+    # working model using rh as concomitant
+    mod = Foehnix('ff', data, concomitant='rh', maxit=150)
+
+    # 150 should be enough to converge
+    assert mod.optimizer['converged']
+    assert mod.optimizer['iter'] < 150
+
+    # test some calculations
+    npt.assert_equal(mod.optimizer['AIC'],
+                     -2*mod.optimizer['loglik'] + 2*mod.optimizer['edf'])
+    sum_1 = (mod.prob['flag'] == 1).sum()
+    npt.assert_equal(mod.optimizer['BIC'],
+                     -2*mod.optimizer['loglik'] + mod.optimizer['edf'] *
+                     np.log(sum_1))
+
+    # using rh as concomitant will reduce foeh probability below 25%
+    mean_n = mod.prob.notna().sum()['flag']
+    mean_occ = 100 * (mod.prob['prob'] >= .5).sum() / mean_n
+    mean_prob = 100 * mod.prob['prob'][mod.prob['flag'].notna()].mean()
+    assert 15 < mean_occ < 25
+    assert 15 < mean_prob < 25
+
+    # test summary function
+    mod.summary()
+    out, err = capfd.readouterr()
+    assert ('Number of observations (total) %8d (0 due to inflation' %
+            len(data)) in out
+    assert 'Used for classification %15d (100.0 percent)' % len(data) in out
+    # detailded summary yes/no
+    assert 'Components: t test of coefficients' not in out
+    mod.summary(detailed=True)
+    out, err = capfd.readouterr()
+    assert 'Components: t test of coefficients' in out
+
+    # make a second model with switch=True
+    mod_switch = Foehnix('ff', data, concomitant='rh', switch=True)
+
+    # AIC, BIC should be almost equal
+    npt.assert_almost_equal(mod.optimizer['AIC'],
+                            mod_switch.optimizer['AIC'], 5)
+    npt.assert_almost_equal(mod.optimizer['BIC'],
+                            mod_switch.optimizer['BIC'], 5)
+
+    # foehn occurance should be above 75%
+    mean_n_sw = mod_switch.prob.notna().sum()['flag']
+    mean_occ_sw = 100 * (mod_switch.prob['prob'] >= .5).sum() / mean_n_sw
+    mean_prob_sw = 100 * mod_switch.prob['prob'][
+        mod_switch.prob['flag'].notna()].mean()
+    assert 75 < mean_occ_sw < 85
+    assert 75 < mean_prob_sw < 85
+
+    # adding the probabilites
+    npt.assert_equal(mean_occ+mean_occ_sw, 100)
+    npt.assert_almost_equal(mean_prob+mean_prob_sw, 100, 5)

@@ -103,8 +103,8 @@ class Control:
         if isinstance(family, Family):
             log.debug('custom foehnix.Family object provided.')
         elif family == 'gaussian' or family == 'logistic':
-            family = initialize_family(familyname=family, left=left,
-                                       right=right, truncated=truncated)
+            self.family = initialize_family(familyname=family, left=left,
+                                            right=right, truncated=truncated)
         else:
             raise ValueError('family must be a foehnix-family object or one of'
                              ' "gaussian" or "logistic".')
@@ -140,13 +140,24 @@ class Control:
         else:
             raise ValueError('tol must be single float or list of length 2')
 
-        self.family = family
         self.switch = switch
         self.left = left
         self.right = right
         self.truncated = truncated
         self.standardize = standardize
         self.force_inflate = force_inflate
+
+        if switch:
+            switchmsg = 'True (higher predictor values are foehn cluster)'
+        else:
+            switchmsg = 'False (lower predictor values are foehn cluster)'
+
+        log.debug('foehnix control object successfully initialised:\n'
+                  'Distribution family: %s\n'
+                  'Switch: %s\n'
+                  'Maximum iterations of the EM algorithm: %d\n'
+                  'Maximum iterations of the IWLS optimization: %d\n'
+                  % (family, switchmsg, self.maxit_em, self.maxit_iwls))
 
 
 class Foehnix:
@@ -656,7 +667,7 @@ class Foehnix:
 
         # If no new data is provided, use the date which has been fitted
         if newdata is None:
-            newdata = self.data.copy()
+            newdata = deepcopy(self.data)
 
         if len(self.concomitant) == 0:
             prob = np.mean(self.optimizer['prob'])
@@ -724,11 +735,11 @@ class Foehnix:
         nr = len(self.prob)
         print("\nNumber of observations (total) %8d (%d due to inflation)" %
               (nr, self.inflated))
-        print("Removed due to missing values  %8d (%3.1f percent)" %
+        print("Removed due to missing values %9d (%3.1f percent)" %
               (sum_na, sum_na / nr * 100))
-        print("Outside defined wind sector    %8d (%3.1f percent)" %
+        print("Outside defined wind sector %11d (%3.1f percent)" %
               (sum_0, sum_0 / nr * 100))
-        print("Used for classification        %8d (%3.1f percent)" %
+        print("Used for classification %15d (%3.1f percent)" %
               (sum_1, sum_1 / nr * 100))
 
         print("\nClimatological foehn occurance %.2f percent (on n = %d)" %
