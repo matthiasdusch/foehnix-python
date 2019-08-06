@@ -3,6 +3,7 @@ import pandas as pd
 import numpy.testing as npt
 from copy import deepcopy
 import logging
+import numpy as np
 
 from foehnix.foehnix_functions import (standardize, destandardized_values,
                                        destandardized_coefficients)
@@ -47,5 +48,15 @@ def test_foehnix_functions_standardize(logitx, caplog):
 def test_foehnix_functions_destandardize_coefs(random_logitx):
     beta = pd.Series([2., -5, -5], index=random_logitx['values'].columns)
     beta2 = destandardized_coefficients(beta, random_logitx)
-    # TODO: this needs some attention first
-    # npt.assert_array_almost_equal(beta2, beta/logitx_2['scale'])
+
+    # manually de-scale
+    beta3 = beta/random_logitx['scale']
+    beta3['Intercept'] = (beta['Intercept'] -
+                          np.sum(beta.loc[['concomitantA', 'concomitantB']] /
+                                 random_logitx['scale'].loc[['concomitantA',
+                                                             'concomitantB']] *
+                                 random_logitx['center'].loc[['concomitantA',
+                                                              'concomitantB']])
+                          )
+
+    npt.assert_array_equal(beta2, beta3)
