@@ -6,7 +6,7 @@ from scipy.stats import logistic, norm
 import os
 import hashlib
 
-from foehnix import demodata
+from foehnix import get_demodata
 
 # specify data directory
 DDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,3 +24,23 @@ def test_md5():
 
         assert md5hash == file.hexdigest()
 
+
+def test_get_demodata():
+    # wrong input
+    with pytest.raises(ValueError) as e:
+        get_demodata('foo')
+    assert e.match('must be either `tyrol`, `california`')
+
+    # cali
+    cali = get_demodata('california')
+    viejas = get_demodata('viejas')
+    lucky = get_demodata('luckyfive')
+    npt.assert_array_equal(cali['air_temp'].dropna(), viejas['air_temp'])
+    npt.assert_array_equal(cali['air_temp_crest'].dropna(), lucky['air_temp'])
+
+    # tirol
+    tirol = get_demodata('tyrol')
+    ellboegen = get_demodata('ellboegen')
+    sattelberg = get_demodata('sattelberg')
+    npt.assert_array_equal(tirol['t'].dropna(), ellboegen['t'].dropna())
+    npt.assert_array_equal(tirol['t_crest'].dropna(), sattelberg['t'].dropna())
