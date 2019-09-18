@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+import numpy.testing as npt
 from copy import deepcopy
 
 from foehnix import iwls_logit
@@ -55,19 +56,19 @@ def test_iwls_logit_model(logitx, model_response, caplog):
 
     # most results should be comparable
     for var in ['AIC', 'BIC', 'beta_se', 'coef', 'edf', 'loglik']:
-        np.testing.assert_array_almost_equal(ccm1[var], ccm2[var])
+        npt.assert_array_almost_equal(ccm1[var], ccm2[var])
         # be a little bit more relaxed on the none converged model
-        np.testing.assert_array_almost_equal(ccm1[var], ccm3[var], decimal=3)
+        npt.assert_array_almost_equal(ccm1[var], ccm3[var], decimal=3)
 
     # standardization will result in different beta values
     with pytest.raises(AssertionError):
-        np.testing.assert_almost_equal(ccm1['beta'], ccm2['beta'], decimal=1)
+        npt.assert_almost_equal(ccm1['beta'], ccm2['beta'], decimal=1)
 
     # ccm3 should be standardized
-    np.testing.assert_almost_equal(ccm2['beta'], ccm3['beta'], decimal=3)
+    npt.assert_almost_equal(ccm2['beta'], ccm3['beta'], decimal=3)
 
     # but if not standardized, beta and coef should be equal
-    np.testing.assert_array_almost_equal(ccm1['beta'].squeeze(), ccm1['coef'])
+    npt.assert_array_almost_equal(ccm1['beta'].squeeze(), ccm1['coef'])
 
 
 def test_iwls_summary(logitx, model_response, capfd):

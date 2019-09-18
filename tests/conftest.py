@@ -68,7 +68,7 @@ def random_logitx(logitx):
     return logitx
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def data():
     """
     n = 100
@@ -115,11 +115,16 @@ def data():
 
 
 @pytest.fixture(scope="function")
-def model_response(data):
+def predictor(data):
     y = data.loc[:, 'ff'].values.copy()
     y = y.reshape(len(y), 1)
 
-    z = np.zeros_like(y)
-    z[y >= np.mean(y)] = 1
+    return y
+
+
+@pytest.fixture(scope="function")
+def model_response(predictor):
+    z = np.zeros_like(predictor)
+    z[predictor >= np.mean(predictor)] = 1
 
     return z
