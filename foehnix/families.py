@@ -242,9 +242,11 @@ def initialize_family(familyname='gaussian', left=float('-Inf'),
         if np.isfinite([left, right]).any():
             if truncated is True:
                 raise NotImplementedError
+                # TODO: this is currently not implemented
                 # family = TruncatedGaussianFamily(left=left, right=right)
             else:
                 raise NotImplementedError
+                # TODO: this is currently not implemented
                 # family = CensoredGaussianFamily(left=left, right=right)
         else:
             family = GaussianFamily()
@@ -253,9 +255,11 @@ def initialize_family(familyname='gaussian', left=float('-Inf'),
         if np.isfinite([left, right]).any():
             if truncated is True:
                 raise NotImplementedError
+                # TODO: this is currently not implemented
                 # family = TruncatedLogisticFamily(left=left, right=right)
             else:
                 raise NotImplementedError
+                # TODO: this is currently not implemented
                 # family = CensoredLogsticFamily(left=left, right=right)
         else:
             family = LogisticFamily()
