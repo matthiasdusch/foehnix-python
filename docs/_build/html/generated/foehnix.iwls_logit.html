@@ -89,7 +89,7 @@
 <h1>foehnix.iwls_logit<a class="headerlink" href="#foehnix-iwls-logit" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="foehnix.iwls_logit">
-<code class="descclassname">foehnix.</code><code class="descname">iwls_logit</code><span class="sig-paren">(</span><em>logitx</em>, <em>y</em>, <em>beta=None</em>, <em>penalty=None</em>, <em>standardize=True</em>, <em>maxit=100</em>, <em>tol=1e-08</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/iwls_logit.html#iwls_logit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.iwls_logit" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">foehnix.</code><code class="descname">iwls_logit</code><span class="sig-paren">(</span><em>logitx</em>, <em>y</em>, <em>beta=None</em>, <em>standardize=True</em>, <em>maxit=100</em>, <em>tol=1e-08</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/iwls_logit.html#iwls_logit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.iwls_logit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterative weighted least squares solver for a logistic regression model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -99,22 +99,19 @@
 <dt><strong>logitx</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
 <dd><p class="first">Must contain:</p>
 <ul class="last simple">
-<li><code class="docutils literal notranslate"><span class="pre">'values'</span></code> : <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.24.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> the model matrix</li>
-<li><code class="docutils literal notranslate"><span class="pre">'center'</span></code> : <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v0.24.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>, containing the mean of
+<li><code class="docutils literal notranslate"><span class="pre">'values'</span></code> : <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.25.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> the model matrix</li>
+<li><code class="docutils literal notranslate"><span class="pre">'center'</span></code> : <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v0.25.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>, containing the mean of
 each model matrix row</li>
 <li><code class="docutils literal notranslate"><span class="pre">'scale'</span></code> : <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, containing the standard
 deviation of matrix rows</li>
 <li><code class="docutils literal notranslate"><span class="pre">'is_standardized'</span></code>: boolean if matrix is standardized</li>
 </ul>
 </dd>
-<dt><strong>y</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a></span></dt>
+<dt><strong>y</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a></span></dt>
 <dd><p class="first last">predictor values of shape(len(observations), 1)</p>
 </dd>
-<dt><strong>beta</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a></span></dt>
+<dt><strong>beta</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a></span></dt>
 <dd><p class="first last">initial regression coefficients. If None will be initialized with 0.</p>
-</dd>
-<dt><strong>penalty</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">Penalty for regularization. Default is None.</p>
 </dd>
 <dt><strong>standardize</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
 <dd><p class="first last">If True (default) the model matrix will be standardized</p>

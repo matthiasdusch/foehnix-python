@@ -89,7 +89,7 @@
 <h1>foehnix.timeseries_plots.image<a class="headerlink" href="#foehnix-timeseries-plots-image" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="foehnix.timeseries_plots.image">
-<code class="descclassname">foehnix.timeseries_plots.</code><code class="descname">image</code><span class="sig-paren">(</span><em>fmm</em>, <em>fun='freq'</em>, <em>deltat=None</em>, <em>deltad=7</em>, <em>cmap=&lt;matplotlib.colors.LinearSegmentedColormap object&gt;</em>, <em>contours=False</em>, <em>contour_color='k'</em>, <em>contour_levels=10</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/timeseries_plots.html#image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.timeseries_plots.image" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">foehnix.timeseries_plots.</code><code class="descname">image</code><span class="sig-paren">(</span><em>fmm</em>, <em>fun='freq'</em>, <em>deltat=None</em>, <em>deltad=7</em>, <em>cmap=&lt;matplotlib.colors.LinearSegmentedColormap object&gt;</em>, <em>contours=False</em>, <em>contour_color='k'</em>, <em>contour_levels=10</em>, <em>contour_labels=False</em>, <em>clabel_format='%.0f'</em>, <em>clabel_size=8</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/timeseries_plots.html#image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.timeseries_plots.image" title="Permalink to this definition">¶</a></dt>
 <dd><p>foehnix Image Plot - Hovmoeller Diagram</p>
 <p>This plots a Hovmoeller Diagram with aggregated days on the x-axis and
 aggregated time on the y-axis.</p>
@@ -131,6 +131,16 @@ series will be used.</p>
 <dt><strong>contour_levels</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or sequence of floats</span></dt>
 <dd><p class="first last">Default <code class="docutils literal notranslate"><span class="pre">10</span></code> will plot 10 contour levels. If a sequence is provided
 contour levels will be plotted at the sequence values.</p>
+</dd>
+<dt><strong>contour_labels</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">Default <code class="docutils literal notranslate"><span class="pre">False</span></code>. If <code class="docutils literal notranslate"><span class="pre">True</span></code> contour labels will be added.</p>
+</dd>
+<dt><strong>clabel_format</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Formatstring for the contour labels. Default <code class="docutils literal notranslate"><span class="pre">&quot;%.0f&quot;</span></code> Switch to
+<code class="docutils literal notranslate"><span class="pre">&quot;%.2f&quot;</span></code> to show to decimal digits.</p>
+</dd>
+<dt><strong>clabel_size</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Fontsize of the contour lables. Default 8.</p>
 </dd>
 <dt><strong>kwargs :</strong></dt>
 <dd><p class="first">Possible keyword arguments for the figure:</p>

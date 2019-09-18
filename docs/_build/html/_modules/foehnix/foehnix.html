@@ -89,6 +89,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="k">import</span> <span class="n">logistic</span><span class="p">,</span> <span class="n">norm</span>
 <span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
 
 <span class="kn">from</span> <span class="nn">foehnix.families</span> <span class="k">import</span> <span class="n">Family</span><span class="p">,</span> <span class="n">initialize_family</span>
 <span class="kn">from</span> <span class="nn">foehnix.foehnix_filter</span> <span class="k">import</span> <span class="n">foehnix_filter</span>
@@ -159,6 +160,9 @@
 <span class="sd">            - False: Only critical errors and warnings will be provided</span>
 <span class="sd">            - &#39;DEBUG&#39;: More detailed information will be provided</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check switch</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">switch</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;switch is mandatory and either True or False&#39;</span><span class="p">)</span>
 
         <span class="c1"># set logging</span>
         <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
@@ -167,6 +171,8 @@
             <span class="n">logging_level</span> <span class="o">=</span> <span class="s1">&#39;CRITICAL&#39;</span>
         <span class="k">elif</span> <span class="n">verbose</span> <span class="o">==</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">:</span>
             <span class="n">logging_level</span> <span class="o">=</span> <span class="s1">&#39;DEBUG&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Verbose must be one of True, False or &#39;DEBUG&#39;.&quot;</span><span class="p">)</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1">: </span><span class="si">%(name)s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
                             <span class="n">datefmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">,</span>
                             <span class="n">level</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">logging</span><span class="p">,</span> <span class="n">logging_level</span><span class="p">))</span>
@@ -182,41 +188,62 @@
         <span class="c1"># Check if family object is provided or initialize it</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">family</span><span class="p">,</span> <span class="n">Family</span><span class="p">):</span>
             <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;custom foehnix.Family object provided.&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;gaussian&#39;</span> <span class="ow">or</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;logistic&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">family</span> <span class="o">=</span> <span class="n">initialize_family</span><span class="p">(</span><span class="n">familyname</span><span class="o">=</span><span class="n">family</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="n">left</span><span class="p">,</span>
+                                            <span class="n">right</span><span class="o">=</span><span class="n">right</span><span class="p">,</span> <span class="n">truncated</span><span class="o">=</span><span class="n">truncated</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">family</span> <span class="o">=</span> <span class="n">initialize_family</span><span class="p">(</span><span class="n">familyname</span><span class="o">=</span><span class="n">family</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="n">left</span><span class="p">,</span>
-                                       <span class="n">right</span><span class="o">=</span><span class="n">right</span><span class="p">,</span> <span class="n">truncated</span><span class="o">=</span><span class="n">truncated</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;family must be a foehnix-family object or one of&#39;</span>
+                             <span class="s1">&#39; &quot;gaussian&quot; or &quot;logistic&quot;.&#39;</span><span class="p">)</span>
 
         <span class="c1"># Maxit and tol are the maximum number of iterations for the</span>
         <span class="c1"># optimization. Need to be numeric. If one value is given it will</span>
         <span class="c1"># be used for both, the EM algorithm and the IWLS optimization for</span>
         <span class="c1"># the concomitants. If two values are given the first one is used</span>
         <span class="c1"># for the EM algorithm, the second for the IWLS solver.</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">maxit</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">maxit_em</span> <span class="o">=</span> <span class="n">maxit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">maxit_iwls</span> <span class="o">=</span> <span class="n">maxit</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;maxit must be integer or list of length 2&#39;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">maxit</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">maxit_em</span> <span class="o">=</span> <span class="n">maxit</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">maxit_iwls</span> <span class="o">=</span> <span class="n">maxit</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tol</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">tol_em</span> <span class="o">=</span> <span class="n">tol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">tol_iwls</span> <span class="o">=</span> <span class="n">tol</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;tol must be float or list of length 2&#39;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">maxit</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">maxit</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">maxit_em</span> <span class="o">=</span> <span class="n">maxit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">maxit_iwls</span> <span class="o">=</span> <span class="n">maxit</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;maxit must be single integer or list of len 2&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxit_em</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Iteration limit for the EM algorithm is turned off! &#39;</span>
+                         <span class="s1">&#39;If the optimization fails to converge it will run &#39;</span>
+                         <span class="s1">&#39;forever ever...&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxit_iwls</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Iteration limit for the IWLS solver is turned off! &#39;</span>
+                         <span class="s1">&#39;If the optimization fails to converge it will run &#39;</span>
+                         <span class="s1">&#39;forever ever...&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tol</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tol_em</span> <span class="o">=</span> <span class="n">tol</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tol_iwls</span> <span class="o">=</span> <span class="n">tol</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">tol</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isreal</span><span class="p">(</span><span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tol_em</span> <span class="o">=</span> <span class="n">tol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tol_iwls</span> <span class="o">=</span> <span class="n">tol</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;tol must be single float or list of length 2&#39;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">family</span> <span class="o">=</span> <span class="n">family</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">switch</span> <span class="o">=</span> <span class="n">switch</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">truncated</span> <span class="o">=</span> <span class="n">truncated</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">standardize</span> <span class="o">=</span> <span class="n">standardize</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">force_inflate</span> <span class="o">=</span> <span class="n">force_inflate</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">force_inflate</span> <span class="o">=</span> <span class="n">force_inflate</span>
+
+        <span class="k">if</span> <span class="n">switch</span><span class="p">:</span>
+            <span class="n">switchmsg</span> <span class="o">=</span> <span class="s1">&#39;True (higher predictor values are foehn cluster)&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">switchmsg</span> <span class="o">=</span> <span class="s1">&#39;False (lower predictor values are foehn cluster)&#39;</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;foehnix control object successfully initialised:</span><span class="se">\n</span><span class="s1">&#39;</span>
+                  <span class="s1">&#39;Distribution family: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
+                  <span class="s1">&#39;Switch: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
+                  <span class="s1">&#39;Maximum iterations of the EM algorithm: </span><span class="si">%d</span><span class="se">\n</span><span class="s1">&#39;</span>
+                  <span class="s1">&#39;Maximum iterations of the IWLS optimization: </span><span class="si">%d</span><span class="se">\n</span><span class="s1">&#39;</span>
+                  <span class="o">%</span> <span class="p">(</span><span class="n">family</span><span class="p">,</span> <span class="n">switchmsg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxit_em</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxit_iwls</span><span class="p">))</span></div></div>
 
 
 <div class="viewcode-block" id="Foehnix"><a class="viewcode-back" href="../../generated/foehnix.Foehnix.html#foehnix.Foehnix">[docs]</a><span class="k">class</span> <span class="nc">Foehnix</span><span class="p">:</span>
@@ -279,16 +306,19 @@
             <span class="k">if</span> <span class="n">con</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Concomitant &quot;</span><span class="si">%s</span><span class="s1">&quot; not found in data&#39;</span> <span class="o">%</span> <span class="n">con</span><span class="p">)</span>
 
+        <span class="c1"># make a copy of the data frame, do not mess with the original</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
         <span class="c1"># Convert index to datetime</span>
-        <span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
         <span class="c1"># check if regular</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;DataFrame index is not monotonic increasing!&#39;</span><span class="p">)</span>
 
         <span class="c1"># calculate minimal difference to make data strictly increasing</span>
-        <span class="n">mindiff</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
-        <span class="n">inflated</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">asfreq</span><span class="p">(</span><span class="n">mindiff</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">size</span>
-        <span class="n">lendata</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">mindiff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">inflated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">asfreq</span><span class="p">(</span><span class="n">mindiff</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">lendata</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="n">inflated</span><span class="o">/</span><span class="n">lendata</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">control</span><span class="o">.</span><span class="n">force_inflate</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
             <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;You have provided a time series object spanning the &#39;</span>
@@ -304,10 +334,11 @@
                          <span class="s1">&#39;This condition can be overruled by setting the &#39;</span>
                          <span class="s1">&#39;input argument ``force_inflate = True`` if needed. &#39;</span>
                          <span class="s1">&#39;For more details please read the foehnix.control &#39;</span>
-                         <span class="s1">&#39;manual page.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                         <span class="s1">&#39;manual page.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
                                            <span class="n">mindiff</span><span class="o">.</span><span class="n">seconds</span><span class="o">/</span><span class="mi">3600</span><span class="p">,</span>
-                                           <span class="n">inflated</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                                           <span class="n">inflated</span><span class="o">*</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                           <span class="n">inflated</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                           <span class="n">inflated</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                                            <span class="n">inflated</span><span class="o">/</span><span class="n">lendata</span><span class="p">))</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;DataFrame gets inflated, see log for details!&#39;</span><span class="p">)</span>
 
@@ -315,27 +346,23 @@
         <span class="n">n_inflated</span> <span class="o">=</span> <span class="n">inflated</span> <span class="o">-</span> <span class="n">lendata</span>
         <span class="c1"># if inflation is ok or forced, create strictly increasing dataframe</span>
         <span class="c1"># with minimal spacing</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">asfreq</span><span class="p">(</span><span class="n">mindiff</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">asfreq</span><span class="p">(</span><span class="n">mindiff</span><span class="p">)</span>
 
         <span class="c1"># create a subset of the needed data</span>
         <span class="n">columns</span> <span class="o">=</span> <span class="n">concomitant</span> <span class="o">+</span> <span class="p">[</span><span class="n">predictor</span><span class="p">]</span>
-        <span class="n">subset</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="c1"># create index where predictor or concomitant is NaN</span>
         <span class="n">idx_notnan</span> <span class="o">=</span> <span class="n">subset</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">index</span>
 
         <span class="c1"># Apply foehnix filter</span>
-        <span class="n">filter_obj</span> <span class="o">=</span> <span class="n">foehnix_filter</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">filter_method</span><span class="o">=</span><span class="n">filter_method</span><span class="p">)</span>
+        <span class="n">filter_obj</span> <span class="o">=</span> <span class="n">foehnix_filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">filter_method</span><span class="o">=</span><span class="n">filter_method</span><span class="p">)</span>
 
         <span class="c1"># Take all elements which are not NaN and which are within</span>
         <span class="c1"># filter_obj[&#39;good&#39;]</span>
         <span class="n">idx_take</span> <span class="o">=</span> <span class="n">idx_notnan</span><span class="p">[</span><span class="n">idx_notnan</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">filter_obj</span><span class="p">[</span><span class="s1">&#39;good&#39;</span><span class="p">])]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_take</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;No data left after applying required filters.&#39;</span><span class="p">)</span>
-
-        <span class="c1"># TODO check with Reto: constant value and truncated check should be</span>
-        <span class="c1"># TODO   after filtering in my opinion. Else the filtered data might</span>
-        <span class="c1"># TODO   contain constant values or values outside truncation</span>
 
         <span class="c1"># check if we have columns with constant values.</span>
         <span class="c1"># This would lead to a non-identifiable problem</span>
@@ -370,8 +397,9 @@
 
             <span class="c1"># standardize data if control.standardize = True (default)</span>
             <span class="k">if</span> <span class="n">control</span><span class="o">.</span><span class="n">standardize</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">logitx</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">standardize</span><span class="p">(</span><span class="n">logitx</span><span class="p">)</span>
+                <span class="n">func</span><span class="o">.</span><span class="n">standardize</span><span class="p">(</span><span class="n">logitx</span><span class="p">)</span>
 
+        <span class="c1"># TODO trncated check for filter, bzw erstmal ganz raus</span>
         <span class="c1"># If truncated family is used: y has to lie within the truncation</span>
         <span class="c1"># points as density is not defined outside the range ]left, right[.</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">control</span><span class="o">.</span><span class="n">truncated</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
@@ -399,8 +427,8 @@
         <span class="c1"># Final coefficients of the concomitant model have to be destandardized</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;ccmodel&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;is_standardized&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">coef</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">destandardize_coefficients</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;ccmodel&#39;</span><span class="p">][</span><span class="s1">&#39;coef&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">logitx</span><span class="p">)</span>
+                <span class="n">coef</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">destandardized_coefficients</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;ccmodel&#39;</span><span class="p">][</span><span class="s1">&#39;coef&#39;</span><span class="p">],</span> <span class="n">logitx</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">coef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;ccmodel&#39;</span><span class="p">][</span><span class="s1">&#39;coef&#39;</span><span class="p">]</span>
 
@@ -408,7 +436,7 @@
             <span class="n">coef</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># If there was only one iteration: drop a warning</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;iter&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;iter&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;The EM algorithm stopped after one iteration!</span><span class="se">\n</span><span class="s1">&#39;</span>
                          <span class="s1">&#39;The coefficients returned are the initial &#39;</span>
                          <span class="s1">&#39;coefficients. This indicates that the model as &#39;</span>
@@ -418,7 +446,6 @@
                          <span class="s1">&#39;model specification (change/add concomitants).&#39;</span><span class="p">)</span>
 
         <span class="c1"># store relevant data within the Foehnix class</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filter_method</span> <span class="o">=</span> <span class="n">filter_method</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filter_obj</span> <span class="o">=</span> <span class="n">filter_obj</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span> <span class="o">=</span> <span class="n">predictor</span>
@@ -464,7 +491,7 @@
         <span class="c1">#   to 0 (probability for foehn is 0), set the second column to FALSE.</span>
 
         <span class="c1"># Foehn probability (a-posteriori probability)</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;prob&#39;</span><span class="p">,</span> <span class="s1">&#39;flag&#39;</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;prob&#39;</span><span class="p">,</span> <span class="s1">&#39;flag&#39;</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
                            <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="c1"># Store a-posteriory probability and flag = TRUE</span>
         <span class="n">tmp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_take</span><span class="p">,</span> <span class="s1">&#39;prob&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;post&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
@@ -507,7 +534,7 @@
         <span class="c1"># EM algorithm: estimate probabilities (prob; E-step), update the model</span>
         <span class="c1"># given the new probabilities (M-step). Always with respect to the</span>
         <span class="c1"># selected family.</span>
-        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># iteration variable</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># iteration variable</span>
         <span class="n">delta</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># likelihood difference between to iteration: break criteria</span>
         <span class="n">converged</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Set to False if we do not converge before maxit</span>
 
@@ -519,7 +546,6 @@
         <span class="k">while</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="n">control</span><span class="o">.</span><span class="n">tol_em</span><span class="p">:</span>
             <span class="c1"># M-step: update probabilites and theta</span>
             <span class="n">prob</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
-            <span class="c1"># TODO was mach das theta=theta hier?</span>
             <span class="c1"># theta = control.family.theta(y, post, theta=theta)</span>
             <span class="n">theta</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">theta</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">post</span><span class="p">)</span>
 
@@ -538,7 +564,7 @@
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Likelihood got NaN!&#39;</span><span class="p">)</span>
 
             <span class="c1"># update liklihood difference</span>
-            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">delta</span> <span class="o">=</span> <span class="n">llpath</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">full</span> <span class="o">-</span> <span class="n">llpath</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">full</span>
 
             <span class="c1"># increase iteration variable</span>
@@ -571,12 +597,12 @@
                  <span class="s1">&#39;loglikpath&#39;</span><span class="p">:</span> <span class="n">llpath</span><span class="p">,</span>
                  <span class="s1">&#39;coefpath&#39;</span><span class="p">:</span> <span class="n">coefpath</span><span class="p">,</span>
                  <span class="s1">&#39;converged&#39;</span><span class="p">:</span> <span class="n">converged</span><span class="p">,</span>
-                 <span class="s1">&#39;iter&#39;</span><span class="p">:</span> <span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">}</span>
+                 <span class="s1">&#39;iter&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">fdict</span></div>
 
 <div class="viewcode-block" id="Foehnix.unreg_fit"><a class="viewcode-back" href="../../generated/foehnix.Foehnix.unreg_fit.html#foehnix.Foehnix.unreg_fit">[docs]</a>    <span class="k">def</span> <span class="nf">unreg_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">logitx</span><span class="p">,</span> <span class="n">control</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Fitting foehnix Mixture Model Without Concomitant Model.</span>
+        <span class="sd">&quot;&quot;&quot;Fitting unregularized foehnix Mixture Model with Concomitant Model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -636,7 +662,6 @@
                                  <span class="n">maxit</span><span class="o">=</span><span class="n">control</span><span class="o">.</span><span class="n">maxit_iwls</span><span class="p">,</span>
                                  <span class="n">tol</span><span class="o">=</span><span class="n">control</span><span class="o">.</span><span class="n">tol_iwls</span><span class="p">)</span>
             <span class="n">prob</span> <span class="o">=</span> <span class="n">logistic</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">logitx</span><span class="p">[</span><span class="s1">&#39;values&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ccmodel</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]))</span>
-            <span class="c1"># TODO was mach das theta=theta hier?</span>
             <span class="n">theta</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">family</span><span class="o">.</span><span class="n">theta</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">post</span><span class="p">)</span>
 
             <span class="c1"># E-step: update expected a-posteriori</span>
@@ -730,7 +755,7 @@
 
         <span class="c1"># If no new data is provided, use the date which has been fitted</span>
         <span class="k">if</span> <span class="n">newdata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">newdata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">newdata</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concomitant</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">prob</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s1">&#39;prob&#39;</span><span class="p">])</span>
@@ -796,12 +821,13 @@
 
         <span class="c1"># Additional information about the data/model</span>
         <span class="n">nr</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Number of observations (total) </span><span class="si">%8d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">nr</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Removed due to missing values  </span><span class="si">%8d</span><span class="s2"> (</span><span class="si">%3.1f</span><span class="s2"> percent)&quot;</span> <span class="o">%</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Number of observations (total) </span><span class="si">%8d</span><span class="s2"> (</span><span class="si">%d</span><span class="s2"> due to inflation)&quot;</span> <span class="o">%</span>
+              <span class="p">(</span><span class="n">nr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inflated</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Removed due to missing values </span><span class="si">%9d</span><span class="s2"> (</span><span class="si">%3.1f</span><span class="s2"> percent)&quot;</span> <span class="o">%</span>
               <span class="p">(</span><span class="n">sum_na</span><span class="p">,</span> <span class="n">sum_na</span> <span class="o">/</span> <span class="n">nr</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Outside defined wind sector    </span><span class="si">%8d</span><span class="s2"> (</span><span class="si">%3.1f</span><span class="s2"> percent)&quot;</span> <span class="o">%</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Outside defined wind sector </span><span class="si">%11d</span><span class="s2"> (</span><span class="si">%3.1f</span><span class="s2"> percent)&quot;</span> <span class="o">%</span>
               <span class="p">(</span><span class="n">sum_0</span><span class="p">,</span> <span class="n">sum_0</span> <span class="o">/</span> <span class="n">nr</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Used for classification        </span><span class="si">%8d</span><span class="s2"> (</span><span class="si">%3.1f</span><span class="s2"> percent)&quot;</span> <span class="o">%</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Used for classification </span><span class="si">%15d</span><span class="s2"> (</span><span class="si">%3.1f</span><span class="s2"> percent)&quot;</span> <span class="o">%</span>
               <span class="p">(</span><span class="n">sum_1</span><span class="p">,</span> <span class="n">sum_1</span> <span class="o">/</span> <span class="n">nr</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Climatological foehn occurance </span><span class="si">%.2f</span><span class="s2"> percent (on n = </span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span>

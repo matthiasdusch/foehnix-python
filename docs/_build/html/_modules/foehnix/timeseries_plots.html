@@ -466,7 +466,8 @@
 
 <div class="viewcode-block" id="image"><a class="viewcode-back" href="../../generated/foehnix.timeseries_plots.image.html#foehnix.timeseries_plots.image">[docs]</a><span class="k">def</span> <span class="nf">image</span><span class="p">(</span><span class="n">fmm</span><span class="p">,</span> <span class="n">fun</span><span class="o">=</span><span class="s1">&#39;freq&#39;</span><span class="p">,</span> <span class="n">deltat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">deltad</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
           <span class="n">cmap</span><span class="o">=</span><span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;Greys&#39;</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="n">contours</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">contour_color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span>
-          <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+          <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">contour_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">clabel_format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%.0f</span><span class="s2">&quot;</span><span class="p">,</span>
+          <span class="n">clabel_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    foehnix Image Plot - Hovmoeller Diagram</span>
 
@@ -500,6 +501,13 @@
 <span class="sd">    contour_levels : float or sequence of floats</span>
 <span class="sd">        Default ``10`` will plot 10 contour levels. If a sequence is provided</span>
 <span class="sd">        contour levels will be plotted at the sequence values.</span>
+<span class="sd">    contour_labels : bool</span>
+<span class="sd">        Default ``False``. If ``True`` contour labels will be added.</span>
+<span class="sd">    clabel_format : str</span>
+<span class="sd">        Formatstring for the contour labels. Default ``&quot;%.0f&quot;`` Switch to</span>
+<span class="sd">        ``&quot;%.2f&quot;`` to show to decimal digits.</span>
+<span class="sd">    clabel_size : int</span>
+<span class="sd">        Fontsize of the contour lables. Default 8.</span>
 <span class="sd">    kwargs :</span>
 <span class="sd">        Possible keyword arguments for the figure:</span>
 
@@ -632,32 +640,14 @@
         <span class="n">zcon</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">Z</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
         <span class="n">zcon</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">Z</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 
-        <span class="c1"># TODO : for nice cyclic boundaries I have to use higher resolution...</span>
-
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        # lower</span>
-<span class="sd">        zcon[0, 2:] = Z[-1, :]</span>
-<span class="sd">        zcon[0, 1] = Z[-1, -1]</span>
-<span class="sd">        zcon[0, 0] = Z[-1, -2]</span>
-
-<span class="sd">        # upper</span>
-<span class="sd">        zcon[-1, :-2] = Z[0, :]</span>
-<span class="sd">        zcon[-1, -2] = Z[0, 0]</span>
-<span class="sd">        zcon[-1, -1] = Z[0, 1]</span>
-
-<span class="sd">        # left</span>
-<span class="sd">        zcon[1:-1, 0] = Z[:, -1]</span>
-
-<span class="sd">        # right</span>
-<span class="sd">        zcon[1:-1, -1] = Z[:, 0]</span>
-
-
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">xcon</span><span class="p">,</span> <span class="n">ycon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">zcon</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span>
                                  <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">zcon</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-        <span class="n">ax</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">xcon</span><span class="p">,</span> <span class="n">ycon</span><span class="p">,</span> <span class="n">zcon</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">contour_color</span><span class="p">,</span>
-                   <span class="n">levels</span><span class="o">=</span><span class="n">contour_levels</span><span class="p">)</span>
+        <span class="n">con</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">xcon</span><span class="p">,</span> <span class="n">ycon</span><span class="p">,</span> <span class="n">zcon</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">contour_color</span><span class="p">,</span>
+                         <span class="n">levels</span><span class="o">=</span><span class="n">contour_levels</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">contour_labels</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">clabel</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="n">contour_levels</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">clabel_format</span><span class="p">,</span>
+                      <span class="n">fontsize</span><span class="o">=</span><span class="n">clabel_size</span><span class="p">,</span> <span class="n">inline_spacing</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
     <span class="c1"># ---- kwargs for plotting</span>
     <span class="k">if</span> <span class="s1">&#39;title&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>

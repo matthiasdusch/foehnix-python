@@ -328,9 +328,11 @@
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">([</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">truncated</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+                <span class="c1"># TODO: this is currently not implemented</span>
                 <span class="c1"># family = TruncatedGaussianFamily(left=left, right=right)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+                <span class="c1"># TODO: this is currently not implemented</span>
                 <span class="c1"># family = CensoredGaussianFamily(left=left, right=right)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">family</span> <span class="o">=</span> <span class="n">GaussianFamily</span><span class="p">()</span>
@@ -339,9 +341,11 @@
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">([</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">truncated</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+                <span class="c1"># TODO: this is currently not implemented</span>
                 <span class="c1"># family = TruncatedLogisticFamily(left=left, right=right)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+                <span class="c1"># TODO: this is currently not implemented</span>
                 <span class="c1"># family = CensoredLogsticFamily(left=left, right=right)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">family</span> <span class="o">=</span> <span class="n">LogisticFamily</span><span class="p">()</span>

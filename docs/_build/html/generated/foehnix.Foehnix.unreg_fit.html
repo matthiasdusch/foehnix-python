@@ -90,21 +90,21 @@
 <dl class="method">
 <dt id="foehnix.Foehnix.unreg_fit">
 <code class="descclassname">Foehnix.</code><code class="descname">unreg_fit</code><span class="sig-paren">(</span><em>y</em>, <em>logitx</em>, <em>control</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/foehnix.html#Foehnix.unreg_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.Foehnix.unreg_fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fitting foehnix Mixture Model Without Concomitant Model.</p>
+<dd><p>Fitting unregularized foehnix Mixture Model with Concomitant Model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>y</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a></span></dt>
+<dt><strong>y</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a></span></dt>
 <dd><p class="first last">Covariate for the components of the mixture model</p>
 </dd>
 <dt><strong>logitx</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
 <dd><p class="first">Covariats for the concomitant model
 Must contain:</p>
 <ul class="last simple">
-<li><code class="docutils literal notranslate"><span class="pre">'values'</span></code> : <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.24.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> the model matrix</li>
-<li><code class="docutils literal notranslate"><span class="pre">'center'</span></code> : <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v0.24.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>, containing the mean of
+<li><code class="docutils literal notranslate"><span class="pre">'values'</span></code> : <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.25.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> the model matrix</li>
+<li><code class="docutils literal notranslate"><span class="pre">'center'</span></code> : <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v0.25.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code></a>, containing the mean of
 each model matrix row</li>
 <li><code class="docutils literal notranslate"><span class="pre">'scale'</span></code> : <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, containing the standard
 deviation of matrix rows</li>

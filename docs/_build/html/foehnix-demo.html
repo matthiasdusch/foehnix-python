@@ -100,12 +100,12 @@
 
 <span class="gp">In [5]: </span><span class="n">ellboegen</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 <span class="gh">Out[5]: </span><span class="go"></span>
-<span class="go">    timestamp     dd   ff      p    rh    t</span>
-<span class="go">0  1263805200  338.0  1.2  899.8  75.0 -0.9</span>
-<span class="go">1  1263808800   18.0  0.1  899.9  66.0  0.2</span>
-<span class="go">2  1263812400  344.0  0.8  899.1  63.0  0.7</span>
-<span class="go">3  1263816000  303.0  2.4  898.8  60.0  0.7</span>
-<span class="go">4  1263819600  292.0  2.8  898.5  57.0  1.9</span>
+<span class="go">    timestamp     dd   ff     rh    t</span>
+<span class="go">0  1136077200  171.0  0.6   90.0 -0.4</span>
+<span class="go">1  1136080800  268.0  0.3  100.0 -1.8</span>
+<span class="go">2  1136084400  115.0  5.2   79.0  0.9</span>
+<span class="go">3  1136088000  152.0  2.1   88.0 -0.6</span>
+<span class="go">4  1136091600  319.0  0.7  100.0 -2.6</span>
 
 <span class="gp">In [6]: </span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">ellboegen</span><span class="p">,</span> <span class="n">sattelberg</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;timestamp&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">,</span> <span class="n">suffixes</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;_crest&#39;</span><span class="p">),</span> <span class="n">sort</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
@@ -129,35 +129,35 @@
 <p>Show a summary of the model results</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [13]: </span><span class="n">model</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">detailed</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
-<span class="go">Number of observations (total)    71346</span>
-<span class="go">Removed due to missing values     10187 (14.3 percent)</span>
-<span class="go">Outside defined wind sector       43539 (61.0 percent)</span>
-<span class="go">Used for classification           17620 (24.7 percent)</span>
+<span class="go">Number of observations (total)   113942 (5527 due to inflation)</span>
+<span class="go">Removed due to missing values     38600 (33.9 percent)</span>
+<span class="go">Outside defined wind sector       50893 (44.7 percent)</span>
+<span class="go">Used for classification           24449 (21.5 percent)</span>
 
-<span class="go">Climatological foehn occurance 13.38 percent (on n = 61159)</span>
-<span class="go">Mean foehn probability 13.23 percent (on n = 61159)</span>
+<span class="go">Climatological foehn occurance 17.90 percent (on n = 75342)</span>
+<span class="go">Mean foehn probability 17.66 percent (on n = 75342)</span>
 
-<span class="go">Log-likelihood: -40634.7, 6 effective degrees of freedom</span>
-<span class="go">Corresponding AIC = 81281.3, BIC = 81328.0</span>
+<span class="go">Log-likelihood: -55763.8, 6 effective degrees of freedom</span>
+<span class="go">Corresponding AIC = 111539.7, BIC = 111588.3</span>
 
-<span class="go">Number of EM iterations 10/100 (converged)</span>
-<span class="go">Time required for model estimation: 0.8 seconds</span>
+<span class="go">Number of EM iterations 6/100 (converged)</span>
+<span class="go">Time required for model estimation: 0.6 seconds</span>
 
 <span class="gt">------------------------------------------------------</span>
 
 <span class="ne">Components</span>: t test of coefficients
 
                <span class="n">Estimate</span>  <span class="n">Std</span><span class="o">.</span> <span class="n">Error</span>     <span class="n">t_value</span>  <span class="n">Pr</span><span class="p">(</span><span class="o">&gt;|</span><span class="n">t</span><span class="o">|</span><span class="p">)</span>
-<span class="p">(</span><span class="n">Intercept</span><span class="p">)</span><span class="o">.</span><span class="mi">1</span>  <span class="mf">5.988051</span>    <span class="mf">0.027467</span>  <span class="mf">218.012058</span>       <span class="mf">0.0</span>
-<span class="p">(</span><span class="n">Intercept</span><span class="p">)</span><span class="o">.</span><span class="mi">2</span>  <span class="mf">1.287427</span>    <span class="mf">0.012943</span>   <span class="mf">99.469082</span>       <span class="mf">0.0</span>
+<span class="p">(</span><span class="n">Intercept</span><span class="p">)</span><span class="o">.</span><span class="mi">1</span>  <span class="mf">5.673516</span>    <span class="mf">0.025089</span>  <span class="mf">226.133738</span>       <span class="mf">0.0</span>
+<span class="p">(</span><span class="n">Intercept</span><span class="p">)</span><span class="o">.</span><span class="mi">2</span>  <span class="mf">0.866782</span>    <span class="mf">0.010944</span>   <span class="mf">79.201240</span>       <span class="mf">0.0</span>
 
 <span class="gt">------------------------------------------------------</span>
 
 <span class="n">Concomitant</span> <span class="n">model</span><span class="p">:</span> <span class="n">z</span> <span class="n">test</span> <span class="n">of</span> <span class="n">coefficients</span>
 
-              <span class="n">Estimate</span>  <span class="n">Std</span><span class="o">.</span> <span class="n">Error</span>     <span class="n">z_value</span>  <span class="n">Pr</span><span class="p">(</span><span class="o">&gt;|</span><span class="n">z</span><span class="o">|</span><span class="p">)</span>
-<span class="n">cc</span><span class="o">.</span><span class="n">Intercept</span> <span class="o">-</span><span class="mf">0.022706</span>    <span class="mf">0.091357</span>   <span class="o">-</span><span class="mf">0.248539</span>  <span class="mf">0.773618</span>
-<span class="n">cc</span><span class="o">.</span><span class="n">ff</span>         <span class="mf">3.981182</span>    <span class="mf">0.015243</span>  <span class="mf">261.179293</span>  <span class="mf">0.000000</span>
+              <span class="n">Estimate</span>  <span class="n">Std</span><span class="o">.</span> <span class="n">Error</span>     <span class="n">z_value</span>      <span class="n">Pr</span><span class="p">(</span><span class="o">&gt;|</span><span class="n">z</span><span class="o">|</span><span class="p">)</span>
+<span class="n">cc</span><span class="o">.</span><span class="n">Intercept</span>  <span class="mf">0.912294</span>    <span class="mf">0.075737</span>   <span class="mf">12.045589</span>  <span class="mf">2.046103e-33</span>
+<span class="n">cc</span><span class="o">.</span><span class="n">ff</span>         <span class="mf">3.996331</span>    <span class="mf">0.013613</span>  <span class="mf">293.566954</span>  <span class="mf">0.000000e+00</span>
 
 <span class="n">Number</span> <span class="n">of</span> <span class="n">IWLS</span> <span class="n">iterations</span> <span class="mi">3</span> <span class="p">(</span><span class="n">converged</span><span class="p">)</span>
 <span class="n">Dispersion</span> <span class="n">parameter</span> <span class="k">for</span> <span class="n">binomial</span> <span class="n">family</span> <span class="n">taken</span> <span class="n">to</span> <span class="n">be</span> <span class="mf">1.</span>
