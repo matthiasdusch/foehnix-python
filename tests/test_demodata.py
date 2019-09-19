@@ -6,7 +6,7 @@ from scipy.stats import logistic, norm
 import os
 import hashlib
 
-from foehnix import get_demodata
+from foehnix import get_demodata, Foehnix
 
 # specify data directory
 DDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -44,3 +44,27 @@ def test_get_demodata():
     sattelberg = get_demodata('sattelberg')
     npt.assert_array_equal(tirol['t'].dropna(), ellboegen['t'].dropna())
     npt.assert_array_equal(tirol['t_crest'].dropna(), sattelberg['t'].dropna())
+
+
+def test_tyrol(tmpfile):
+    # load data
+    tyrol = get_demodata('tyrol')
+
+    # specify wind filter
+    tyr_filter = {'dd': [43, 223], 'dd_crest': [90, 270]}
+
+    tyr1 = Foehnix('diff_t', tyrol, concomitant=['rh', 'ff'],
+                   filter_method=tyr_filter, switch=True, verbose=False)
+
+    tyr1
+
+
+def test_ellboegen(tmpfile):
+    # load data
+    ellboegen = get_demodata('ellboegen')
+
+    # specify wind filter
+    ell_filter = {'dd': [43, 233]}
+
+    ell1 = Foehnix('ff', ellboegen, filter_method=ell_filter, verbose=False)
+    ell1
