@@ -29,7 +29,7 @@ def _check_filter_function(filtered, lenx):
                            " or ``nan`` values.")
 
 
-def foehnix_filter(x, filter_method=None):
+def foehnix_filter(x, filter_method, cols):
     """
     Evaluates Data Filter Rules for foehnix Mixture Model Calls
 
@@ -72,6 +72,10 @@ def foehnix_filter(x, filter_method=None):
         - `func`: A custom function which will be applied on ``x``
         - `dict`: Keys must be columns of ``x``, values can either be a custom
           function on ``x[key]`` or a list of length two.
+    cols : list of strings
+        These strings must be contained in the columns of ``x`` and specify
+        which columns are not allowed to contain missing values.
+        If `None` is passed, all elements have to be non-missing.
 
     Returns
     -------
@@ -152,9 +156,20 @@ def foehnix_filter(x, filter_method=None):
     else:
         raise RuntimeError('Filter method not understood')
 
+    # Set rows with missing values to NaN according to cols parameter:
+    if cols is None:
+        isnan = x.isna().any(axis=1).values
+    else:
+        isnan = x.loc[:, cols].isna().any(axis=1).values
+    filtered[isnan] = np.nan
+
     good = x.index[filtered == 1]
     bad = x.index[filtered == 0]
     ugly = x.index[np.isnan(filtered)]
+
+    # check filter length
+    if len(filtered) != len(x):
+        raise RuntimeWarning('Filter did not return expected length!')
 
     return {'good': good,
             'bad': bad,

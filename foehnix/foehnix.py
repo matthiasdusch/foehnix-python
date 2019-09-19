@@ -270,7 +270,8 @@ class Foehnix:
         idx_notnan = subset.dropna().index
 
         # Apply foehnix filter
-        filter_obj = foehnix_filter(self.data, filter_method=filter_method)
+        filter_obj = foehnix_filter(self.data, filter_method,
+                                    concomitant + [predictor])
 
         # Take all elements which are not NaN and which are within
         # filter_obj['good']
