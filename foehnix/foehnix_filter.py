@@ -29,7 +29,7 @@ def _check_filter_function(filtered, lenx):
                            " or ``nan`` values.")
 
 
-def foehnix_filter(x, filter_method, cols):
+def foehnix_filter(x, filter_method=None, cols=None):
     """
     Evaluates Data Filter Rules for foehnix Mixture Model Calls
 
