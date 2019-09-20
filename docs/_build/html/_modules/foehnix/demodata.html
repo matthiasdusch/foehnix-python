@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>foehnix.demodata &#8212; foehnix-python 0.0.9 documentation</title>
+    <title>foehnix.demodata &#8212; foehnix-python 0.1.2 documentation</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -36,7 +36,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           foehnix-python</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.9</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -88,30 +88,33 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 
-<div class="viewcode-block" id="get_demodata"><a class="viewcode-back" href="../../generated/foehnix.get_demodata.html#foehnix.get_demodata">[docs]</a><span class="k">def</span> <span class="nf">get_demodata</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;combined&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="get_demodata"><a class="viewcode-back" href="../../generated/foehnix.get_demodata.html#foehnix.get_demodata">[docs]</a><span class="k">def</span> <span class="nf">get_demodata</span><span class="p">(</span><span class="n">which</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Returns a demo data set from `Ellboegen` and `Sattelberg`.</span>
+<span class="sd">    Returns a demo data.</span>
 
-<span class="sd">    The foehnix package comes with two demo data sets containing</span>
-<span class="sd">    observations from two automated weather stations in Tyrol,</span>
-<span class="sd">    Austria. One station (Sattelberg) is located close to the main</span>
-<span class="sd">    alpine ridge and is used as &#39;crest&#39; station. The second station</span>
-<span class="sd">    (Ellboegen) is located in the Wipp valley.</span>
-<span class="sd">    The package demos and examples will estimate automated foehn</span>
-<span class="sd">    classification models foehnix models for</span>
-<span class="sd">    station Ellboegen using additional information from the</span>
-<span class="sd">    crest station as concomitant variables and for custom wind</span>
-<span class="sd">    filters foehnix_filter.</span>
+<span class="sd">    The foehnix package comes with two sets of meteorological observations: one</span>
+<span class="sd">    for Tyrol, Austria, and one for Southern California, USA.</span>
+<span class="sd">    Both data sets come with observations from two stations, one valley station</span>
+<span class="sd">    (or target station) and one station further upstream of the main foehn wind</span>
+<span class="sd">    direction (crest station) used to filter the data (see foehnix_filter).</span>
+<span class="sd">    For Tyrol, observations for station Ellbögen (valley) and station</span>
+<span class="sd">    Sattelberg (crest) are included, the Californian data set consists of the</span>
+<span class="sd">    crest station &#39;Lucky Five Ranch&#39; and the valley station &#39;Viejas Casino and</span>
+<span class="sd">    Resort&#39;.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    which : str</span>
 <span class="sd">        Select one of the stations or a combined DataFrame:</span>
 
+<span class="sd">        - ``&#39;tyrol&#39;`` returns the combined Tyrolian data set</span>
+<span class="sd">          Suffix ``_crest`` indicates the mountain station Sattelberg.</span>
+<span class="sd">        - ``&#39;california&#39;`` returns the combined California data set</span>
+<span class="sd">          Suffix ``_crest`` indicates the mountain station Lucky Five Range.</span>
 <span class="sd">        - ``&#39;ellboegen&#39;`` only observations from station Ellboegen</span>
 <span class="sd">        - ``&#39;sattelberg`` only observations from station Sattelberg</span>
-<span class="sd">        - ``&#39;combined&#39;`` (default) observations from both stations.</span>
-<span class="sd">          Suffix ``_crest`` indicates the mountain station Sattelberg.</span>
+<span class="sd">        - ``&#39;luckyfive&#39;`` only observations from station Lucky Five Range</span>
+<span class="sd">        - ``&#39;viejas&#39;`` only observations from station Viejas Casino and Resort</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -122,27 +125,44 @@
     <span class="n">wd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)))</span>
     <span class="n">wd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="s1">&#39;data/&#39;</span><span class="p">)</span>
 
-    <span class="n">ellboegen</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="s1">&#39;ellboegen.csv&#39;</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span>
-                            <span class="n">skipinitialspace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">which</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;ellboegen&#39;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">ellboegen</span>
-
-    <span class="n">sattelberg</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="s1">&#39;sattelberg.csv&#39;</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span>
-                             <span class="n">skipinitialspace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">which</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;sattelberg&#39;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">sattelberg</span>
-
-    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">ellboegen</span><span class="p">,</span> <span class="n">sattelberg</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;timestamp&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">,</span>
-                    <span class="n">suffixes</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;_crest&#39;</span><span class="p">),</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
-
-    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;diff_t&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;t_crest&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">10.27</span> <span class="o">-</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span>
-
-    <span class="k">if</span> <span class="n">which</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;combined&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">which</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ellboegen&#39;</span><span class="p">,</span> <span class="s1">&#39;sattelberg&#39;</span><span class="p">,</span> <span class="s1">&#39;viejas&#39;</span><span class="p">,</span> <span class="s1">&#39;luckyfive&#39;</span><span class="p">]:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.csv&#39;</span> <span class="o">%</span> <span class="n">which</span><span class="o">.</span><span class="n">lower</span><span class="p">()),</span>
+                           <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">skipinitialspace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span>
+
+    <span class="k">elif</span> <span class="n">which</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;tyrol&#39;</span><span class="p">:</span>
+        <span class="n">ellboegen</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="s1">&#39;ellboegen.csv&#39;</span><span class="p">),</span>
+                                <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">skipinitialspace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">sattelberg</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="s1">&#39;sattelberg.csv&#39;</span><span class="p">),</span>
+                                 <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">skipinitialspace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">ellboegen</span><span class="p">,</span> <span class="n">sattelberg</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;timestamp&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">,</span>
+                        <span class="n">suffixes</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;_crest&#39;</span><span class="p">),</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
+
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;diff_t&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;t_crest&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">10.27</span> <span class="o">-</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="k">elif</span> <span class="n">which</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;california&#39;</span><span class="p">:</span>
+        <span class="n">viejas</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="s1">&#39;viejas.csv&#39;</span><span class="p">),</span>
+                             <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">skipinitialspace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">lucky</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="s1">&#39;luckyfive.csv&#39;</span><span class="p">),</span>
+                            <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">skipinitialspace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">viejas</span><span class="p">,</span> <span class="n">lucky</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;timestamp&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">,</span>
+                        <span class="n">suffixes</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;_crest&#39;</span><span class="p">),</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
+
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;diff_air_temp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;air_temp_crest&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">7.30</span> <span class="o">-</span>
+                                 <span class="n">data</span><span class="p">[</span><span class="s1">&#39;air_temp&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">data</span>
+
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;`which` must be either combined, ellboegen or &#39;</span>
-                         <span class="s1">&#39;sattelberg.&#39;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;`which` must be either `tyrol`, `california`, &#39;</span>
+                         <span class="s1">&#39;`ellboegen`, `sattelberg`, `viejas` or `luckyfive`&#39;</span><span class="p">)</span></div>
 </pre></div>
 
     </div>

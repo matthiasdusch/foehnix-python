@@ -11,8 +11,8 @@ from codecs import open  # To use a consistent encoding
 from os import path, walk
 
 MAJOR = 0
-MINOR = 0
-MICRO = 9
+MINOR = 1
+MICRO = 2
 ISRELEASED = False
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 QUALIFIER = ''
