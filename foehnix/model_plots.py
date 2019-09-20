@@ -53,8 +53,8 @@ def loglikcontribution(fmm, log=True):
 
     ll = fmm.optimizer['loglikpath'].copy()
     ll = ll-ll.iloc[0]
-    ylim = [ll.values.min(), ll.values.max()] + np.array([-0.05, 0.2]) * \
-           (ll.values.max() - ll.values.min())
+    ylim = [ll.values.min(), ll.values.max()] + np.array([-0.05, 0.2]) *\
+        (ll.values.max() - ll.values.min())
     xlabel = 'EM iteration'
     if log is True:
         ll.index = np.log(ll.index)

@@ -2,6 +2,7 @@ import pytest
 import pandas as pd
 import numpy as np
 
+import foehnix
 from foehnix.foehnix_functions import standardize
 
 
@@ -138,3 +139,35 @@ def tmpfile(tmp_path):
     tmpfile = path / 'out.csv'
 
     return tmpfile
+
+
+@pytest.fixture(scope='session')
+def tyr_mod1():
+    """
+    Runs and returns a simple foehnix mixture model for the Tyrol dataset
+    """
+    # import data
+    tyrol = foehnix.get_demodata('tyrol')
+
+    # specify wind filter
+    tyr_filter = {'dd': [43, 223], 'dd_crest': [90, 270]}
+
+    tyr = foehnix.Foehnix('ff', tyrol, filter_method=tyr_filter,
+                          verbose=False)
+    return tyr
+
+
+@pytest.fixture(scope='session')
+def tyr_mod2():
+    """
+    Runs and returns a foehnix mixture model with concomitants
+    """
+    # import data
+    tyrol = foehnix.get_demodata('tyrol')
+
+    # specify wind filter
+    tyr_filter = {'dd': [43, 223], 'dd_crest': [90, 270]}
+
+    tyr = foehnix.Foehnix('ff', tyrol, concomitant=['rh', 'diff_t'],
+                          filter_method=tyr_filter, verbose=False)
+    return tyr

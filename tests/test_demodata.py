@@ -83,22 +83,15 @@ def prob_to_csv(fmo, fpath):
                                      index_label=index_label))
 
 
-def test_tyrol(tmpfile):
-    # load data
-    tyrol = get_demodata('tyrol')
-
-    # specify wind filter
-    tyr_filter = {'dd': [43, 223], 'dd_crest': [90, 270]}
-
-    tyr1 = Foehnix('ff', tyrol, filter_method=tyr_filter, verbose=False)
-    prob_to_csv(tyr1, tmpfile)
+def test_tyrol(tmpfile, tyr_mod1, tyr_mod2):
+    # write probabilities to csv file
+    prob_to_csv(tyr_mod1, tmpfile)
     readfile = hashlib.md5(tmpfile.open('rb').read())
     # Hashsum is in agreement with github.com/retostauffer/Rfoehnix
     assert readfile.hexdigest() == '43562856bc775e05f8f17d3deb27447d'
 
-    tyr2 = Foehnix('ff', tyrol, concomitant=['rh', 'diff_t'],
-                   filter_method=tyr_filter, verbose=False)
-    prob_to_csv(tyr2, tmpfile)
+    # write probabilities to csv file
+    prob_to_csv(tyr_mod2, tmpfile)
     readfile = hashlib.md5(tmpfile.open('rb').read())
     # Hashsum is in agreement with github.com/retostauffer/Rfoehnix
     assert readfile.hexdigest() == 'f1cb14d57e0a8697fd8d0e3c6c0360ff'
