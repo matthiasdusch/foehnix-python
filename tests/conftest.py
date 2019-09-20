@@ -128,3 +128,13 @@ def model_response(predictor):
     z[predictor >= np.mean(predictor)] = 1
 
     return z
+
+
+@pytest.fixture(scope="function")
+def tmpfile(tmp_path):
+    # temporary file to store output
+    path = tmp_path / 'tmp'
+    path.mkdir()
+    tmpfile = path / 'out.csv'
+
+    return tmpfile

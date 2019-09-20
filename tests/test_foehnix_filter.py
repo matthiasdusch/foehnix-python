@@ -106,6 +106,22 @@ def test_limit_filter_and_summary(data, caplog, capfd):
     assert ('The ugly (NaN, missing values): %11d' % np.isnan(data['dd']).sum()
             in out)
 
+    # test NaN filter of other columns
+    data.loc[ffo['good'][0], 'rand'] = np.nan
+    ffo3 = foehnix_filter(data, filter_method={'dd': [90, 270]})
+    npt.assert_array_equal(ffo['bad'], ffo3['bad'])
+    npt.assert_equal(ffo['total'], ffo3['total'])
+    with pytest.raises(AssertionError):
+        npt.assert_array_equal(ffo['good'], ffo3['good'])
+    with pytest.raises(AssertionError):
+        npt.assert_array_equal(ffo['ugly'], ffo3['ugly'])
+
+    # with specified columns
+    ffo4 = foehnix_filter(data, filter_method={'dd': [90, 270]},
+                          cols=['dd'])
+    for key in ffo.keys():
+        npt.assert_array_equal(ffo4[key], ffo[key])
+
 
 def test_multi_filter(data):
     # only use very high wind speeds for example
