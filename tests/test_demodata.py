@@ -1,11 +1,9 @@
 import pytest
 import numpy as np
 import numpy.testing as npt
-from copy import deepcopy
 import pandas as pd
 import os
 import hashlib
-import sys
 
 from foehnix import get_demodata, Foehnix
 
@@ -13,11 +11,12 @@ from foehnix import get_demodata, Foehnix
 DDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DDir = os.path.join(DDir, 'data/')
 
+# Note: Reto said md5 sums could cause problems under Windows. If so use this
+# wrapper to skip these test under Windows.
 # nowindows = pytest.mark.skipif(sys.platform == 'win32',
-#                               reason='md5 hashsums are calculated
-#                                      'differently under Windows')
+#                              reason='md5 hashsums cause problems in Windows')
 # usage: @nowindows
-#        def foo():
+#        def test_xxx():
 
 
 def test_md5():
