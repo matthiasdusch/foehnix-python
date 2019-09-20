@@ -136,3 +136,5 @@ def tmpfile(tmp_path):
     path = tmp_path / 'tmp'
     path.mkdir()
     tmpfile = path / 'out.csv'
+
+    return tmpfile

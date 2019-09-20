@@ -42,6 +42,7 @@ def get_demodata(which):
     if which.lower() in ['ellboegen', 'sattelberg', 'viejas', 'luckyfive']:
         data = pd.read_csv(os.path.join(wd, '%s.csv' % which.lower()),
                            delimiter=';', skipinitialspace=True)
+        data.index = pd.to_datetime(data.timestamp, unit='s')
         return data
 
     elif which.lower() == 'tyrol':
