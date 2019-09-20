@@ -449,7 +449,7 @@ class Foehnix:
         # EM algorithm: estimate probabilities (prob; E-step), update the model
         # given the new probabilities (M-step). Always with respect to the
         # selected family.
-        i = 0  # iteration variable
+        i = 1  # iteration variable
         delta = 1  # likelihood difference between to iteration: break criteria
         converged = True  # Set to False if we do not converge before maxit
 
@@ -479,7 +479,7 @@ class Foehnix:
                 raise RuntimeError('Likelihood got NaN!')
 
             # update liklihood difference
-            if i > 0:
+            if i > 1:
                 delta = llpath.iloc[-1].full - llpath.iloc[-2].full
 
             # increase iteration variable
@@ -512,7 +512,7 @@ class Foehnix:
                  'loglikpath': llpath,
                  'coefpath': coefpath,
                  'converged': converged,
-                 'iter': i}
+                 'iter': i-1}
 
         self.optimizer = fdict
 
