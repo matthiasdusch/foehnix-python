@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>foehnix.foehnix_filter &#8212; foehnix-python 0.0.9 documentation</title>
+    <title>foehnix.foehnix_filter &#8212; foehnix-python 0.1.2 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -38,7 +38,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           foehnix-python</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.9</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -89,7 +89,7 @@
 <h1>foehnix.foehnix_filter<a class="headerlink" href="#foehnix-foehnix-filter" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="foehnix.foehnix_filter">
-<code class="descclassname">foehnix.</code><code class="descname">foehnix_filter</code><span class="sig-paren">(</span><em>x</em>, <em>filter_method=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/foehnix_filter.html#foehnix_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.foehnix_filter" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">foehnix.</code><code class="descname">foehnix_filter</code><span class="sig-paren">(</span><em>x</em>, <em>filter_method=None</em>, <em>cols=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/foehnix_filter.html#foehnix_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.foehnix_filter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluates Data Filter Rules for foehnix Mixture Model Calls</p>
 <p><a class="reference internal" href="foehnix.Foehnix.html#foehnix.Foehnix" title="foehnix.Foehnix"><code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.Foehnix</span></code></a> models allow to specify an optional
 <a class="reference internal" href="#foehnix.foehnix_filter" title="foehnix.foehnix_filter"><code class="xref py py-func docutils literal notranslate"><span class="pre">foehnix.foehnix_filter()</span></code></a>. If a filter is given only a subset of
@@ -127,6 +127,11 @@ direction range at a crest station. Example:</p>
 <li><cite>dict</cite>: Keys must be columns of <code class="docutils literal notranslate"><span class="pre">x</span></code>, values can either be a custom
 function on <code class="docutils literal notranslate"><span class="pre">x[key]</span></code> or a list of length two.</li>
 </ul>
+</dd>
+<dt><strong>cols</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of strings</span></dt>
+<dd><p class="first last">These strings must be contained in the columns of <code class="docutils literal notranslate"><span class="pre">x</span></code> and specify
+which columns are not allowed to contain missing values.
+If <cite>None</cite> is passed, all elements have to be non-missing.</p>
 </dd>
 </dl>
 </td>

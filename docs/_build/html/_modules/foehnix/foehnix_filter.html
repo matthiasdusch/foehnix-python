@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>foehnix.foehnix_filter &#8212; foehnix-python 0.0.9 documentation</title>
+    <title>foehnix.foehnix_filter &#8212; foehnix-python 0.1.2 documentation</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -36,7 +36,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           foehnix-python</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.9</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -115,7 +115,7 @@
                            <span class="s2">&quot; or ``nan`` values.&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="foehnix_filter"><a class="viewcode-back" href="../../generated/foehnix.foehnix_filter.html#foehnix.foehnix_filter">[docs]</a><span class="k">def</span> <span class="nf">foehnix_filter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">filter_method</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="foehnix_filter"><a class="viewcode-back" href="../../generated/foehnix.foehnix_filter.html#foehnix.foehnix_filter">[docs]</a><span class="k">def</span> <span class="nf">foehnix_filter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">filter_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluates Data Filter Rules for foehnix Mixture Model Calls</span>
 
@@ -158,6 +158,10 @@
 <span class="sd">        - `func`: A custom function which will be applied on ``x``</span>
 <span class="sd">        - `dict`: Keys must be columns of ``x``, values can either be a custom</span>
 <span class="sd">          function on ``x[key]`` or a list of length two.</span>
+<span class="sd">    cols : list of strings</span>
+<span class="sd">        These strings must be contained in the columns of ``x`` and specify</span>
+<span class="sd">        which columns are not allowed to contain missing values.</span>
+<span class="sd">        If `None` is passed, all elements have to be non-missing.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -238,9 +242,20 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Filter method not understood&#39;</span><span class="p">)</span>
 
+    <span class="c1"># Set rows with missing values to NaN according to cols parameter:</span>
+    <span class="k">if</span> <span class="n">cols</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">isnan</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">isnan</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">filtered</span><span class="p">[</span><span class="n">isnan</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
     <span class="n">good</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">filtered</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
     <span class="n">bad</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">filtered</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
     <span class="n">ugly</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">filtered</span><span class="p">)]</span>
+
+    <span class="c1"># check filter length</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filtered</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeWarning</span><span class="p">(</span><span class="s1">&#39;Filter did not return expected length!&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;good&#39;</span><span class="p">:</span> <span class="n">good</span><span class="p">,</span>
             <span class="s1">&#39;bad&#39;</span><span class="p">:</span> <span class="n">bad</span><span class="p">,</span>

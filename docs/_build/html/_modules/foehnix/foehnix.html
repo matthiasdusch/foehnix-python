@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>foehnix.foehnix &#8212; foehnix-python 0.0.9 documentation</title>
+    <title>foehnix.foehnix &#8212; foehnix-python 0.1.2 documentation</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -36,7 +36,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           foehnix-python</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.9</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -356,7 +356,8 @@
         <span class="n">idx_notnan</span> <span class="o">=</span> <span class="n">subset</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">index</span>
 
         <span class="c1"># Apply foehnix filter</span>
-        <span class="n">filter_obj</span> <span class="o">=</span> <span class="n">foehnix_filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">filter_method</span><span class="o">=</span><span class="n">filter_method</span><span class="p">)</span>
+        <span class="n">filter_obj</span> <span class="o">=</span> <span class="n">foehnix_filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">filter_method</span><span class="o">=</span><span class="n">filter_method</span><span class="p">,</span>
+                                    <span class="n">cols</span><span class="o">=</span><span class="n">concomitant</span> <span class="o">+</span> <span class="p">[</span><span class="n">predictor</span><span class="p">])</span>
 
         <span class="c1"># Take all elements which are not NaN and which are within</span>
         <span class="c1"># filter_obj[&#39;good&#39;]</span>
