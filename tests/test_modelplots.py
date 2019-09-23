@@ -60,6 +60,15 @@ def test_loglikcontri(tyr_mod1):
     npt.assert_array_equal(x, tyr_mod1.optimizer['loglikpath'].index)
 
 
+def test_histogram(tyr_mod1):
+    plt.cla()
+    plt.clf()
+    plt.close()
+    tyr_mod1.plot('hist')
+    # title
+    assert 'Conditional Histogram' in plt.gca().get_title()
+
+
 @pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_coef(tyr_mod1, tyr_mod2):
     # with a logarithmic scale
@@ -79,10 +88,3 @@ def test_coef(tyr_mod1, tyr_mod2):
     assert len(plt.gcf().axes) == 2
 
 
-def test_histogram(tyr_mod1):
-    plt.cla()
-    plt.clf()
-    plt.close()
-    tyr_mod1.plot('hist')
-    # title
-    assert 'Conditional Histogram' in plt.gca().get_title()
