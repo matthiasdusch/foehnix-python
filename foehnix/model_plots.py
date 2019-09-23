@@ -147,6 +147,7 @@ def hist(fmm):
         y = np.minimum(y, fmm.control.right)
 
     print('travis trace 3')
+    print('len y = %d' % len(y))
     if len(y) > 0:
         print('travis trace 4')
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))

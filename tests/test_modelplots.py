@@ -70,7 +70,6 @@ def test_loglikcontri(tyr_mod1):
     npt.assert_array_equal(x, tyr_mod1.optimizer['loglikpath'].index)
 
 
-
 @pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_coef(tyr_mod1, tyr_mod2):
     # with a logarithmic scale
@@ -88,5 +87,3 @@ def test_coef(tyr_mod1, tyr_mod2):
     npt.assert_array_equal(x, tyr_mod2.optimizer['coefpath'].index)
     # with concomitant -> 2 axes
     assert len(plt.gcf().axes) == 2
-
-
