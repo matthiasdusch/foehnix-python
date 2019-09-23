@@ -28,6 +28,15 @@ def test_plot_api(caplog, tyr_mod1):
             caplog.records[-1].message)
 
 
+def test_histogram(tyr_mod1):
+    plt.cla()
+    plt.clf()
+    plt.close()
+    tyr_mod1.plot('hist')
+    # title
+    assert 'Conditional Histogram' in plt.gca().get_title()
+
+
 @pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_loglik(tyr_mod1):
     # with a logarithmic scale
@@ -59,14 +68,6 @@ def test_loglikcontri(tyr_mod1):
     x = plt.gca().get_lines()[-1].get_xydata()[:, 0]
     npt.assert_array_equal(x, tyr_mod1.optimizer['loglikpath'].index)
 
-
-def test_histogram(tyr_mod1):
-    plt.cla()
-    plt.clf()
-    plt.close()
-    tyr_mod1.plot('hist')
-    # title
-    assert 'Conditional Histogram' in plt.gca().get_title()
 
 
 @pytest.mark.filterwarnings('ignore::RuntimeWarning')
