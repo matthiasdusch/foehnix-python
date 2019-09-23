@@ -7,14 +7,6 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 
 
-def test_histogram(tyr_mod1):
-    print('travis trace 1')
-    print('tyr prob.dtypes', tyr_mod1.prob.dtypes)
-    tyr_mod1.plot('hist')
-    # title
-    assert 'Conditional Histogram' in plt.gca().get_title()
-
-
 def test_plot_api(caplog, tyr_mod1):
     # Test some wrong inputs to the plot API
 
@@ -86,4 +78,10 @@ def test_coef(tyr_mod1, tyr_mod2):
     # with concomitant -> 2 axes
     assert len(plt.gcf().axes) == 2
 
+
+def test_histogram(tyr_mod1):
+    # make a histogram plot
+    tyr_mod1.plot('hist')
+    # title
+    assert 'Conditional Histogram' in plt.gca().get_title()
 

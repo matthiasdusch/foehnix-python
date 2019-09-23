@@ -132,8 +132,6 @@ def hist(fmm):
     fmm : :py:class:`foehnix.Foehnix`
         A foehnix mixture model object
     """
-
-    print('travis trace 2')
     # exclude missing values
     idx = fmm.prob.flag[fmm.prob.flag == 1].dropna().index
     # get y and probability
@@ -146,13 +144,7 @@ def hist(fmm):
     if np.isfinite(fmm.control.right):
         y = np.minimum(y, fmm.control.right)
 
-    print('travis trace 3')
-    print('fmm prob.dtypes', fmm.prob.dtypes)
-    print('fmm prob flag::::::', fmm.prob.flag)
-    print('fmm prob flag == 1:::::', fmm.prob.flag[fmm.prob.flag == 1])
-    print('fmm prob flag == 1:::::', fmm.prob.loc[fmm.prob.flag == 1, 'flag'])
     if len(y) > 0:
-        print('travis trace 4')
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
 
         at = np.linspace(y.min(), y.max(), 501)

@@ -416,8 +416,6 @@ class Foehnix:
 
         # store in self
         self.prob = tmp.copy()
-        print('self.prob.dtypes:\n', self.prob.dtypes)
-        assert self.prob.dtypes.all() == 'float64'
 
         # Store execution time in seconds
         self.time = time.time() - start_time

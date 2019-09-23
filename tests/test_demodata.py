@@ -4,6 +4,7 @@ import numpy.testing as npt
 import pandas as pd
 import os
 import hashlib
+from copy import deepcopy
 
 from foehnix import get_demodata, Foehnix
 
@@ -64,23 +65,25 @@ def prob_to_csv(fmo, fpath):
     fmo : Foehnix class object
     fpath : PosixPath to the csv file
     """
+    fmo_out = deepcopy(fmo)
     # Format the flag as Integer with 4 characters
-    fmo.prob['flag'] = fmo.prob['flag']. \
+    fmo_out.prob['flag'] = fmo_out.prob['flag']. \
         map(lambda x: '%5d' % x if not pd.isna(x) else '%5s' % 'NA')
 
     # Format the timestamp as Unix time
-    fmo.prob.index = (fmo.prob.index.astype(np.int64)/1e9).astype(int)
+    fmo_out.prob.index = (fmo_out.prob.index.astype(np.int64)/1e9).astype(int)
 
     # Format the index and header label
     index_label = '%10s' % 'timestamp'
-    header = fmo.prob.columns.tolist()
+    header = fmo_out.prob.columns.tolist()
     header[0] = '%7s' % header[0]
     header[1] = '%5s' % header[1]
 
     # write probability output to file an check csv
-    fpath.write_text(fmo.prob.to_csv(float_format='%7.3f', na_rep='%7s' % 'NA',
-                                     sep=';', header=header,
-                                     index_label=index_label))
+    fpath.write_text(fmo_out.prob.to_csv(float_format='%7.3f',
+                                         na_rep='%7s' % 'NA',
+                                         sep=';', header=header,
+                                         index_label=index_label))
 
 
 def test_tyrol(tmpfile, tyr_mod1, tyr_mod2):
