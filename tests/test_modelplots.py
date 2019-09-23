@@ -1,9 +1,6 @@
 import pytest
 import numpy as np
 import numpy.testing as npt
-import pandas as pd
-import logging
-from copy import deepcopy
 import matplotlib.pyplot as plt
 
 
@@ -84,4 +81,3 @@ def test_histogram(tyr_mod1):
     tyr_mod1.plot('hist')
     # title
     assert 'Conditional Histogram' in plt.gca().get_title()
-

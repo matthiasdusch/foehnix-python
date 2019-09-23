@@ -5,11 +5,12 @@ from scipy.stats import logistic, norm
 import time
 from copy import deepcopy
 
+import foehnix
 from foehnix.families import Family, initialize_family
 from foehnix.foehnix_filter import foehnix_filter
 from foehnix.iwls_logit import iwls_logit, iwls_summary
 import foehnix.foehnix_functions as func
-from foehnix import model_plots, timeseries_plots
+from foehnix import model_plots, analysis_lots
 
 # logger
 log = logging.getLogger(__name__)
@@ -87,9 +88,13 @@ class Control:
             logging_level = 'DEBUG'
         else:
             raise ValueError("Verbose must be one of True, False or 'DEBUG'.")
+
         logging.basicConfig(format='%(asctime)s: %(name)s: %(message)s',
                             datefmt='%Y-%m-%d %H:%M:%S',
                             level=getattr(logging, logging_level))
+
+        # keep matplotlib logger at original level or it'll get noisy at DEBUG
+        logging.getLogger('matplotlib').setLevel(30)
 
         # Check limits for censoring/truncation
         if np.isfinite([left, right]).any():
@@ -820,9 +825,9 @@ class Foehnix:
             elif i == 'hist':
                 model_plots.hist(self)
             elif i == 'timeseries':
-                timeseries_plots.tsplot(self, **kwargs)
+                analysis_lots.tsplot(self, **kwargs)
             elif i == 'image':
-                timeseries_plots.image(self, **kwargs)
+                analysis_lots.image(self, **kwargs)
 
             else:
                 log.critical('Skipping "%s", not a valid plot argument' % i)
