@@ -79,8 +79,10 @@ def test_coef(tyr_mod1, tyr_mod2):
     assert len(plt.gcf().axes) == 2
 
 
-@pytest.mark.filterwarnings('ignore::RuntimeWarning')
 def test_histogram(tyr_mod1):
+    plt.cla()
+    plt.clf()
+    plt.close()
     tyr_mod1.plot('hist')
     # title
     assert 'Conditional Histogram' in plt.gca().get_title()
