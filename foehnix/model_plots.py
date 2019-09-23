@@ -147,7 +147,7 @@ def hist(fmm):
         y = np.minimum(y, fmm.control.right)
 
     print('travis trace 3')
-    print('fmm prob', fmm.prob)
+    print('fmm prob.dtypes', fmm.prob.dtypes)
     print('fmm prob flag::::::', fmm.prob.flag)
     print('fmm prob flag == 1:::::', fmm.prob.flag[fmm.prob.flag == 1])
     print('fmm prob flag == 1:::::', fmm.prob.loc[fmm.prob.flag == 1, 'flag'])
