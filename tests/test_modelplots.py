@@ -8,9 +8,6 @@ import matplotlib.pyplot as plt
 
 
 def test_histogram(tyr_mod1):
-    plt.cla()
-    plt.clf()
-    plt.close()
     print('travis trace 1')
     print('tyr prob.dtypes', tyr_mod1.prob.dtypes)
     tyr_mod1.plot('hist')
