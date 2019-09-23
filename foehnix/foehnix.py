@@ -449,7 +449,7 @@ class Foehnix:
         # EM algorithm: estimate probabilities (prob; E-step), update the model
         # given the new probabilities (M-step). Always with respect to the
         # selected family.
-        i = 1  # iteration variable
+        i = 0  # iteration variable
         delta = 1  # likelihood difference between to iteration: break criteria
         converged = True  # Set to False if we do not converge before maxit
 
@@ -459,6 +459,13 @@ class Foehnix:
         llpath = pd.DataFrame([], columns=['component', 'concomitant', 'full'])
 
         while delta > control.tol_em:
+            # check if we converged
+            if (i > 0) and (i == control.maxit_em):
+                converged = False
+                break
+            # increase iteration variable, here to store 1st iteration as 1
+            i += 1
+
             # M-step: update probabilites and theta
             prob = np.mean(post)
             # theta = control.family.theta(y, post, theta=theta)
@@ -482,14 +489,6 @@ class Foehnix:
             if i > 1:
                 delta = llpath.iloc[-1].full - llpath.iloc[-2].full
 
-            # increase iteration variable
-            i += 1
-
-            # check if we converged
-            if i == control.maxit_em:
-                converged = False
-                break
-
         # If converged, remove last likelihood and coefficient entries
         if converged:
             llpath = llpath.iloc[:-1]
@@ -512,7 +511,7 @@ class Foehnix:
                  'loglikpath': llpath,
                  'coefpath': coefpath,
                  'converged': converged,
-                 'iter': i-1}
+                 'iter': i}
 
         self.optimizer = fdict
 
@@ -560,7 +559,7 @@ class Foehnix:
         # EM algorithm: estimate probabilities (prob; E-step), update the model
         # given the new probabilities (M-step). Always with respect to the
         # selected family.
-        i = 1  # iteration variable
+        i = 0  # iteration variable
         delta = 1  # likelihood difference between to iteration: break criteria
         converged = True  # Set to False if we do not converge before maxit
 
@@ -571,6 +570,14 @@ class Foehnix:
         llpath = pd.DataFrame([], columns=['component', 'concomitant', 'full'])
 
         while delta > control.tol_em:
+            # check if we converged
+            if (i > 0) and (i == control.maxit_em):
+                converged = False
+                break
+
+            # increase iteration variable, here to store 1st iteration as 1
+            i += 1
+
             # M-step: update probabilites and theta
             ccmodel = iwls_logit(logitx, post, beta=ccmodel['beta'],
                                  standardize=False,
@@ -594,14 +601,6 @@ class Foehnix:
             if i > 1:
                 delta = llpath.iloc[-1].full - llpath.iloc[-2].full
 
-            # increase iteration variable
-            i += 1
-
-            # check if we converged
-            if i == control.maxit_em:
-                converged = False
-                break
-
         # If converged, remove last likelihood and coefficient entries
         if converged:
             llpath = llpath.iloc[:-1]
@@ -624,7 +623,7 @@ class Foehnix:
                  'loglikpath': llpath,
                  'coefpath': coefpath,
                  'converged': converged,
-                 'iter': i-1}
+                 'iter': i}
 
         self.optimizer = fdict
 
