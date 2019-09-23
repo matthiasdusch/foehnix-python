@@ -410,12 +410,14 @@ class Foehnix:
                            dtype=float)
         # Store a-posteriory probability and flag = TRUE
         tmp.loc[idx_take, 'prob'] = self.optimizer['post'].reshape(len(y))
-        tmp.loc[idx_take, 'flag'] = 1
+        tmp.loc[idx_take, 'flag'] = 1.0
         # Store prob = 0 and flag=0 where removed due to filter rule
-        tmp.loc[filter_obj['bad']] = 0
+        tmp.loc[filter_obj['bad']] = 0.0
 
         # store in self
         self.prob = tmp.copy()
+
+        print('self.prob.dtypes:\n', self.prob.dtypes)
 
         # Store execution time in seconds
         self.time = time.time() - start_time
