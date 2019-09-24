@@ -59,6 +59,6 @@ Plotting
     foehnix.model_plots.loglikcontribution
     foehnix.model_plots.coef
     foehnix.model_plots.hist
-    foehnix.timeseries_plots.TSControl
-    foehnix.timeseries_plots.tsplot
-    foehnix.timeseries_plots.image
+    foehnix.analysis_plots.TSControl
+    foehnix.analysis_plots.tsplot
+    foehnix.analysis_plots.image

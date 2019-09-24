@@ -115,8 +115,9 @@ def coef(fmm, log=True):
         ylim = [conc.values.min(), conc.values.max()] +\
                np.array([-0.05, 0.15]) * (conc.values.max() -
                                           conc.values.min())
-        conc.plot(ax=ax1, color=['k', 'xkcd:coral'], style=['-', '--'])
-        ax1.set(xlabel=xlabel, title='coefficient path (components)',
+        conc.plot(ax=ax1, color=['k', 'xkcd:coral', 'xkcd:green'],
+                  style=['-', '--', '--'])
+        ax1.set(xlabel=xlabel, title='coefficient path (concomitants)',
                 ylabel='concomitant coefficients (standardized)', ylim=ylim)
         ax1.legend(loc=1, ncol=4)
 

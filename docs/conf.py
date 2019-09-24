@@ -155,7 +155,7 @@ html_theme_options = {
     # Note the "1" or "True" value above as the third argument to indicate
     # an arbitrary url.
     'navbar_links': [
-        ("Getting started", "foehnix-demo"),
+        ("Getting started", "ellboegen"),
         ("API reference", "api"),
         ("foehnix R package", "https://retostauffer.github.io/Rfoehnix", True),
         #    ("Link", "http://example.com", True),

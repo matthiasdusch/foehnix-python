@@ -55,7 +55,7 @@ def _var_not_found_message(var):
                  'the variable name does not match the default variable name.'
                  'Default names can be changed by passing a userdict or '
                  'keyword arguments like ``ff="windspd"``. See '
-                 ':py:class:`foehnix.timeseries_plots.TSControl` for further '
+                 ':py:class:`foehnix.analysis_plots.TSControl` for further '
                  'details.' % var)
 
 
@@ -98,7 +98,7 @@ class TSControl:
             initialize a default control but change the column name from
             `ff` to `windspd`. These keyword arguments can also directly passed
             to the main plotting function
-            :py:func:`foehnix.timeseries_plots.tsplot`. E.g.:
+            :py:func:`foehnix.analysis_plots.tsplot`. E.g.:
             ``tsplot(fmm, dd='winddir')``.
         """
 
@@ -198,7 +198,7 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, showplot=True,
         Must be within the daterange of fmm.data.
     ndays : int
         Number of days which one plot shows. Default 10.
-    tscontrol : :py:class:`foehnix.timeseries_plots.TSControl` object
+    tscontrol : :py:class:`foehnix.analysis_plots.TSControl` object
         Can be predefined before calling this function or else will be
         initialized if None (default).
     showplot : bool
@@ -221,13 +221,13 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, showplot=True,
     userdict : dict
         alternative plotting parameters (variable names, colors, labels) which
         will be passed to TSControl. See
-        :py:class:`foehnix.timeseries_plots.TSControl` for more details.
+        :py:class:`foehnix.analysis_plots.TSControl` for more details.
         If a suitable ``tscontrol`` argument is provided this dict will be
         ignored.
     kwargs
         will be passed to TSControl and can be used to rename the variable
         names of the ``fmm.data`` DataFrame. See
-        :py:class:`foehnix.timeseries_plots.TSControl` for more details.
+        :py:class:`foehnix.analysis_plots.TSControl` for more details.
         If a suitable ``tscontrol`` argument is provided these argumetns will
         be ignored.
     """
@@ -455,7 +455,7 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, showplot=True,
 
 def image(fmm, fun='freq', deltat=None, deltad=7,
           cmap=cm.get_cmap('Greys', 20), contours=False, contour_color='k',
-          contour_levels=10, contour_labels=False, clabel_format="%.0f",
+          contour_levels=10, contour_labels=False, clabel_format="%.2f",
           clabel_size=8, showplot=True, saveplot=False, savedir='',
           savefilename='foehnix_hovmoeller.png', **kwargs):
     """
@@ -494,8 +494,8 @@ def image(fmm, fun='freq', deltat=None, deltad=7,
     contour_labels : bool
         Default ``False``. If ``True`` contour labels will be added.
     clabel_format : str
-        Formatstring for the contour labels. Default ``"%.0f"`` Switch to
-        ``"%.2f"`` to show to decimal digits.
+        Formatstring for the contour labels. Default ``"%.2f"`` Switch to
+        ``"%.0f"`` to show no decimal digits.
     clabel_size : int
         Fontsize of the contour lables. Default 8.
     showplot : bool

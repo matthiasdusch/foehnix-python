@@ -4,6 +4,7 @@
 [![Build Status](https://travis-ci.com/matthiasdusch/foehnix-python.svg?branch=master)](https://travis-ci.com/matthiasdusch/foehnix-python)
 [![codecov](https://codecov.io/gh/matthiasdusch/foehnix-python/branch/master/graph/badge.svg)](https://codecov.io/gh/matthiasdusch/foehnix-python)
 [![Repository Status](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/badges/latest/wip.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # A Toolbox for Automated Foehn Classification based on Mixture Models
 

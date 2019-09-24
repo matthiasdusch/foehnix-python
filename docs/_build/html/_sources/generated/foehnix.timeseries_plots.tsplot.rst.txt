@@ -1,6 +1,0 @@
-foehnix.timeseries\_plots.tsplot
-================================
-
-.. currentmodule:: foehnix.timeseries_plots
-
-.. autofunction:: tsplot
