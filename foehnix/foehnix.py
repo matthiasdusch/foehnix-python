@@ -5,11 +5,12 @@ from scipy.stats import logistic, norm
 import time
 from copy import deepcopy
 
+import foehnix
 from foehnix.families import Family, initialize_family
 from foehnix.foehnix_filter import foehnix_filter
 from foehnix.iwls_logit import iwls_logit, iwls_summary
 import foehnix.foehnix_functions as func
-from foehnix import model_plots, timeseries_plots
+from foehnix import model_plots, analysis_plots
 
 # logger
 log = logging.getLogger(__name__)
@@ -87,9 +88,13 @@ class Control:
             logging_level = 'DEBUG'
         else:
             raise ValueError("Verbose must be one of True, False or 'DEBUG'.")
+
         logging.basicConfig(format='%(asctime)s: %(name)s: %(message)s',
                             datefmt='%Y-%m-%d %H:%M:%S',
                             level=getattr(logging, logging_level))
+
+        # keep matplotlib logger at original level or it'll get noisy at DEBUG
+        logging.getLogger('matplotlib').setLevel(30)
 
         # Check limits for censoring/truncation
         if np.isfinite([left, right]).any():
@@ -410,9 +415,9 @@ class Foehnix:
                            dtype=float)
         # Store a-posteriory probability and flag = TRUE
         tmp.loc[idx_take, 'prob'] = self.optimizer['post'].reshape(len(y))
-        tmp.loc[idx_take, 'flag'] = 1
+        tmp.loc[idx_take, 'flag'] = 1.0
         # Store prob = 0 and flag=0 where removed due to filter rule
-        tmp.loc[filter_obj['bad']] = 0
+        tmp.loc[filter_obj['bad']] = 0.0
 
         # store in self
         self.prob = tmp.copy()
@@ -459,6 +464,13 @@ class Foehnix:
         llpath = pd.DataFrame([], columns=['component', 'concomitant', 'full'])
 
         while delta > control.tol_em:
+            # check if we converged
+            if (i > 0) and (i == control.maxit_em):
+                converged = False
+                break
+            # increase iteration variable, here to store 1st iteration as 1
+            i += 1
+
             # M-step: update probabilites and theta
             prob = np.mean(post)
             # theta = control.family.theta(y, post, theta=theta)
@@ -479,16 +491,8 @@ class Foehnix:
                 raise RuntimeError('Likelihood got NaN!')
 
             # update liklihood difference
-            if i > 0:
+            if i > 1:
                 delta = llpath.iloc[-1].full - llpath.iloc[-2].full
-
-            # increase iteration variable
-            i += 1
-
-            # check if we converged
-            if i == control.maxit_em:
-                converged = False
-                break
 
         # If converged, remove last likelihood and coefficient entries
         if converged:
@@ -560,7 +564,7 @@ class Foehnix:
         # EM algorithm: estimate probabilities (prob; E-step), update the model
         # given the new probabilities (M-step). Always with respect to the
         # selected family.
-        i = 1  # iteration variable
+        i = 0  # iteration variable
         delta = 1  # likelihood difference between to iteration: break criteria
         converged = True  # Set to False if we do not converge before maxit
 
@@ -571,6 +575,14 @@ class Foehnix:
         llpath = pd.DataFrame([], columns=['component', 'concomitant', 'full'])
 
         while delta > control.tol_em:
+            # check if we converged
+            if (i > 0) and (i == control.maxit_em):
+                converged = False
+                break
+
+            # increase iteration variable, here to store 1st iteration as 1
+            i += 1
+
             # M-step: update probabilites and theta
             ccmodel = iwls_logit(logitx, post, beta=ccmodel['beta'],
                                  standardize=False,
@@ -594,14 +606,6 @@ class Foehnix:
             if i > 1:
                 delta = llpath.iloc[-1].full - llpath.iloc[-2].full
 
-            # increase iteration variable
-            i += 1
-
-            # check if we converged
-            if i == control.maxit_em:
-                converged = False
-                break
-
         # If converged, remove last likelihood and coefficient entries
         if converged:
             llpath = llpath.iloc[:-1]
@@ -624,7 +628,7 @@ class Foehnix:
                  'loglikpath': llpath,
                  'coefpath': coefpath,
                  'converged': converged,
-                 'iter': i-1}
+                 'iter': i}
 
         self.optimizer = fdict
 
@@ -821,9 +825,9 @@ class Foehnix:
             elif i == 'hist':
                 model_plots.hist(self)
             elif i == 'timeseries':
-                timeseries_plots.tsplot(self, **kwargs)
+                analysis_plots.tsplot(self, **kwargs)
             elif i == 'image':
-                timeseries_plots.image(self, **kwargs)
+                analysis_plots.image(self, **kwargs)
 
             else:
                 log.critical('Skipping "%s", not a valid plot argument' % i)

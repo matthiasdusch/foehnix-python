@@ -4,12 +4,59 @@ from matplotlib import cm
 import numpy as np
 import pandas as pd
 import logging
+import os
 
 import foehnix
 
 
 # logger
 log = logging.getLogger(__name__)
+
+
+def _save_foehnixplots(fig, saveplot, savedir, savefilename, nr=None):
+    """
+    Helper function to save fohenix plots to disc
+
+    Parameters
+    ----------
+    fig: `matplotlib.pyplot.figure`
+        The figure to save
+    saveplot : bool
+        If False, this will do nothing
+    savedir : str
+        Path to a directory where plots should be saved
+    savefilename : str
+        Filename of the graphic, must contain a file format (e.g. 'plot.png')
+    nr : int
+        If not None (default) this will be added as a filename suffix.
+
+    Returns
+    -------
+
+    """
+    if saveplot is True:
+        if not os.path.exists(savedir):
+            raise IOError('The specified directory to save the Foehnix '
+                          'plots can not be found or does not exist.')
+
+        if nr is not None:
+            suffix = '_%02d.' % nr
+        else:
+            suffix = '.'
+        ext = savefilename.split('.')[-1]
+        fname = os.path.join(savedir, savefilename.split(
+            '.%s' % ext)[0] + suffix + ext)
+
+        fig.savefig(fname)
+
+
+def _var_not_found_message(var):
+    log.critical('Variable >> %s << not found in the data. Probable reason is '
+                 'the variable name does not match the default variable name.'
+                 'Default names can be changed by passing a userdict or '
+                 'keyword arguments like ``ff="windspd"``. See '
+                 ':py:class:`foehnix.timeseries_plots.TSControl` for further '
+                 'details.' % var)
 
 
 class TSControl:
@@ -69,18 +116,18 @@ class TSControl:
             userdict = {}
 
         for key in userdict.keys():
-            try:
+            if key in ctrldict:
                 ctrldict[key] = userdict[key]
-            except KeyError:
-                log.critical('KeyError %s not valid. Default values will be '
-                             'used instead.')
+            else:
+                log.critical('Key "%s" not valid. Default values will be '
+                             'used instead.' % key)
 
         for key in kwargs.keys():
-            try:
+            if key in ctrldict:
                 ctrldict[key][0] = kwargs[key]
-            except KeyError:
-                log.critical('KeyError %s not valid. Default values will be '
-                             'used instead.')
+            else:
+                log.critical('Kwarg "%s" not valid. Default values will be '
+                             'used instead.' % key)
 
         # create a dict deciding which variables to plot
         doplot = {'0_temp': [],
@@ -88,21 +135,40 @@ class TSControl:
                   '2_wind': [],
                   '3_prob': []}
 
+        # temperature/humidity plot
         if ctrldict['t'][0] in fmm.data:
             doplot['0_temp'].append('t')
+        elif ('t' in kwargs) or ('t' in userdict):
+            _var_not_found_message(ctrldict['t'][0])
+
         if ctrldict['rh'][0] in fmm.data:
             doplot['0_temp'].append('rh')
+        elif ('rh' in kwargs) or ('rh' in userdict):
+            _var_not_found_message(ctrldict['rh'][0])
 
+        # temperature difference plot
         if ctrldict['diff_t'][0] in fmm.data:
             doplot['1_dT'].append('diff_t')
+        elif ('diff_t' in kwargs) or ('diff_t' in userdict):
+            _var_not_found_message(ctrldict['diff_t'][0])
 
+        # wind speed/dir plot
         if ctrldict['dd'][0] in fmm.data:
             doplot['2_wind'].append('dd')
+        elif ('dd' in kwargs) or ('dd' in userdict):
+            _var_not_found_message(ctrldict['dd'][0])
+
         if ctrldict['ff'][0] in fmm.data:
             doplot['2_wind'].append('ff')
+        elif ('ff' in kwargs) or ('ff' in userdict):
+            _var_not_found_message(ctrldict['ff'][0])
+
         if ctrldict['ffx'][0] in fmm.data:
             doplot['2_wind'].append('ffx')
+        elif ('ffx' in kwargs) or ('ffx' in userdict):
+            _var_not_found_message(ctrldict['ffx'][0])
 
+        # probability plot
         if 'prob' in fmm.prob:
             doplot['3_prob'].append('prob')
 
@@ -110,21 +176,13 @@ class TSControl:
         doplot = {k: v for k, v in doplot.items() if v != []}
 
         self.subplots = len(doplot)
-        if self.subplots == 0:
-            raise ValueError('Cannot find any of the required variables! One '
-                             'reason: your variable names do not match any of '
-                             'the default variable names. Default names can '
-                             'changed with passing a userdict or '
-                             'keyword arguments like ``ff="windspd"``. See '
-                             ':py:class:`foehnix.timeseries_plots.TSControl` '
-                             'for further details.')
-
         self.ctrldict = ctrldict
         self.doplot = doplot
 
 
-def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, show_n_plots=3,
-           userdict=None, **kwargs):
+def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, showplot=True,
+           show_n_plots=3, saveplot=False, savedir='',
+           savefilename='foehnix_timeseries.png', userdict=None, **kwargs):
     """
     Time series plot for foehnix models
 
@@ -143,9 +201,23 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, show_n_plots=3,
     tscontrol : :py:class:`foehnix.timeseries_plots.TSControl` object
         Can be predefined before calling this function or else will be
         initialized if None (default).
+    showplot : bool
+        If True (default) plots will be shown. If False, they can be shown by
+        the user with `plt.show()` at a later stage.
     show_n_plots : int
         How many figures will be opened, default is 1. After closing all, the
         next ones will be opened.
+    saveplot : bool
+        If False (default) plots will not be saved to disc
+        If True, all plots will be saved to ``savedir`` which must be provided
+        as well.
+    savedir : str
+        Path to a directory where the plots are saved to. Mandatory if
+        ``saveplots=True``.
+    savefilename : str
+        Filename of the saved plot. Will be extended by a running number if
+        multiple plots are saved. Can be used to specify the file format:
+        e.g. use "foehnix_timeseries.pdf" to save the plots as PDF.
     userdict : dict
         alternative plotting parameters (variable names, colors, labels) which
         will be passed to TSControl. See
@@ -160,13 +232,13 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, show_n_plots=3,
         be ignored.
     """
 
+    if not isinstance(fmm, foehnix.Foehnix):
+        raise AttributeError('First Attribute must be a foehnix mixture model '
+                             'instance.')
+
     # If no control object is provided: Use default one.
     if not isinstance(tscontrol, TSControl):
         tscontrol = TSControl(fmm, userdict=userdict, **kwargs)
-
-    if not isinstance(fmm, foehnix.Foehnix):
-        raise AttributeError('First Attribute must be a foehnix mixture model '
-                             ' instance.')
 
     # difference between time steps
     dt = fmm.data.index.to_series().diff().min()
@@ -281,7 +353,7 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, show_n_plots=3,
                         max()+0.5)
                 if np.isnan(ylim).any():
                     ylim = (0, 1)
-                axs[j].set(ylabel=tscontrol.ctrldict['ff'][2], ylim=ylim)
+                axff.set(ylabel=tscontrol.ctrldict['ff'][2], ylim=ylim)
 
             if 'ffx' in vals:
                 if 'ff' not in vals:
@@ -372,16 +444,20 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, show_n_plots=3,
         fig.tight_layout(rect=[0, 0.02, 1, 0.98])
         fig.subplots_adjust(hspace=0.02)
 
-        if (nr+1) % show_n_plots == 0:
+        _save_foehnixplots(fig, saveplot, savedir, savefilename, nr)
+
+        if (showplot is True) and ((nr+1) % show_n_plots == 0):
             plt.show()
 
-    plt.show()
+    if showplot is True:
+        plt.show()
 
 
 def image(fmm, fun='freq', deltat=None, deltad=7,
           cmap=cm.get_cmap('Greys', 20), contours=False, contour_color='k',
           contour_levels=10, contour_labels=False, clabel_format="%.0f",
-          clabel_size=8, **kwargs):
+          clabel_size=8, showplot=True, saveplot=False, savedir='',
+          savefilename='foehnix_hovmoeller.png', **kwargs):
     """
     foehnix Image Plot - Hovmoeller Diagram
 
@@ -422,6 +498,20 @@ def image(fmm, fun='freq', deltat=None, deltad=7,
         ``"%.2f"`` to show to decimal digits.
     clabel_size : int
         Fontsize of the contour lables. Default 8.
+    showplot : bool
+        If True (default) plots will be shown. If False, they can be shown by
+        the user with `plt.show()` at a later stage.
+    saveplot : bool
+        If False (default) plots will not be saved to disc
+        If True, all plots will be saved to ``savedir`` which must be provided
+        as well.
+    savedir : str
+        Path to a directory where the plots are saved to. Mandatory if
+        ``saveplots=True``.
+    savefilename : str
+        Filename of the saved plot. Will be extended by a running number if
+        multiple plots are saved. Can be used to specify the file format:
+        e.g. use "foehnix_hovmoeller.pdf" to save the plots as PDF.
     kwargs :
         Possible keyword arguments for the figure:
 
@@ -603,3 +693,8 @@ def image(fmm, fun='freq', deltat=None, deltad=7,
     # --- overall figure
     ax.set_title(title)
     fig.tight_layout()
+
+    _save_foehnixplots(fig, saveplot, savedir, savefilename)
+
+    if showplot is True:
+        plt.show()
