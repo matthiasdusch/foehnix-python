@@ -1,6 +1,0 @@
-foehnix.Foehnix.predict
-=======================
-
-.. currentmodule:: foehnix
-
-.. automethod:: Foehnix.predict

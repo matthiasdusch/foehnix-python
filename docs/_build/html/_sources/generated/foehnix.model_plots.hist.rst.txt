@@ -1,6 +1,0 @@
-foehnix.model\_plots.hist
-=========================
-
-.. currentmodule:: foehnix.model_plots
-
-.. autofunction:: hist
