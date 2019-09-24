@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>foehnix.analysis_plots.TSControl &#8212; foehnix-python 0.1.2 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="foehnix.analysis_plots.tsplot" href="foehnix.analysis_plots.tsplot.html" />
+    <link rel="prev" title="foehnix.model_plots.hist" href="foehnix.model_plots.hist.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          foehnix-python</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../ellboegen.html">Getting started</a></li>
+                <li><a href="../api.html">API reference</a></li>
+                <li><a href="https://retostauffer.github.io/Rfoehnix">foehnix R package</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site navigation <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="foehnix-analysis-plots-tscontrol">
+<h1>foehnix.analysis_plots.TSControl<a class="headerlink" href="#foehnix-analysis-plots-tscontrol" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="foehnix.analysis_plots.TSControl">
+<em class="property">class </em><code class="descclassname">foehnix.analysis_plots.</code><code class="descname">TSControl</code><span class="sig-paren">(</span><em>fmm</em>, <em>userdict=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/analysis_plots.html#TSControl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.analysis_plots.TSControl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Control object for the foehnix time series plot function.</p>
+<p>Can be used to set variable names, colors and labels.</p>
+<dl class="method">
+<dt id="foehnix.analysis_plots.TSControl.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>fmm</em>, <em>userdict=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/foehnix/analysis_plots.html#TSControl.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#foehnix.analysis_plots.TSControl.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a control object instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>fmm</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="foehnix.Foehnix.html#foehnix.Foehnix" title="foehnix.Foehnix"><code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.Foehnix</span></code></a></span></dt>
+<dd><p class="first last">A foehnix mixture model object</p>
+</dd>
+<dt><strong>userdict</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first">If provided will be used to overrule the default settings.</p>
+<p>If a key is not provided, default values will be used.
+Each entry consists of <code class="docutils literal notranslate"><span class="pre">'key':</span> <span class="pre">['varname',</span> <span class="pre">'color',</span> <span class="pre">'label']</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">'varname'</span></code> must be present in the DataFrame provided to the
+model.</p>
+<p><code class="docutils literal notranslate"><span class="pre">'color'</span></code> must be any valid matplotlib-colorstring</p>
+<p>Possible keys and default values are:</p>
+<ul class="last simple">
+<li><code class="docutils literal notranslate"><span class="pre">'t':</span> <span class="pre">['t',</span> <span class="pre">'C3',</span> <span class="pre">'air</span> <span class="pre">temperature</span> <span class="pre">[C]']</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">'rh':</span> <span class="pre">['rh',</span> <span class="pre">'C2',</span> <span class="pre">'relative</span> <span class="pre">humidity</span> <span class="pre">[%]']</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">'diff_t':</span> <span class="pre">['diff_t',</span> <span class="pre">'C8',</span> <span class="pre">'temperature</span> <span class="pre">difference</span> <span class="pre">[C]']</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">'dd':</span> <span class="pre">['dd',</span> <span class="pre">'black',</span> <span class="pre">'wind</span> <span class="pre">direction</span> <span class="pre">[deg]']</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">'ff':</span> <span class="pre">['ff',</span> <span class="pre">'C0',</span> <span class="pre">'wind</span> <span class="pre">speed</span> <span class="pre">[m/s]']</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">'ffx':</span> <span class="pre">['ffx',</span> <span class="pre">'C4',</span> <span class="pre">'gust</span> <span class="pre">speed</span> <span class="pre">[m/s]']</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">'prob':</span> <span class="pre">[None,</span> <span class="pre">'C6',</span> <span class="pre">'probability']</span></code></li>
+</ul>
+</dd>
+<dt><strong>kwargs :</strong></dt>
+<dd><p class="first last">Can be used to quickly change the name of parameters within the
+Dataframe. E.g. <code class="docutils literal notranslate"><span class="pre">tsc</span> <span class="pre">=</span> <span class="pre">TSControl(fmm,</span> <span class="pre">ff='windspd')</span></code> will
+initialize a default control but change the column name from
+<cite>ff</cite> to <cite>windspd</cite>. These keyword arguments can also directly passed
+to the main plotting function
+<a class="reference internal" href="foehnix.analysis_plots.tsplot.html#foehnix.analysis_plots.tsplot" title="foehnix.analysis_plots.tsplot"><code class="xref py py-func docutils literal notranslate"><span class="pre">foehnix.analysis_plots.tsplot()</span></code></a>. E.g.:
+<code class="docutils literal notranslate"><span class="pre">tsplot(fmm,</span> <span class="pre">dd='winddir')</span></code>.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#foehnix.analysis_plots.TSControl.__init__" title="foehnix.analysis_plots.TSControl.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(fmm[,&nbsp;userdict])</td>
+<td>Initializes a control object instance.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, Matthias Dusch.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

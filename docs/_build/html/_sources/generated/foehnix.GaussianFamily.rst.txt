@@ -1,0 +1,26 @@
+foehnix.GaussianFamily
+======================
+
+.. currentmodule:: foehnix
+
+.. autoclass:: GaussianFamily
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~GaussianFamily.__init__
+      ~GaussianFamily.density
+      ~GaussianFamily.loglik
+      ~GaussianFamily.posterior
+      ~GaussianFamily.theta
+   
+   
+
+   
+   
+   

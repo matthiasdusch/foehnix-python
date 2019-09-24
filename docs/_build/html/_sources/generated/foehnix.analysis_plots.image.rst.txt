@@ -1,0 +1,6 @@
+foehnix.analysis\_plots.image
+=============================
+
+.. currentmodule:: foehnix.analysis_plots
+
+.. autofunction:: image

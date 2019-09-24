@@ -1,0 +1,6 @@
+foehnix.Foehnix.no\_concomitant\_fit
+====================================
+
+.. currentmodule:: foehnix
+
+.. automethod:: Foehnix.no_concomitant_fit

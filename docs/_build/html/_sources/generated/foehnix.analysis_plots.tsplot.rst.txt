@@ -1,0 +1,6 @@
+foehnix.analysis\_plots.tsplot
+==============================
+
+.. currentmodule:: foehnix.analysis_plots
+
+.. autofunction:: tsplot

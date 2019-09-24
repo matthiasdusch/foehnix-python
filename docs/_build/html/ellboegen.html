@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Data Set Description &#8212; foehnix-python 0.1.2 documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="foehnix.analysis_plots.image" href="generated/foehnix.analysis_plots.image.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          foehnix-python</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="#">Getting started</a></li>
+                <li><a href="api.html">API reference</a></li>
+                <li><a href="https://retostauffer.github.io/Rfoehnix">foehnix R package</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site navigation <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="data-set-description">
+<span id="ellboegen-demo"></span><h1>Data Set Description<a class="headerlink" href="#data-set-description" title="Permalink to this headline">¶</a></h1>
+<p>The “Tyrolean” data set provides hourly observations
+from two stations, namely “Ellbögen” and “Sattelberg” located in
+Tyrol, Austria.</p>
+<p>Ellbögen is our target station (valley site) located in the Wipp Valley, a
+north-south oriented alpine valley on the northern side of the European Alps.
+To the north the Wipp Valley opens into the Inn Valley (close to Innsbruck, the
+capitol of Tyrol), to the south the valley ends at a narrow gap in the main
+Alpine ridge called Brennerpass (<span class="math notranslate nohighlight">\(1370~m\)</span>; the pass between Austria and Italy)
+flanked by mountains (<span class="math notranslate nohighlight">\(&gt;2100~m\)</span>).
+The Wipp Valley is one of the lowest and most distinct cuts trough the Alpine
+mountain range and well known for south foehn (north of the Alps).  Station
+Sattelberg serves as crest station and provides observations of the upstream
+air mass during south foehn events. The station is located on top of the
+mountain to the west of the pass.</p>
+</div>
+<div class="section" id="loading-the-data-set">
+<h1>Loading the Data Set<a class="headerlink" href="#loading-the-data-set" title="Permalink to this headline">¶</a></h1>
+<p>The call
+<a class="reference internal" href="generated/foehnix.get_demodata.html#foehnix.get_demodata" title="foehnix.get_demodata"><code class="xref py py-func docutils literal notranslate"><span class="pre">foehnix.get_demodata('tyrol')</span></code></a>
+returns the combined
+data set for both station (Ellbögen and Sattelberg).
+In addition, the potential temperature difference between the two stations
+is calculated by reducing the dry air temperature from “Sattelberg”
+to the height of “Ellbögen” (dry adiabatic lapse rate of 1K per 100m;
+stored on <code class="docutils literal notranslate"><span class="pre">diff_t</span></code>).
+Details can be found on the
+<a class="reference internal" href="generated/foehnix.get_demodata.html#foehnix.get_demodata" title="foehnix.get_demodata"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_demodata()</span></code></a>
+reference page.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="gp">In [2]: </span><span class="kn">import</span> <span class="nn">foehnix</span>
+
+<span class="go"># load the data for Tyrol and show a summary:</span>
+<span class="gp">In [3]: </span><span class="n">data</span> <span class="o">=</span> <span class="n">foehnix</span><span class="o">.</span><span class="n">get_demodata</span><span class="p">(</span><span class="s1">&#39;tyrol&#39;</span><span class="p">)</span>
+
+<span class="gp">In [4]: </span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="gh">Out[4]: </span><span class="go"></span>
+<span class="go">                      timestamp     dd   ff     rh    t  dd_crest  ff_crest  rh_crest  t_crest  diff_t</span>
+<span class="go">timestamp                                                                                             </span>
+<span class="go">2006-01-01 01:00:00  1136077200  171.0  0.6   90.0 -0.4     180.0      10.8     100.0     -7.8    2.87</span>
+<span class="go">2006-01-01 02:00:00  1136080800  268.0  0.3  100.0 -1.8     186.0      12.5     100.0     -8.0    4.07</span>
+<span class="go">2006-01-01 03:00:00  1136084400  115.0  5.2   79.0  0.9     181.0      11.3     100.0     -7.4    1.97</span>
+<span class="go">2006-01-01 04:00:00  1136088000  152.0  2.1   88.0 -0.6     178.0      13.3     100.0     -7.5    3.37</span>
+<span class="go">2006-01-01 05:00:00  1136091600  319.0  0.7  100.0 -2.6     176.0      13.1     100.0     -7.1    5.77</span>
+</pre></div>
+</div>
+<p>The data set returned is a regular <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.25.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> object.
+Note that the data set is not strictly regular (contains hourly observations,
+but some are missing) and contains quite some missing values (<code class="docutils literal notranslate"><span class="pre">NaN</span></code>).
+This is not a problem as the functions and methods will take care of missing
+values and inflate the time series object
+(regular <span class="math notranslate nohighlight">\(\rightarrow\)</span> strictly regular).</p>
+<p><strong>Important:</strong> The names of the variables in the Tyrolean data set are the
+“<em>standard names</em>” on which most functions and methods provided by this package
+are based on. To be precise:</p>
+<ul class="simple">
+<li><strong>Valley station:</strong> air temperature <code class="docutils literal notranslate"><span class="pre">t</span></code>, relative humidity <code class="docutils literal notranslate"><span class="pre">rh</span></code>,
+wind speed <code class="docutils literal notranslate"><span class="pre">ff</span></code>, wind direction <code class="docutils literal notranslate"><span class="pre">dd</span></code>
+(meteorological, degrees <span class="math notranslate nohighlight">\(\in [0, 360]\)</span>)</li>
+<li><strong>Crest station:</strong> air temperature <code class="docutils literal notranslate"><span class="pre">t_crest</span></code>,
+relative humidity <code class="docutils literal notranslate"><span class="pre">rh_crest</span></code>, wind speed <code class="docutils literal notranslate"><span class="pre">ff_crest</span></code>,
+wind direction <code class="docutils literal notranslate"><span class="pre">dd_crest</span></code> (<span class="math notranslate nohighlight">\(\in [0, 360]\)</span>)</li>
+<li><strong>Note:</strong> The crest station syntax is different from the <em>R foehnix</em> version,
+where a prefix is used (e.g. <em>crest_ff</em>).</li>
+<li><strong>In addition:</strong> Potential temperature difference <code class="docutils literal notranslate"><span class="pre">diff_t</span></code> (calculated by
+<a class="reference internal" href="generated/foehnix.get_demodata.html#foehnix.get_demodata" title="foehnix.get_demodata"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_demodata()</span></code></a>)</li>
+</ul>
+<p>… however, all functions have arguments which allow to set custom names
+(see “[Demos &gt; Viejas (California, USA)](articles/viejas.html)” or
+function references).</p>
+<p>Based on prior knowledge we define two “foehn wind sectors”
+as follows:</p>
+<ul class="simple">
+<li>At <strong>Ellbögen</strong> the observed wind direction (<code class="docutils literal notranslate"><span class="pre">dd</span></code>) needs to be
+along valley within 43 and 223 degrees
+(south-easterly; a 180 degree sector).</li>
+<li>At <strong>Sattelberg</strong> the observed wind direction (<code class="docutils literal notranslate"><span class="pre">dd_crest</span></code>) needs to be
+within 90 and 270 degrees (south wind; 180 degree sector).</li>
+</ul>
+</div>
+<div class="section" id="estimate-classification-model">
+<h1>Estimate Classification Model<a class="headerlink" href="#estimate-classification-model" title="Permalink to this headline">¶</a></h1>
+<p>The most important step is to estimate the <a class="reference internal" href="generated/foehnix.Foehnix.html#foehnix.Foehnix" title="foehnix.Foehnix"><code class="xref py py-class docutils literal notranslate"><span class="pre">foehnix.Foehnix</span></code></a>
+classification model. We use the following model assumptions:</p>
+<ul class="simple">
+<li><strong>Main variable</strong>: <code class="docutils literal notranslate"><span class="pre">diff_t</span></code> is used as the main covariate to separate ‘foehn’
+from ‘no foehn’ events (potential temperature difference).</li>
+<li><strong>Concomitant variable</strong>: <code class="docutils literal notranslate"><span class="pre">rh</span></code> and <code class="docutils literal notranslate"><span class="pre">ff</span></code> at valley site (relative humidity and
+wind speed).</li>
+<li><strong>Wind filters</strong>: two filters are defined. <code class="docutils literal notranslate"><span class="pre">dd</span> <span class="pre">=</span> <span class="pre">[43,</span> <span class="pre">223]</span></code> for Ellbögen and
+<code class="docutils literal notranslate"><span class="pre">dd_crest</span> <span class="pre">=</span> <span class="pre">[90,</span> <span class="pre">270]</span></code> for Sattelberg (see above).</li>
+<li><strong>Option switch:</strong> <code class="docutils literal notranslate"><span class="pre">switch=True</span></code> as high <code class="docutils literal notranslate"><span class="pre">diff_temp</span></code> indicate stable stratification (no foehn).</li>
+</ul>
+<p>Run the model and show a summary</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="go"># Estimate the foehnix classification model</span>
+<span class="gp">In [5]: </span><span class="n">tyrol_filter</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dd&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">43</span><span class="p">,</span> <span class="mi">223</span><span class="p">],</span> <span class="s1">&#39;dd_crest&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">90</span><span class="p">,</span> <span class="mi">270</span><span class="p">]}</span>
+
+<span class="gp">In [6]: </span><span class="n">model</span> <span class="o">=</span> <span class="n">foehnix</span><span class="o">.</span><span class="n">Foehnix</span><span class="p">(</span><span class="s1">&#39;diff_t&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">concomitant</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;rh&#39;</span><span class="p">,</span> <span class="s1">&#39;ff&#39;</span><span class="p">],</span> <span class="n">filter_method</span><span class="o">=</span><span class="n">tyrol_filter</span><span class="p">,</span> <span class="n">switch</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="model-summary">
+<h2>Model summary<a class="headerlink" href="#model-summary" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="n">model</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">detailed</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="go">Number of observations (total)   113952 (5527 due to inflation)</span>
+<span class="go">Removed due to missing values     38859 (34.1 percent)</span>
+<span class="go">Outside defined wind sector       50665 (44.5 percent)</span>
+<span class="go">Used for classification           24428 (21.4 percent)</span>
+
+<span class="go">Climatological foehn occurance 18.36 percent (on n = 75093)</span>
+<span class="go">Mean foehn probability 18.06 percent (on n = 75093)</span>
+
+<span class="go">Log-likelihood: -55044.0, 7 effective degrees of freedom</span>
+<span class="go">Corresponding AIC = 110101.9, BIC = 110158.6</span>
+
+<span class="go">Number of EM iterations 5/100 (converged)</span>
+<span class="go">Time required for model estimation: 0.6 seconds</span>
+
+<span class="gt">------------------------------------------------------</span>
+
+<span class="ne">Components</span>: t test of coefficients
+
+               <span class="n">Estimate</span>  <span class="n">Std</span><span class="o">.</span> <span class="n">Error</span>     <span class="n">t_value</span>  <span class="n">Pr</span><span class="p">(</span><span class="o">&gt;|</span><span class="n">t</span><span class="o">|</span><span class="p">)</span>
+<span class="p">(</span><span class="n">Intercept</span><span class="p">)</span><span class="o">.</span><span class="mi">1</span>  <span class="mf">5.799082</span>    <span class="mf">0.024419</span>  <span class="mf">237.485686</span>       <span class="mf">0.0</span>
+<span class="p">(</span><span class="n">Intercept</span><span class="p">)</span><span class="o">.</span><span class="mi">2</span>  <span class="mf">0.858603</span>    <span class="mf">0.010773</span>   <span class="mf">79.697585</span>       <span class="mf">0.0</span>
+
+<span class="gt">------------------------------------------------------</span>
+
+<span class="n">Concomitant</span> <span class="n">model</span><span class="p">:</span> <span class="n">z</span> <span class="n">test</span> <span class="n">of</span> <span class="n">coefficients</span>
+
+              <span class="n">Estimate</span>  <span class="n">Std</span><span class="o">.</span> <span class="n">Error</span>     <span class="n">z_value</span>      <span class="n">Pr</span><span class="p">(</span><span class="o">&gt;|</span><span class="n">z</span><span class="o">|</span><span class="p">)</span>
+<span class="n">cc</span><span class="o">.</span><span class="n">Intercept</span>  <span class="mf">0.812719</span>    <span class="mf">0.105710</span>    <span class="mf">7.688184</span>  <span class="mf">1.492381e-14</span>
+<span class="n">cc</span><span class="o">.</span><span class="n">rh</span>        <span class="o">-</span><span class="mf">1.029320</span>    <span class="mf">0.001446</span> <span class="o">-</span><span class="mf">711.848118</span>  <span class="mf">0.000000e+00</span>
+<span class="n">cc</span><span class="o">.</span><span class="n">ff</span>         <span class="mf">3.305431</span>    <span class="mf">0.012133</span>  <span class="mf">272.422207</span>  <span class="mf">0.000000e+00</span>
+
+<span class="n">Number</span> <span class="n">of</span> <span class="n">IWLS</span> <span class="n">iterations</span> <span class="mi">3</span> <span class="p">(</span><span class="n">converged</span><span class="p">)</span>
+<span class="n">Dispersion</span> <span class="n">parameter</span> <span class="k">for</span> <span class="n">binomial</span> <span class="n">family</span> <span class="n">taken</span> <span class="n">to</span> <span class="n">be</span> <span class="mf">1.</span>
+</pre></div>
+</div>
+<p>The data set contains <span class="math notranslate nohighlight">\(N = 113952\)</span> observations,
+<span class="math notranslate nohighlight">\(108452\)</span> from
+the data set itself (<code class="docutils literal notranslate"><span class="pre">data</span></code>) and <span class="math notranslate nohighlight">\(5527\)</span> due to inflation used to make the
+time series object strictly regular.</p>
+<p>Due to missing data <span class="math notranslate nohighlight">\(38859\)</span> observations are not considered
+during model estimation (<code class="docutils literal notranslate"><span class="pre">dd</span></code>, <code class="docutils literal notranslate"><span class="pre">dd_crest</span></code>, <code class="docutils literal notranslate"><span class="pre">diff_t</span></code>, <code class="docutils literal notranslate"><span class="pre">rh</span></code>, or <code class="docutils literal notranslate"><span class="pre">ff</span></code> missing),
+and <span class="math notranslate nohighlight">\(50665\)</span> are not included in model estimation as they do not
+lie within the defined wind sectors (<code class="docutils literal notranslate"><span class="pre">tyrol_filter</span></code>).
+Thus, the
+<a class="reference internal" href="generated/foehnix.Foehnix.html#foehnix.Foehnix" title="foehnix.Foehnix"><code class="xref py py-class docutils literal notranslate"><span class="pre">Foehnix</span></code></a> model is based on a total number of
+<span class="math notranslate nohighlight">\(24428\)</span> observations.</p>
+</div>
+<div class="section" id="estimated-coefficients">
+<h2>Estimated Coefficients<a class="headerlink" href="#estimated-coefficients" title="Permalink to this headline">¶</a></h2>
+<p>The following parameters are estimated for the two
+Gaussian clusters:</p>
+<ul class="simple">
+<li>No-foehn cluster: <span class="math notranslate nohighlight">\(\mu_1 = 5.8, \sigma_1 = 2.64 (parameter scale)\)</span>,</li>
+<li>Foehn cluster: <span class="math notranslate nohighlight">\(\mu_2 = 0.86, \sigma_2 = 1.33 (parameter scale)\)</span>,</li>
+<li>Concomitant model: positive <code class="docutils literal notranslate"><span class="pre">rh</span></code> <span class="math notranslate nohighlight">\(-5.3\)</span> percent on
+relative humidity and a positive <code class="docutils literal notranslate"><span class="pre">ff</span></code> effect of <span class="math notranslate nohighlight">\(+141.4\)</span>
+percent on wind speed</li>
+</ul>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [8]: </span><span class="n">model</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;mu1&#39;</span><span class="p">]</span>
+<span class="gh">Out[8]: </span><span class="go">5.7990815368565505</span>
+
+<span class="gp">In [9]: </span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;logsd1&#39;</span><span class="p">])</span>
+<span class="go">                           Out[9]: 2.6406847321165876</span>
+
+<span class="gp">In [10]: </span><span class="n">model</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;mu2&#39;</span><span class="p">]</span>
+<span class="go">                                                      Out[10]: 0.8586032145482315</span>
+
+<span class="gp">In [11]: </span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;logsd2&#39;</span><span class="p">])</span>
+<span class="go">                                                                                  Out[11]: 1.328458443236942</span>
+</pre></div>
+</div>
+<p>In other words: if the relative humidity increases the probability that we observed
+foehn decreases, while the probability increases with increasing wind speed.</p>
+</div>
+</div>
+<div class="section" id="graphical-model-assessment">
+<h1>Graphical Model Assessment<a class="headerlink" href="#graphical-model-assessment" title="Permalink to this headline">¶</a></h1>
+<p>A <a class="reference internal" href="generated/foehnix.Foehnix.html#foehnix.Foehnix" title="foehnix.Foehnix"><code class="xref py py-class docutils literal notranslate"><span class="pre">Foehnix</span></code></a> object comes with generic plots for graphical model
+assessment.</p>
+<p>The following figure shows the ‘log-likelihood contribution’ of</p>
+<ul class="simple">
+<li>the main <strong>component</strong> (left hand side of formula),</li>
+<li>the <strong>concomitant</strong> model (right hand side of formula),</li>
+<li>and the <strong>full</strong> log-likelihood sum which is maximised by
+the optimization algorithm.</li>
+</ul>
+<p>The abscissa shows (by default) the logarithm of the iterations during
+optimization.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [12]: </span><span class="n">model</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;loglikcontribution&#39;</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/loglikecontribution.png" src="_images/loglikecontribution.png" />
+<p>In addition, the coefficient paths during optimization can be visualized:</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [13]: </span><span class="n">model</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;coef&#39;</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/coef.png" src="_images/coef.png" />
+<p>The left plot shows the parameters of the two components
+(<span class="math notranslate nohighlight">\(\mu_1, \log(\sigma_1), \mu_2, \log(\sigma_2)\)</span>), the
+right one the standardized coefficients of the concomitant model.</p>
+<p>Last but not least a histogram with the two clusters is plotted.
+<code class="docutils literal notranslate"><span class="pre">'hist</span></code> creates an empirical density histogram separating “no foehn”
+and “foehn” events adding the estimated distribution for these two clusters.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [14]: </span><span class="n">model</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;hist&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/hist.png" src="_images/hist.png" />
+<div class="section" id="time-series-plot">
+<h2>Time Series Plot<a class="headerlink" href="#time-series-plot" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [15]: </span><span class="n">model</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;timeseries&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s1">&#39;2017-02-01&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2017-02-11&#39;</span><span class="p">,</span> <span class="n">ndays</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/timeseries.png" src="_images/timeseries.png" />
+</div>
+<div class="section" id="hovmoeller-diagram">
+<h2>Hovmoeller Diagram<a class="headerlink" href="#hovmoeller-diagram" title="Permalink to this headline">¶</a></h2>
+<p>The image function plots a Hovmoeller Diagram to assess foehn freqency</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [16]: </span><span class="n">model</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="n">deltat</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span> <span class="n">deltad</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/hovmoeller1.png" src="_images/hovmoeller1.png" />
+<p>Customized plot which shows the “foehn frequency” with custom
+colors and additional contour lines and custom aggregation period
+(10-days, 3-hourly).</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [17]: </span><span class="kn">import</span> <span class="nn">colorspace</span>
+
+<span class="gp">In [18]: </span><span class="n">mycmap</span> <span class="o">=</span> <span class="n">colorspace</span><span class="o">.</span><span class="n">sequential_hcl</span><span class="p">(</span><span class="n">palette</span><span class="o">=</span><span class="s1">&#39;Blue-Yellow&#39;</span><span class="p">,</span> <span class="n">rev</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">cmap</span><span class="p">(</span><span class="mi">51</span><span class="p">)</span>
+
+<span class="gp">In [19]: </span><span class="n">model</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="n">deltat</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="mi">3600</span><span class="p">,</span> <span class="n">deltad</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">mycmap</span><span class="p">,</span>
+<span class="gp">   ....: </span>           <span class="n">contours</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">contour_color</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">contour_levels</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span>
+<span class="gp">   ....: </span>           <span class="n">contour_labels</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">   ....: </span>
+</pre></div>
+</div>
+<img alt="_images/hovmoeller2.png" src="_images/hovmoeller2.png" />
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, Matthias Dusch.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

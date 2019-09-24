@@ -1,0 +1,22 @@
+foehnix.analysis\_plots.TSControl
+=================================
+
+.. currentmodule:: foehnix.analysis_plots
+
+.. autoclass:: TSControl
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TSControl.__init__
+   
+   
+
+   
+   
+   

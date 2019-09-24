@@ -1,0 +1,6 @@
+foehnix.model\_plots.loglik
+===========================
+
+.. currentmodule:: foehnix.model_plots
+
+.. autofunction:: loglik

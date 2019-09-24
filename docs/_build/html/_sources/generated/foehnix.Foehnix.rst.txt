@@ -1,0 +1,27 @@
+foehnix.Foehnix
+===============
+
+.. currentmodule:: foehnix
+
+.. autoclass:: Foehnix
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Foehnix.__init__
+      ~Foehnix.no_concomitant_fit
+      ~Foehnix.plot
+      ~Foehnix.predict
+      ~Foehnix.summary
+      ~Foehnix.unreg_fit
+   
+   
+
+   
+   
+   
