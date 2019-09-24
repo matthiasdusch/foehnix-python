@@ -10,7 +10,7 @@ from foehnix.families import Family, initialize_family
 from foehnix.foehnix_filter import foehnix_filter
 from foehnix.iwls_logit import iwls_logit, iwls_summary
 import foehnix.foehnix_functions as func
-from foehnix import model_plots, analysis_lots
+from foehnix import model_plots, analysis_plots
 
 # logger
 log = logging.getLogger(__name__)
@@ -825,9 +825,9 @@ class Foehnix:
             elif i == 'hist':
                 model_plots.hist(self)
             elif i == 'timeseries':
-                analysis_lots.tsplot(self, **kwargs)
+                analysis_plots.tsplot(self, **kwargs)
             elif i == 'image':
-                analysis_lots.image(self, **kwargs)
+                analysis_plots.image(self, **kwargs)
 
             else:
                 log.critical('Skipping "%s", not a valid plot argument' % i)

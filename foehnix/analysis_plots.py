@@ -13,7 +13,7 @@ import foehnix
 log = logging.getLogger(__name__)
 
 
-def _save_foehnixplots(fig, saveplots, savedir, savefilename, nr=None):
+def _save_foehnixplots(fig, saveplot, savedir, savefilename, nr=None):
     """
     Helper function to save fohenix plots to disc
 
@@ -21,7 +21,7 @@ def _save_foehnixplots(fig, saveplots, savedir, savefilename, nr=None):
     ----------
     fig: `matplotlib.pyplot.figure`
         The figure to save
-    saveplots : bool
+    saveplot : bool
         If False, this will do nothing
     savedir : str
         Path to a directory where plots should be saved
@@ -34,7 +34,7 @@ def _save_foehnixplots(fig, saveplots, savedir, savefilename, nr=None):
     -------
 
     """
-    if saveplots is True:
+    if saveplot is True:
         if not os.path.exists(savedir):
             raise IOError('The specified directory to save the Foehnix '
                           'plots can not be found or does not exist.')
@@ -180,8 +180,8 @@ class TSControl:
         self.doplot = doplot
 
 
-def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, showplots=True,
-           show_n_plots=3, saveplots=False, savedir='',
+def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, showplot=True,
+           show_n_plots=3, saveplot=False, savedir='',
            savefilename='foehnix_timeseries.png', userdict=None, **kwargs):
     """
     Time series plot for foehnix models
@@ -201,13 +201,13 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, showplots=True,
     tscontrol : :py:class:`foehnix.timeseries_plots.TSControl` object
         Can be predefined before calling this function or else will be
         initialized if None (default).
-    showplots : bool
+    showplot : bool
         If True (default) plots will be shown. If False, they can be shown by
         the user with `plt.show()` at a later stage.
     show_n_plots : int
         How many figures will be opened, default is 1. After closing all, the
         next ones will be opened.
-    saveplots : bool
+    saveplot : bool
         If False (default) plots will not be saved to disc
         If True, all plots will be saved to ``savedir`` which must be provided
         as well.
@@ -234,7 +234,7 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, showplots=True,
 
     if not isinstance(fmm, foehnix.Foehnix):
         raise AttributeError('First Attribute must be a foehnix mixture model '
-                             ' instance.')
+                             'instance.')
 
     # If no control object is provided: Use default one.
     if not isinstance(tscontrol, TSControl):
@@ -444,19 +444,19 @@ def tsplot(fmm, start=None, end=None, ndays=10, tscontrol=None, showplots=True,
         fig.tight_layout(rect=[0, 0.02, 1, 0.98])
         fig.subplots_adjust(hspace=0.02)
 
-        _save_foehnixplots(fig, saveplots, savedir, savefilename, nr)
+        _save_foehnixplots(fig, saveplot, savedir, savefilename, nr)
 
-        if (showplots is True) and ((nr+1) % show_n_plots == 0):
+        if (showplot is True) and ((nr+1) % show_n_plots == 0):
             plt.show()
 
-    if showplots is True:
+    if showplot is True:
         plt.show()
 
 
 def image(fmm, fun='freq', deltat=None, deltad=7,
           cmap=cm.get_cmap('Greys', 20), contours=False, contour_color='k',
           contour_levels=10, contour_labels=False, clabel_format="%.0f",
-          clabel_size=8, showplots=True, saveplots=False, savedir='',
+          clabel_size=8, showplot=True, saveplot=False, savedir='',
           savefilename='foehnix_hovmoeller.png', **kwargs):
     """
     foehnix Image Plot - Hovmoeller Diagram
@@ -498,10 +498,10 @@ def image(fmm, fun='freq', deltat=None, deltad=7,
         ``"%.2f"`` to show to decimal digits.
     clabel_size : int
         Fontsize of the contour lables. Default 8.
-    showplots : bool
+    showplot : bool
         If True (default) plots will be shown. If False, they can be shown by
         the user with `plt.show()` at a later stage.
-    saveplots : bool
+    saveplot : bool
         If False (default) plots will not be saved to disc
         If True, all plots will be saved to ``savedir`` which must be provided
         as well.
@@ -694,7 +694,7 @@ def image(fmm, fun='freq', deltat=None, deltad=7,
     ax.set_title(title)
     fig.tight_layout()
 
-    _save_foehnixplots(fig, saveplots, savedir, savefilename)
+    _save_foehnixplots(fig, saveplot, savedir, savefilename)
 
-    if showplots is True:
+    if showplot is True:
         plt.show()
